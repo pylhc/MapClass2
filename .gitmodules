@@ -1,0 +1,3 @@
+[submodule "pytpsa"]
+	path = pytpsa
+	url = ssh://dmartine@lxplus.cern.ch/afs/cern.ch/user/d/dmartine/Repos/pytpsa.git
