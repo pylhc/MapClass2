@@ -27,20 +27,17 @@ def gammlnGOOD( xx):
 
 
 #########################
-class Map2:
+class Map2(polmap):
 #########################
   '''
   MAP coefficients from madx-PTC output
 
   :param int order: Calculate map up to this order
   :param string filename: Input filename
-  :param boolean gaussianDelta: Use gaussianDelta or not
   '''
 
-  def __init__(self, order=6, filename='fort.18', gaussianDelta=False):
-    ietall=0
-    self.order=order+1
-    self.gaussianDelta=gaussianDelta
+  def __init__(self, order=6, filename='fort.18'):
+    ietall=-1
     
     xyzd=['x', 'px', 'y', 'py', 'd','s']
     fxyzd=['fx', 'fpx', 'fy', 'fpy', 'fd', 'fs']
@@ -49,18 +46,26 @@ class Map2:
 
     for line in open(filename):
       sline=split(line)
+      l=len(sline)
+      # Filling sline with 0's at the end, that way it doesn't matter if we read a file with 5 vars 
+      # or 6 vars. If it's 5 vars the order for 's' will always be 0 and give the right results
+      sline+=[0,0]
 
-      if len(sline) == 8:
+      if l == 8 or l == 9:
         coef=float(sline[1])
-        a=[int(sline[3]), int(sline[4]), int(sline[5]), int(sline[6]), int(sline[7])]
-        if (a[0]+a[1]+a[2]+a[3]+a[4]) <= self.order:
+        a=[int(sline[3]), int(sline[4]), int(sline[5]), int(sline[6]), int(sline[7]), int(sline[8])]
+        if (a[0]+a[1]+a[2]+a[3]+a[4]+a[5]) <= order:
           dct[tuple(a)]=coef
 
       if "etall" in line:
-        p=pol()
-        p.fromdict(dct,xyzd)
-        fdct[fxyzd[ietall]]=p
-        dct={}
+        if ietall >= 0:
+          p=pol()
+          p.fromdict(dct,xyzd)
+          fdct[fxyzd[ietall]]=p
+          dct={}
         ietall+=1
 
-    self.polmap=polmap(fdct)
+    p=pol()
+    p.fromdict(dct,xyzd)
+    fdct[fxyzd[ietall]]=p
+    self.update(fdct)
