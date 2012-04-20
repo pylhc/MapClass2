@@ -1,4 +1,5 @@
 from string import split
+from math import *
 
 from pytpsa import pol, polmap
 
@@ -54,7 +55,7 @@ class Map2(polmap):
       if l == 8 or l == 9:
         coef=float(sline[1])
         a=[int(sline[3]), int(sline[4]), int(sline[5]), int(sline[6]), int(sline[7]), int(sline[8])]
-        if (a[0]+a[1]+a[2]+a[3]+a[4]+a[5]) <= order:
+        if sum(a) <= order:
           dct[tuple(a)]=coef
 
       if "etall" in line:
@@ -69,3 +70,69 @@ class Map2(polmap):
     p.fromdict(dct,xyzd)
     fdct[fxyzd[ietall]]=p
     self.update(fdct)
+
+
+  def offset(self, xory, i, gaussianDelta=False):
+    '''
+    Calculate the beam offset
+
+    :param string xory: Which coordinate to calculate for (x,y,px, or py)
+    :param list i: Size of beam in sigma [x,px,y,py]
+    '''
+    sx=0
+    for ind,coeff in self[xory].iteritems():
+      if all(n % 2 == 0 for n in ind):
+        sigmaprod=self.__sigma(ind, i, gaussianDelta)
+        if sigmaprod > 0:
+          Gammasumln=self.__gamma(ind, gaussianDelta)
+          factor=self.__factor(ind, gaussianDelta)
+          sx+=coeff*factor*exp(Gammasumln)*sigmaprod
+    return sx
+
+
+  def sigma(self, xory, i, gaussianDelta=False):
+    '''
+    Calculate the beam size in sigma.
+
+    :param string xory: Which coordinate to calculate for (x,y,px, or py)
+    :param list i: Size of beam in sigma [x,px,y,py]
+    '''
+    sx=0
+    for ind1,coeff1 in self[xory].iteritems():
+      for ind2,coeff2 in self[xory].iteritems():
+        if ind1 >= ind2:
+          countfactor=2.0
+          if ind1 == ind2:
+            countfactor=1.0
+          ind=[sum(a) for a in zip(ind1, ind2)]
+          if all(n % 2 == 0 for n in ind):
+            sigmaprod=self.__sigma(ind, i, gaussianDelta)
+            if sigmaprod > 0:
+              Gammasumln=self.__gamma(ind, gaussianDelta)
+              factor=countfactor*self.__factor(ind, gaussianDelta)
+              sx+=coeff1*coeff2*factor*exp(Gammasumln)*sigmaprod
+    return sx
+
+  #Auxiliary functions (private)
+  def __sigma(self, ind, i, gaussianDelta):
+    if (gaussianDelta):
+      sigmaprod = pow(i[0], ind[0])*pow(i[1], ind[1])*pow(i[2], ind[2])*pow(i[3], ind[3])*pow(i[4], ind[4])
+    else:
+      sigmaprod = pow(i[0], ind[0])*pow(i[1], ind[1])*pow(i[2], ind[2])*pow(i[3], ind[3])*pow(i[4]/2., ind[4])
+    return sigmaprod
+
+
+  def __gamma(self, ind, gaussianDelta):
+    if (gaussianDelta):
+      Gammasumln = gammln(0.5+ind[0]/2.)+gammln(0.5+ind[1]/2.)+gammln(0.5+ind[2]/2.)+gammln(0.5+ind[3]/2.)+gammln(0.5+ind[4]/2.)
+    else:
+      Gammasumln = gammln(0.5+ind[0]/2.)+gammln(0.5+ind[1]/2.)+gammln(0.5+ind[2]/2.)+gammln(0.5+ind[3]/2.)
+    return Gammasumln
+
+  def __factor(self, ind, gaussianDelta):
+    if (gaussianDelta):
+      factor = pow(2, sum(ind)/2.)/pow(pi, 2.5)
+    else:
+      #FIXME: This works for now but it's not right!!!
+      factor = pow(2, sum(ind[:-2])/2.)/pow(pi, 2.)/(ind[-2]+1)
+    return factor
