@@ -13,7 +13,7 @@ def gammln(xx):
 
 
 #################
-def gammlnGOOD( xx):
+def gammlnGOOD(xx):
 #################
   cof=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5]
   y=x=xx
@@ -37,11 +37,12 @@ class Map2(polmap):
   :param string filename: Input filename
   '''
 
+  fxyzd=['fx', 'fpx', 'fy', 'fpy', 'fd', 'fs']
+  xyzd=['x', 'px', 'y', 'py', 'd','s']
+
   def __init__(self, order=6, filename='fort.18'):
     ietall=-1
     
-    xyzd=['x', 'px', 'y', 'py', 'd','s']
-    fxyzd=['fx', 'fpx', 'fy', 'fpy', 'fd', 'fs']
     dct={}
     fdct={}
 
@@ -61,15 +62,16 @@ class Map2(polmap):
       if "etall" in line:
         if ietall >= 0:
           p=pol()
-          p.fromdict(dct,xyzd)
-          fdct[fxyzd[ietall]]=p
+          p.fromdict(dct,self.xyzd)
+          fdct[self.fxyzd[ietall]]=p
           dct={}
         ietall+=1
 
     p=pol()
-    p.fromdict(dct,xyzd)
-    fdct[fxyzd[ietall]]=p
+    p.fromdict(dct,self.xyzd)
+    fdct[self.fxyzd[ietall]]=p
     self.update(fdct)
+
 
 
   def offset(self, xory, i, gaussianDelta=False):
@@ -88,6 +90,7 @@ class Map2(polmap):
           factor=self.__factor(ind, gaussianDelta)
           sx+=coeff*factor*exp(Gammasumln)*sigmaprod
     return sx
+
 
 
   def sigma(self, xory, i, gaussianDelta=False):
@@ -112,6 +115,33 @@ class Map2(polmap):
               factor=countfactor*self.__factor(ind, gaussianDelta)
               sx+=coeff1*coeff2*factor*exp(Gammasumln)*sigmaprod
     return sx
+
+
+
+  def comp(self, m, v=None):
+    chi2=0
+    if not v: v=self.fxyzd
+    for f in v:
+      if len(self[f].items()) < len(m[f].items()):
+        print "For '", f , "'. Self map has fewer elements than map2!!"
+        print "This gives a wrong result"
+      for k,v in self[f].iteritems():
+        #TODO: Why k[4]?
+        if k[4]==0: chi2+=(v-m[f].get(k,0))**2
+    return chi2
+
+  def compc(self, m, v=None):
+    chi2=0
+    if not v: v=self.fxyzd
+    for f in v:
+      if len(self[f].items()) < len(m[f].items()):
+        print "For '", f , "'. Self map has fewer elements than map2!!"
+        print "This gives a wrong result"
+      for k,v in self[f].iteritems():
+        chi2+=(v-m[f].get(k,0))**2
+    return chi2
+
+
 
   #Auxiliary functions (private)
   def __sigma(self, ind, i, gaussianDelta):
