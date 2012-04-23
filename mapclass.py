@@ -117,8 +117,12 @@ class Map2(polmap):
     return sx
 
 
-
   def comp(self, m, v=None):
+    '''
+    :m another map
+    :v list of variables used to compare the maps
+    by default it's self.fxyzd
+    '''
     chi2=0
     if not v: v=self.fxyzd
     for f in v:
@@ -131,6 +135,11 @@ class Map2(polmap):
     return chi2
 
   def compc(self, m, v=None):
+    '''
+    :m another map
+    :v list of variables used to compare the maps
+    by default it's self.fxyzd
+    '''
     chi2=0
     if not v: v=self.fxyzd
     for f in v:
@@ -141,6 +150,61 @@ class Map2(polmap):
         chi2+=(v-m[f].get(k,0))**2
     return chi2
 
+
+  #Correlation from mapclass.py originally
+  def correlation(self, v1, v2, i, gaussianDelta=False):
+    sx=0
+    for ind1,coeff1 in self[v1].iteritems():
+      for ind2,coeff2 in self[v2].iteritems():
+        if ind1 >= ind2:
+          countfactor=2.0
+          if ind1 == ind2:
+            countfactor=1.0
+          ind=[sum(a) for a in zip(ind1, ind2)]
+          if all(n % 2 == 0 for n in ind):
+            sigmaprod=self.__sigma(ind, i, gaussianDelta)
+            if sigmaprod > 0:
+              Gammasumln=self.__gamma(ind, gaussianDelta)
+              factor=countfactor*self.__factor(ind, gaussianDelta)
+              sx+=coeff1*coeff2*factor*exp(Gammasumln)*sigmaprod
+    return sx
+
+  #Correlation3 from mapclass.GaussianDelta.py
+  def correlation3(self, v1, v2, v3, i, gaussianDelta=False):
+    sx=0
+    for ind1,coeff1 in self[v1].iteritems():
+      for ind2,coeff2 in self[v2].iteritems():
+        for ind3, coeff3 in self[v3].iteritems():
+          countfactor=1.0
+          ind=[sum(a) for a in zip(ind1, ind2, ind3)]
+          if all(n % 2 == 0 for n in ind):
+            sigmaprod=self.__sigma(ind, i, gaussianDelta)
+            if sigmaprod > 0:
+              Gammasumln=self.__gamma(ind, gaussianDelta)
+              factor=countfactor*self.__factor(ind, gaussianDelta)
+              sx+=coeff1*coeff2*coef3*factor*exp(Gammasumln)*sigmaprod
+    return sx
+
+
+
+  def generatelist(self, xory, i, gaussianDelta=False):
+    sx=0
+    l=[]
+    for ind1,coeff1 in self[xory].iteritems():
+      for ind2,coeff2 in self[xory].iteritems():
+        if ind1 >= ind2:
+          countfactor=2.0
+          if ind1 == ind2:
+            countfactor=1.0
+          ind=[sum(a) for a in zip(ind1, ind2)]
+          if all(n % 2 == 0 for n in ind):
+            sigmaprod=self.__sigma(ind, i, gaussianDelta)
+            if sigmaprod > 0:
+              Gammasumln=self.__gamma(ind, gaussianDelta)
+              factor=countfactor*self.__factor(ind, gaussianDelta)
+              sxt=coeff1*coeff2*factor*exp(Gammasumln)*sigmaprod
+              l.append([-abs(sxt),sxt]+ind1+ind2)
+    return l.sort()
 
 
   #Auxiliary functions (private)
