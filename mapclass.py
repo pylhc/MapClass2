@@ -230,3 +230,13 @@ class Map2(polmap):
       #FIXME: This works for now but it's not right!!!
       factor = pow(2, sum(ind[:-2])/2.)/pow(pi, 2.)/(ind[-2]+1)
     return factor
+
+
+  ## Overloaded methods
+
+  # Fancy/easier access to things
+  def __getattr__(self, attr):
+    try:
+      return self[attr]
+    except:
+      raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
