@@ -1,3 +1,6 @@
 [submodule "pytpsa"]
 	path = pytpsa
 	url = ssh://dmartine@lxplus.cern.ch/afs/cern.ch/user/d/dmartine/Repos/pytpsa.git
+[submodule "old"]
+	path = old
+	url = ssh://dmartine@lxplus.cern.ch/afs/cern.ch/user/d/dmartine/Repos/MapClass.git
