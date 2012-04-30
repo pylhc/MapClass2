@@ -80,8 +80,14 @@ class Map2(polmap):
 
     :param string xory: Which coordinate to calculate for (x,y,px, or py)
     :param list i: Size of beam in sigma [x,px,y,py]
+    :param boolean gaussianDelta: Use gaussian energy delta or not
     '''
     sx=0
+    if gaussianDelta:
+      if 'x' in xory:
+        xory='fx'
+      else:
+        xory='fy'
     for ind,coeff in self[xory].iteritems():
       if all(n % 2 == 0 for n in ind):
         sigmaprod=self.__sigma(ind, i, gaussianDelta)
@@ -99,6 +105,7 @@ class Map2(polmap):
 
     :param string xory: Which coordinate to calculate for (x,y,px, or py)
     :param list i: Size of beam in sigma [x,px,y,py]
+    :param boolean gaussianDelta: Use gaussian energy delta or not
     '''
     sx=0
     for ind1,coeff1 in self[xory].iteritems():
@@ -120,8 +127,7 @@ class Map2(polmap):
   def comp(self, m, v=None):
     '''
     :m another map
-    :v list of variables used to compare the maps
-    by default it's self.fxyzd
+    :v list of variables used to compare the maps by default it's self.fxyzd
     '''
     chi2=0
     if not v: v=self.fxyzd
@@ -137,8 +143,7 @@ class Map2(polmap):
   def compc(self, m, v=None):
     '''
     :m another map
-    :v list of variables used to compare the maps
-    by default it's self.fxyzd
+    :v list of variables used to compare the maps by default it's self.fxyzd
     '''
     chi2=0
     if not v: v=self.fxyzd
@@ -158,7 +163,7 @@ class Map2(polmap):
       for ind2,coeff2 in self[v2].iteritems():
         if ind1 >= ind2:
           countfactor=2.0
-          if ind1 == ind2:
+          if ind1 == ind2 or gaussianDelta:
             countfactor=1.0
           ind=[sum(a) for a in zip(ind1, ind2)]
           if all(n % 2 == 0 for n in ind):
@@ -182,7 +187,7 @@ class Map2(polmap):
             if sigmaprod > 0:
               Gammasumln=self.__gamma(ind, gaussianDelta)
               factor=countfactor*self.__factor(ind, gaussianDelta)
-              sx+=coeff1*coeff2*coef3*factor*exp(Gammasumln)*sigmaprod
+              sx+=coeff1*coeff2*coeff3*factor*exp(Gammasumln)*sigmaprod
     return sx
 
 

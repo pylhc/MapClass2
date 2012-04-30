@@ -17,7 +17,7 @@ ex=68e-8
 ey=2e-8
 sigmaFFS=[sqrt(ex*betx/gamma), sqrt(ex/betx/gamma), sqrt(ey*bety/gamma), sqrt(ey/bety/gamma), 0.01]
 
-file='fort.18'
+file='assets/fort.18'
 map=Map2(args.order,file)
 print "sigmax=",sqrt(map.sigma('fx',sigmaFFS)),";"
 print "sigmay=",sqrt(map.sigma('fy',sigmaFFS)),";"
