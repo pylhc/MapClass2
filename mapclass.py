@@ -49,13 +49,13 @@ class Map2(polmap):
     for line in open(filename):
       sline=split(line)
       l=len(sline)
-      # Filling sline with 0's at the end, that way it doesn't matter if we read a file with 5 vars 
-      # or 6 vars. If it's 5 vars the order for 's' will always be 0 and give the right results
-      sline+=[0,0]
 
       if l == 8 or l == 9:
         coef=float(sline[1])
-        a=[int(sline[3]), int(sline[4]), int(sline[5]), int(sline[6]), int(sline[7]), int(sline[8])]
+        if l == 8:
+          a=[int(sline[3]), int(sline[4]), int(sline[5]), int(sline[6]), int(sline[7])]
+        else:
+          a=[int(sline[3]), int(sline[4]), int(sline[5]), int(sline[6]), int(sline[7]), int(sline[8])]
         if sum(a) <= order:
           dct[tuple(a)]=coef
 
@@ -161,7 +161,7 @@ class Map2(polmap):
     sx=0
     for ind1,coeff1 in self[v1].iteritems():
       for ind2,coeff2 in self[v2].iteritems():
-        if ind1 >= ind2:
+        if ind1 >= ind2 or gaussianDelta:
           countfactor=2.0
           if ind1 == ind2 or gaussianDelta:
             countfactor=1.0
@@ -211,6 +211,7 @@ class Map2(polmap):
               l.append([-abs(sxt),sxt]+ind1+ind2)
     return l.sort()
 
+#FIXME: for 6 vars!!
 
   #Auxiliary functions (private)
   def __sigma(self, ind, i, gaussianDelta):
@@ -232,8 +233,7 @@ class Map2(polmap):
     if (gaussianDelta):
       factor = pow(2, sum(ind)/2.)/pow(pi, 2.5)
     else:
-      #FIXME: This works for now but it's not right!!!
-      factor = pow(2, sum(ind[:-2])/2.)/pow(pi, 2.)/(ind[-2]+1)
+      factor = pow(2, sum(ind[:-1])/2.)/pow(pi, 2.)/(ind[-1]+1)
     return factor
 
 
