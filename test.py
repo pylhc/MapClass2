@@ -28,22 +28,6 @@ print "offsety=",map.offset('fy',sigmaFFS),";"
 print "offsetpx=",map.offset('fpx',sigmaFFS),";"
 print "offsetpy=",map.offset('fpy',sigmaFFS),";"
 
-# print "--------------------------------"
-
-# print "generatelistx"
-# map.generatelist('x',sigmaFFS)
-# print "generatelisty"
-# map.generatelist('y',sigmaFFS)
-# print "generatelistpx"
-# map.generatelist('px',sigmaFFS)
-# print "generatelistpy"
-# map.generatelist('py',sigmaFFS)
-
-# print "------------------------------"
-# print "@comp fort.18, 5fort.18"
-# map2=Map(args.order,'5fort.18')
-# print map.comp(map2)
-
 print "\n\n########## GaussianDelta ##########"
 
 map=Map2(args.order,file)
@@ -55,19 +39,3 @@ print "offsetx=",map.offset('fx',sigmaFFS, True),";"
 print "offsety=",map.offset('fy',sigmaFFS, True),";"
 print "offsetpx=",map.offset('fpx',sigmaFFS, True),";"
 print "offsetpy=",map.offset('fpy',sigmaFFS, True),";"
-
-# print "--------------------------------"
-
-# print "generatelistx"
-# map.generatelist('x',sigmaFFS)
-# print "generatelisty"
-# map.generatelist('y',sigmaFFS)
-# print "generatelistpx"
-# map.generatelist('px',sigmaFFS)
-# print "generatelistpy"
-# map.generatelist('py',sigmaFFS)
-
-# print "------------------------------"
-# print "@comp fort.18, 5fort.18"
-# map2=Map(args.order,'5fort.18',True)
-# print map.comp(map2)
