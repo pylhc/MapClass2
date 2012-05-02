@@ -1,4 +1,5 @@
 from string import split
+from operator import *
 from math import *
 
 from pytpsa import pol, polmap
@@ -90,7 +91,7 @@ class Map2(polmap):
         xory='fy'
     for ind,coeff in self[xory].iteritems():
       if all(n % 2 == 0 for n in ind):
-        sigmaprod=self.__sigma(ind, i, gaussianDelta)
+        sigmaprod=self.__sigma(ind, i, gaussianDelta, dv=2)
         if sigmaprod > 0:
           Gammasumln=self.__gamma(ind, gaussianDelta)
           factor=self.__factor(ind, gaussianDelta)
@@ -195,6 +196,11 @@ class Map2(polmap):
   def generatelist(self, xory, i, gaussianDelta=False):
     sx=0
     l=[]
+    if gaussianDelta:
+      if 'x' in xory:
+        xory='fx'
+      else:
+        xory='fy'
     for ind1,coeff1 in self[xory].iteritems():
       for ind2,coeff2 in self[xory].iteritems():
         if ind1 >= ind2:
@@ -208,32 +214,44 @@ class Map2(polmap):
               Gammasumln=self.__gamma(ind, gaussianDelta)
               factor=countfactor*self.__factor(ind, gaussianDelta)
               sxt=coeff1*coeff2*factor*exp(Gammasumln)*sigmaprod
-              l.append([-abs(sxt),sxt]+ind1+ind2)
-    return l.sort()
+              l.append([-abs(sxt),sxt]+list(ind1)+list(ind2))
+    l.sort()
+    return l
 
-#FIXME: for 6 vars!!
 
   #Auxiliary functions (private)
-  def __sigma(self, ind, i, gaussianDelta):
+  def __sigma(self, ind, i, gaussianDelta,dv=1):
     if (gaussianDelta):
-      sigmaprod = pow(i[0], ind[0])*pow(i[1], ind[1])*pow(i[2], ind[2])*pow(i[3], ind[3])*pow(i[4], ind[4])
+#      sigmaprod = pow(i[0], ind[0])*pow(i[1], ind[1])*pow(i[2], ind[2])*pow(i[3], ind[3])*pow(i[4], ind[4])
+      sigmaprod = reduce(mul,map(pow, i, ind))
     else:
-      sigmaprod = pow(i[0], ind[0])*pow(i[1], ind[1])*pow(i[2], ind[2])*pow(i[3], ind[3])*pow(i[4]/2., ind[4])
+#      sigmaprod = pow(i[0], ind[0])*pow(i[1], ind[1])*pow(i[2], ind[2])*pow(i[3], ind[3])*pow(i[4]/2., ind[4])
+      qq=1
+      if len(ind) > 5:
+        qq = pow(i[5]/dv,ind[5])
+      sigmaprod = reduce(mul,map(pow, i[:4], ind[:4]))*pow(i[4]/2.,ind[4])*qq
     return sigmaprod
 
 
   def __gamma(self, ind, gaussianDelta):
     if (gaussianDelta):
-      Gammasumln = gammln(0.5+ind[0]/2.)+gammln(0.5+ind[1]/2.)+gammln(0.5+ind[2]/2.)+gammln(0.5+ind[3]/2.)+gammln(0.5+ind[4]/2.)
+#      Gammasumln = gammln(0.5+ind[0]/2.)+gammln(0.5+ind[1]/2.)+gammln(0.5+ind[2]/2.)+gammln(0.5+ind[3]/2.)+gammln(0.5+ind[4]/2.)
+      Gammasumln = reduce(add,map(lambda x: gammln(0.5+x/2.), ind))
     else:
-      Gammasumln = gammln(0.5+ind[0]/2.)+gammln(0.5+ind[1]/2.)+gammln(0.5+ind[2]/2.)+gammln(0.5+ind[3]/2.)
+      indl = list(ind)
+      del indl[4]
+      Gammasumln = reduce(add,map(lambda x: gammln(0.5+x/2.), indl))
     return Gammasumln
 
-  def __factor(self, ind, gaussianDelta):
+  def __factor(self, ind, gaussianDelta, c=2.):
     if (gaussianDelta):
       factor = pow(2, sum(ind)/2.)/pow(pi, 2.5)
     else:
-      factor = pow(2, sum(ind[:-1])/2.)/pow(pi, 2.)/(ind[-1]+1)
+      if len(ind) > 5:
+        c = 2.5
+      indl = list(ind)
+      del indl[4]
+      factor = pow(2, sum(indl)/2.)/pow(pi, c)/(ind[4]+1)
     return factor
 
 
