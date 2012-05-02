@@ -171,6 +171,27 @@ class Test6var6order(unittest.TestCase, TestExtended):
     # test to avoid running it
     return
 
+class Test6var10order(unittest.TestCase, TestExtended):
+
+  def setUp(self):
+    from mapclass25_6var import Map
+
+    self.sigmaFFS = [0.000227,9.306e-5, 5.02e-4, 4.21e-5,0.00666,0.002]
+
+    o = 10
+    f = 'assets/6Dfort.18'
+    self.vals = OrderedDict([('x',self.sigmaFFS[0]),('px',self.sigmaFFS[1]),('y',self.sigmaFFS[2]),('py',self.sigmaFFS[3]),('d',self.sigmaFFS[4]),('s',self.sigmaFFS[5])])
+
+    self.m = Map2(order=o,filename=f)
+    self.mm = Map(order=o,filename=f)
+
+  @unittest.skip("Unnecessary")
+  def testGenList(self):
+    # generatelist isn't clear in mapclass25_6var so override this
+    # test to avoid running it
+    return
+
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Tester for MapClass')
   parser.add_argument('-s', help='Run the slow tests as well',
