@@ -2,6 +2,8 @@ import sys
 
 from collections import namedtuple
 
+from transport import *
+
 #########################
 class twiss(dict):
 #########################
@@ -61,3 +63,16 @@ class twiss(dict):
       print "From Metaclass: Bad format or empy file ", filename
       print "Leaving Metaclass"
       exit()
+
+######################### 
+## Twiss functionality   
+#########################
+def matrixForElement(e):
+  try:
+    if e.KEYWORD == "DRIFT":
+      d = DRIFT.copy()
+      d(**e._asdict())
+      return d
+  except:
+    print "The Twiss object doesn't have the desired structure"
+    sys.exit()

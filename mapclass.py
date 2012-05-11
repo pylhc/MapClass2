@@ -1,6 +1,11 @@
+import sys
 from string import split
 from operator import *
 from math import *
+from numpy import identity, matrix
+
+from transport import *
+from metaclass import *
 
 from pytpsa import pol, polmap
 
@@ -41,7 +46,24 @@ class Map2(polmap):
   fxyzd=['fx', 'fpx', 'fy', 'fpy', 'fd', 'fs']
   xyzd=['x', 'px', 'y', 'py', 'd','s']
 
-  def __init__(self, order=6, filename='fort.18'):
+  def __init__(self, *args, **kwargs):
+    if len(args) == 1 and isinstance(args[0], twiss):
+      self.fromTwiss(args[0])
+    else:
+      self.fromFort(*args,**kwargs)
+
+  ## Twiss
+  def fromTwiss(self, t):
+    R=identity(6)
+    for e in t.elems:
+      R = matrixForElement(e) * R
+    R = R * U
+
+    for i in range(0, len(self.fxyzd)):
+      self[self.fxyzd[i]] = R.item(i)
+  
+  ## fort.18
+  def fromFort(self, order=6, filename='fort.18'):
     ietall=-1
     
     dct={}
