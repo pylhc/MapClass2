@@ -1,6 +1,7 @@
 import sys
 
 from collections import namedtuple
+from numpy import identity
 
 from transport import *
 
@@ -70,9 +71,13 @@ class twiss(dict):
 def matrixForElement(e):
   try:
     if e.KEYWORD == "DRIFT":
-      d = DRIFT.copy()
-      d(**e._asdict())
-      return d
+      r = DRIFT(**e._asdict())
+      return r
+    if e.KEYWORD == "QUADRUPOLE":
+      r = QUADRUPOLE(**e._asdict())
+      return r
+    else:
+      return identity(6)
   except:
     print "The Twiss object doesn't have the desired structure"
     sys.exit()
