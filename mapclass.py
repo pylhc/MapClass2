@@ -1,13 +1,14 @@
 import sys
 from string import split
 from operator import *
-from math import *
 from numpy import identity, matrix
 
 from transport import *
 from metaclass import *
 
 from pytpsa import pol, polmap
+
+from math import *
 
 ################
 def gammln(xx):
