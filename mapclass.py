@@ -4,7 +4,6 @@ from math import *
 
 from pytpsa import pol, polmap
 
-
 ################
 def gammln(xx):
 ###############
@@ -133,8 +132,9 @@ class Map2(polmap):
     chi2=0
     if not v: v=self.fxyzd
     for f in v:
-      if len(self[f].items()) < len(m[f].items()):
-        print "For '", f , "'. Self map has fewer elements than map2!!"
+      if len(self[f].items()) < len(m[f].items()) and self[f].vars() == m[f].vars():
+        print "For '", f , "'. Self map has fewer elements than map2 or the dimentions are different!"
+        print "Try applying new_map = map.reorder(map2[f].vars()) to make the variables of both maps be in the same order."
         print "This gives a wrong result"
       for k,v in self[f].iteritems():
         #TODO: Why k[4]?
@@ -149,8 +149,9 @@ class Map2(polmap):
     chi2=0
     if not v: v=self.fxyzd
     for f in v:
-      if len(self[f].items()) < len(m[f].items()):
-        print "For '", f , "'. Self map has fewer elements than map2!!"
+      if len(self[f].items()) < len(m[f].items()) and self[f].vars() == m[f].vars():
+        print "For '", f , "'. Self map has fewer elements than map2 or the dimentions are different!"
+        print "Try applying new_map = map.reorder(map2[f].vars()) to make the variables of both maps be in the same order."
         print "This gives a wrong result"
       for k,v in self[f].iteritems():
         chi2+=(v-m[f].get(k,0))**2
