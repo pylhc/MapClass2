@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import os
 from math import *
 from collections import OrderedDict
 import itertools
@@ -205,20 +206,25 @@ class TwissExtended:
     self.assertTrue(self.m.compc(self.mm, self.fxyzd).real < 0.1)
 
 
-class TestQF(unittest.TestCase, TwissExtended):
+class TestElems(unittest.TestCase, TwissExtended):
 
   def setUp(self):
     from metaclass import twiss
     
-    t = twiss('assets/twiss/qf/twiss')
-    m = Map2(t)
-    self.mm = Map2(order=10, filename='assets/twiss/qf/fort.18')
-    self.m = m.reorder(self.mm.vars())
+    for root, subFolders, files in os.walk('assets/twiss/'):
+      if 'twiss' in files and 'fort.18' in files:
+        print "\nTesting: ", root
+        twissfile = os.path.join(root, "twiss")
+        fortfile = os.path.join(root, "fort.18")
+        t = twiss(twissfile)
+        m = Map2(t)
+        self.mm = Map2(order=10, filename=fortfile)
+        self.m = m.reorder(self.mm.vars())
 
 
 def twissSuite():
   suite = unittest.TestSuite()
-  suite.addTest(TestQF("compareFortTwiss"))
+  suite.addTest(TestElems("compareFortTwiss"))
   return suite
 
 ####################
