@@ -192,10 +192,50 @@ class Test6var10order(unittest.TestCase, TestExtended):
     return
 
 
+
+########################
+## Twiss
+########################
+
+class TwissExtended:
+
+  fxyzd = ['fx','fpx','fy','fpy']
+
+  def compareFortTwiss(self):
+    self.assertTrue(self.m.compc(self.mm, self.fxyzd).real < 0.1)
+
+
+class TestQF(unittest.TestCase, TwissExtended):
+
+  def setUp(self):
+    from metaclass import twiss
+    
+    t = twiss('assets/twiss/qf/twiss')
+    m = Map2(t)
+    self.mm = Map2(order=10, filename='assets/twiss/qf/fort.18')
+    self.m = m.reorder(self.mm.vars())
+
+
+def twissSuite():
+  suite = unittest.TestSuite()
+  suite.addTest(TestQF("compareFortTwiss"))
+  return suite
+
+####################
+## Main
+####################
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Tester for MapClass')
   parser.add_argument('-s', help='Run the slow tests as well',
                     action='store_true', dest='slow')
-  parser.parse_args()
+  parser.add_argument('-t', help="Test the import from Twiss and compare with fort.18. It doesn't run any of the other tests.",
+                      action='store_true', dest='twiss')
+  args = parser.parse_args()
 
-  unittest.main(verbosity=2,argv=sys.argv[:1])
+  if args.twiss:
+    runner = unittest.TextTestRunner(verbosity=2)
+    test_suite = twissSuite()
+    runner.run(test_suite)
+  else:
+    unittest.main(verbosity=2,argv=sys.argv[:1])
