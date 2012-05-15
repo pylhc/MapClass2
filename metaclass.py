@@ -1,5 +1,3 @@
-import sys
-
 from collections import namedtuple
 from numpy import identity
 
@@ -74,10 +72,13 @@ def matrixForElement(e):
       r = DRIFT(**e._asdict())
       return r
     if e.KEYWORD == "QUADRUPOLE":
-      r = QUADRUPOLE(**e._asdict())
+      if e.K1L > 0:
+        r = QF(**e._asdict())
+      else:
+        r = QD(**e._asdict())
       return r
     else:
       return identity(6)
   except:
     print "The Twiss object doesn't have the desired structure"
-    sys.exit()
+    exit()
