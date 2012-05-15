@@ -77,8 +77,12 @@ def matrixForElement(e):
       else:
         r = QD(**e._asdict())
       return r
+    if e.KEYWORD == "SBEND":
+      r = DI(**e._asdict())
+      return r
     else:
       return identity(6)
-  except:
+  except Exception as e:
     print "The Twiss object doesn't have the desired structure"
+    print e
     exit()

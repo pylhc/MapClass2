@@ -68,3 +68,19 @@ QD = mtrx([ [Q33, Q34, 0, 0, 0, 0],
             [0, 0, Q21, Q11, 0, 0],
             [0, 0, 0, 0, 1, 0],
             [0, 0, 0, 0, 0, 1] ])
+
+# DIPOLES
+
+def D11(L,ANGLE,**args): THETA = ANGLE/sqrt(1+D); return cos(THETA)
+def D12(L,ANGLE,**args): THETA = ANGLE/sqrt(1+D); P = L/ANGLE; return P*sin(THETA)
+def D15(L,ANGLE,**args): return 0
+def D21(L,ANGLE,**args): THETA = ANGLE/sqrt(1+D); P = L/ANGLE; return -(1/P)*sin(THETA)
+def D25(L,ANGLE,**args): return 0
+def D34(L,**args): return L/(1+D)
+
+DI = mtrx([ [D11, D12, 0, 0, D15, 0],
+            [D21, D11, 0, 0, D25, 0],
+            [0, 0, 1, D34, 0, 0],
+            [0, 0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, 1] ])
