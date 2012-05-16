@@ -68,20 +68,20 @@ class twiss(dict):
 #########################
 def matrixForElement(e):
   try:
+    r = identity(6)
     if e.KEYWORD == "DRIFT":
       r = DRIFT(**e._asdict())
-      return r
     if e.KEYWORD == "QUADRUPOLE":
-      if e.K1L > 0:
-        r = QF(**e._asdict())
+      if e.L == 0:
+        r = QTHIN(**e._asdict())
       else:
-        r = QD(**e._asdict())
-      return r
+        if e.K1L > 0:
+          r = QF(**e._asdict())
+        else:
+          r = QD(**e._asdict())
     if e.KEYWORD == "SBEND":
       r = DI(**e._asdict())
-      return r
-    else:
-      return identity(6)
+    return r
   except Exception as e:
     print "The Twiss object doesn't have the desired structure"
     print e

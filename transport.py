@@ -69,6 +69,16 @@ QD = mtrx([ [Q33, Q34, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0],
             [0, 0, 0, 0, 0, 1] ])
 
+def QT21(K1L,**args): return -K1L
+def QT43(K1L,**args): return K1L
+
+QTHIN = mtrx([ [1, 0, 0, 0, 0, 0],
+               [QT21, 1, 0, 0, 0, 0],
+               [0, 0, 1, 0, 0, 0],
+               [0, 0, QT43, 1, 0, 0],
+               [0, 0, 0, 0, 1, 0],
+               [0, 0, 0, 0, 0, 1] ])
+
 # DIPOLES
 
 def D11(L,ANGLE,**args): THETA = ANGLE/sqrt(1+D); return cos(THETA)
