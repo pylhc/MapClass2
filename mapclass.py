@@ -61,6 +61,10 @@ class Map2(polmap):
 
     for i in range(0, len(self.fxyzd)):
       self[self.fxyzd[i]] = R.item(i)
+    # Reorder the variables so that they are always in the same order
+    # This is important for comparision operations but also for all
+    # the other methods
+    self.reorder(self.xyzd)
   
   ## fort.18
   def fromFort(self, order=6, filename='fort.18'):
