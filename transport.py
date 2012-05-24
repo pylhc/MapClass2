@@ -1,5 +1,6 @@
 from types import FunctionType
 from numpy import matrix, nditer
+from math import factorial
 
 from pytpsa import *
 
@@ -69,15 +70,17 @@ QD = mtrx([ [Q33, Q34, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0],
             [0, 0, 0, 0, 0, 1] ])
 
-def QT21(K1L,**args): return -K1L
-def QT43(K1L,**args): return K1L
+# Different implementation for thin quadrupole
+# Now the implementation for thin multipole is used
+# def QT21(K1L,**args): return -K1L
+# def QT43(K1L,**args): return K1L
 
-QTHIN = mtrx([ [1, 0, 0, 0, 0, 0],
-               [QT21, 1, 0, 0, 0, 0],
-               [0, 0, 1, 0, 0, 0],
-               [0, 0, QT43, 1, 0, 0],
-               [0, 0, 0, 0, 1, 0],
-               [0, 0, 0, 0, 0, 1] ])
+# QTHIN = mtrx([ [1, 0, 0, 0, 0, 0],
+#                [QT21, 1, 0, 0, 0, 0],
+#                [0, 0, 1, 0, 0, 0],
+#                [0, 0, QT43, 1, 0, 0],
+#                [0, 0, 0, 0, 1, 0],
+#                [0, 0, 0, 0, 0, 1] ])
 
 # DIPOLES
 
@@ -94,3 +97,20 @@ DI = mtrx([ [D11, D12, 0, 0, D15, 0],
             [0, 0, 0, 1, 0, 0],
             [0, 0, 0, 0, 1, 0],
             [0, 0, 0, 0, 0, 1] ])
+
+# MULTIPOLES
+
+J = complex(0,1)
+
+def EQ(n): return (1./factorial(n))*(X+J*Y)**n
+
+def Bx(N,KnL): r,i = EQ(N).separateComplex(); return KnL*-r
+def By(N,KnL): r,i = EQ(N).separateComplex(); return KnL*i
+
+# It doesn't go any higher than 'decapole' but you can simply add it if you are
+# going to use it
+def MUL(K1L,K2L,K3L,K4L,**args):
+  m = polmap(fx=0,fpx=0,fy=0,fpy=0,fd=0,fs=0)
+  m['fpx'] = Bx(1,K1L) + Bx(2,K2L) + Bx(3,K3L) + Bx(4,K4L)
+  m['fpy'] = By(1,K1L) + By(2,K2L) + By(3,K3L) + By(4,K4L)
+  return m

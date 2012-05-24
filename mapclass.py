@@ -55,12 +55,14 @@ class Map2(polmap):
   ## Twiss
   def fromTwiss(self, t):
     R=identity(6)
+    m=polmap()
     for e in t.elems:
       R = matrixForElement(e) * R
+      m = mapForElement(e) + m
     R = R * U
 
     for i in range(0, len(self.fxyzd)):
-      self[self.fxyzd[i]] = R.item(i)
+      self[self.fxyzd[i]] = R.item(i) + m[self.fxyzd[i]]
     # Reorder the variables so that they are always in the same order
     # This is important for comparision operations but also for all
     # the other methods

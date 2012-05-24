@@ -2,6 +2,7 @@ from collections import namedtuple
 from numpy import identity
 
 from transport import *
+from pytpsa import polmap
 
 #########################
 class twiss(dict):
@@ -72,9 +73,7 @@ def matrixForElement(e):
     if e.KEYWORD == "DRIFT":
       r = DRIFT(**e._asdict())
     if e.KEYWORD == "QUADRUPOLE":
-      if e.L == 0:
-        r = QTHIN(**e._asdict())
-      else:
+      if e.L != 0:
         if e.K1L > 0:
           r = QF(**e._asdict())
         else:
@@ -82,6 +81,22 @@ def matrixForElement(e):
     if e.KEYWORD == "SBEND":
       r = DI(**e._asdict())
     return r
+  except Exception as e:
+    print "The Twiss object doesn't have the desired structure"
+    print e
+    exit()
+
+
+def mapForElement(e):
+  try:
+    m = polmap(fx=0,fpx=0,fy=0,fpy=0,fd=0,fs=0)
+    if e.KEYWORD == "QUADRUPOLE":
+      if e.L == 0:
+        m = MUL(**e._asdict())
+    if e.KEYWORD == "MULTIPOLE":
+      if e.L == 0:
+        m = MUL(**e._asdict())
+    return m
   except Exception as e:
     print "The Twiss object doesn't have the desired structure"
     print e
