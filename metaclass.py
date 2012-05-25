@@ -89,7 +89,7 @@ def matrixForElement(e):
 
 def mapForElement(e):
   try:
-    m = polmap(fx=0,fpx=0,fy=0,fpy=0,fd=0,fs=0)
+    m = polmap(fx='x',fpx='px',fy='y',fpy='py',fd='d',fs='s')
     if e.KEYWORD == "QUADRUPOLE":
       if e.L == 0:
         m = MUL(**e._asdict())

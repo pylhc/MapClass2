@@ -8,6 +8,7 @@ import itertools
 import argparse
 import unittest
 
+from definitions import *
 from mapclass import Map2
 
 sys.path.append("old")
@@ -21,7 +22,7 @@ sys.path.append("old")
 
 class TestExtended:
 
-  fxyzd = ['fx', 'fpx', 'fy', 'fpy']
+  xyzd = XYZD[:-2]
 
   sf = "%.8e"
 
@@ -47,36 +48,36 @@ class TestExtended:
     self.assertTrue(res1.issuperset(res2))
 
   def testSigma(self):
-    for i in self.fxyzd:
-      self.assertAlmostEq(self.m.sigma(i,self.sigmaFFS,self.gaussian), self.mm.sigma(i[1:],self.sigmaFFS))
+    for i in self.xyzd:
+      self.assertAlmostEq(self.m.sigma(i,self.sigmaFFS,self.gaussian), self.mm.sigma(i,self.sigmaFFS))
 
   def testOffset(self):
-    for i in self.fxyzd:
-      self.assertAlmostEq(self.m.offset(i,self.sigmaFFS,self.gaussian), self.mm.offset(i[1:],self.sigmaFFS))
+    for i in self.xyzd:
+      self.assertAlmostEq(self.m.offset(i,self.sigmaFFS,self.gaussian), self.mm.offset(i,self.sigmaFFS))
 
   def testCorrelation(self):
     if self.correlation:
-      for [v1, v2] in itertools.combinations(self.fxyzd, 2):
-        self.assertAlmostEq(self.m.correlation(v1,v2,self.sigmaFFS,self.gaussian), self.mm.correlation(v1[1:],v2[1:],self.sigmaFFS))
+      for [v1, v2] in itertools.combinations(self.xyzd, 2):
+        self.assertAlmostEq(self.m.correlation(v1,v2,self.sigmaFFS,self.gaussian), self.mm.correlation(v1,v2,self.sigmaFFS))
 
   @unittest.skipUnless('-s' in sys.argv, "Slow test")
   def testCorrelation3(self):
     if self.correlation:
-      for [v1, v2, v3] in itertools.combinations(self.fxyzd, 3):
-        self.assertAlmostEq(self.m.correlation3(v1,v2,v3,self.sigmaFFS,self.gaussian), self.mm.correlation3(v1[1:],v2[1:],v3[1:],self.sigmaFFS))
+      for [v1, v2, v3] in itertools.combinations(self.xyzd, 3):
+        self.assertAlmostEq(self.m.correlation3(v1,v2,v3,self.sigmaFFS,self.gaussian), self.mm.correlation3(v1,v2,v3,self.sigmaFFS))
 
   def testComp(self):
     if self.compare:
-      self.assertAlmostEq(self.m.comp(self.m2,v=self.fxyzd), self.mm.comp(self.mm2))
+      self.assertAlmostEq(self.m.comp(self.m2,v=self.xyzd), self.mm.comp(self.mm2))
 
   def testCompc(self):
     if self.compare:
-      self.assertAlmostEq(self.m.compc(self.m2,v=self.fxyzd), self.mm.compc(self.mm2))
+      self.assertAlmostEq(self.m.compc(self.m2,v=self.xyzd), self.mm.compc(self.mm2))
 
   def testGenList(self):
-    for v in self.fxyzd:
-      self.mm.generatelist(v[1:], self.sigmaFFS)
-      for (l1,l2) in zip(self.m.generatelist(v, self.sigmaFFS, self.gaussian), getattr(self.mm, 'list' + v[1:])):
+    for v in self.xyzd:
+      self.mm.generatelist(v, self.sigmaFFS)
+      for (l1,l2) in zip(self.m.generatelist(v, self.sigmaFFS, self.gaussian), getattr(self.mm, 'list' + v)):
         self.assertAlmostEq(l1[0],l2[0])
         # Because the order in which the indices are stored isn't the
         # same the result isn't equal but equivalent.
@@ -200,10 +201,10 @@ class Test6var10order(unittest.TestCase, TestExtended):
 
 class TwissExtended:
 
-  fxyzd = ['fx','fpx','fy','fpy']
+  xyzd = XYZD[:-2]
 
   def compareFortTwiss(self):
-    self.assertTrue(self.m.compc(self.mm, self.fxyzd).real < 0.1)
+    self.assertTrue(self.m.compc(self.mm, self.xyzd).real < 0.1)
 
 
 class TestElems(unittest.TestCase, TwissExtended):
@@ -217,9 +218,8 @@ class TestElems(unittest.TestCase, TwissExtended):
         twissfile = os.path.join(root, "twiss")
         fortfile = os.path.join(root, "fort.18")
         t = twiss(twissfile)
-        m = Map2(t)
+        self.m = Map2(t)
         self.mm = Map2(order=10, filename=fortfile)
-        self.m = m.reorder(self.mm.vars())
 
 
 def twissSuite():

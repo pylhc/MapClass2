@@ -3,8 +3,9 @@ from string import split
 from operator import *
 from numpy import identity, matrix
 
-from transport import *
+from definitions import *
 from metaclass import *
+from transport import *
 
 from pytpsa import pol, polmap
 
@@ -43,9 +44,6 @@ class Map2(polmap):
   :param string filename: Input filename
   '''
 
-  fxyzd=['fx', 'fpx', 'fy', 'fpy', 'fd', 'fs']
-  xyzd=['x', 'px', 'y', 'py', 'd','s']
-
   def __init__(self, *args, **kwargs):
     if len(args) == 1 and isinstance(args[0], twiss):
       self.fromTwiss(args[0])
@@ -54,19 +52,23 @@ class Map2(polmap):
 
   ## Twiss
   def fromTwiss(self, t):
-    R=identity(6)
-    m=polmap()
+    R=generateDefaultMap()
     for e in t.elems:
-      R = matrixForElement(e) * R
-      m = mapForElement(e) + m
-    R = R * U
-
-    for i in range(0, len(self.fxyzd)):
-      self[self.fxyzd[i]] = R.item(i) + m[self.fxyzd[i]]
+      mtr = matrixForElement(e)
+      M = mtr * U
+      tt = matrixToMap(M, XYZD)
+      t = mapForElement(e)
+      if (mtr == identity(6)).all():
+        R = t(R)
+      else:
+        R = tt(R)
+      
+    for k in XYZD:
+      self[k] = R[k]
     # Reorder the variables so that they are always in the same order
     # This is important for comparision operations but also for all
     # the other methods
-    self.reorder(self.xyzd)
+    self.reorder(XYZD)
   
   ## fort.18
   def fromFort(self, order=6, filename='fort.18'):
@@ -91,14 +93,14 @@ class Map2(polmap):
       if "etall" in line:
         if ietall >= 0:
           p=pol()
-          p.fromdict(dct,self.xyzd)
-          fdct[self.fxyzd[ietall]]=p
+          p.fromdict(dct,XYZD)
+          fdct[XYZD[ietall]]=p
           dct={}
         ietall+=1
 
     p=pol()
-    p.fromdict(dct,self.xyzd)
-    fdct[self.fxyzd[ietall]]=p
+    p.fromdict(dct,XYZD)
+    fdct[XYZD[ietall]]=p
     self.update(fdct)
 
 
@@ -114,9 +116,9 @@ class Map2(polmap):
     sx=0
     if gaussianDelta:
       if 'x' in xory:
-        xory='fx'
+        xory=XYZD[0]
       else:
-        xory='fy'
+        xory=XYZD[2]
     for ind,coeff in self[xory].iteritems():
       if all(n % 2 == 0 for n in ind):
         sigmaprod=self.__sigma(ind, i, gaussianDelta, dv=2)
@@ -156,10 +158,10 @@ class Map2(polmap):
   def comp(self, m, v=None):
     '''
     :m another map
-    :v list of variables used to compare the maps by default it's self.fxyzd
+    :v list of variables used to compare the maps by default it's XYZD
     '''
     chi2=0
-    if not v: v=self.fxyzd
+    if not v: v=XYZD
     for f in v:
       if len(self[f].items()) < len(m[f].items()) and self[f].vars() == m[f].vars():
         print "For '", f , "'. Self map has fewer elements than map2 or the dimentions are different!"
@@ -173,10 +175,10 @@ class Map2(polmap):
   def compc(self, m, v=None):
     '''
     :m another map
-    :v list of variables used to compare the maps by default it's self.fxyzd
+    :v list of variables used to compare the maps by default it's XYZD
     '''
     chi2=0
-    if not v: v=self.fxyzd
+    if not v: v=XYZD
     for f in v:
       if len(self[f].items()) < len(m[f].items()) and self[f].vars() == m[f].vars():
         print "For '", f , "'. Self map has fewer elements than map2 or the dimentions are different!"
@@ -228,9 +230,9 @@ class Map2(polmap):
     l=[]
     if gaussianDelta:
       if 'x' in xory:
-        xory='fx'
+        xory=XYZD[0]
       else:
-        xory='fy'
+        xory=XYZD[2]
     for ind1,coeff1 in self[xory].iteritems():
       for ind2,coeff2 in self[xory].iteritems():
         if ind1 >= ind2:

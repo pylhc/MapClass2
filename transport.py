@@ -2,6 +2,7 @@ from types import FunctionType
 from numpy import matrix, nditer
 from math import factorial
 
+from definitions import *
 from pytpsa import *
 
 #########################
@@ -15,22 +16,14 @@ class mtrx(matrix):
     return m
 
 
-## Polynomes declaration
-X  = pol('x')
-PX = pol('px')
-Y  = pol('y')
-PY = pol('py')
-D  = pol('d')
-S  = pol('s')
+#### Helper functions ####
+def matrixToMap(m, vrs):
+  mp = polmap()
+  for i in range(0,len(vrs)):
+    mp[vrs[i]] = m.item(i)
+  return mp
 
-# Matrix with the incognites
 
-U = matrix([ [X],
-             [PX],
-             [Y],
-             [PY],
-             [D],
-             [S] ])
 
 ########################
 # Transport matrices
@@ -110,7 +103,7 @@ def By(N,KnL): r,i = EQ(N).separateComplex(); return KnL*i
 # It doesn't go any higher than 'decapole' but you can simply add it if you are
 # going to use it
 def MUL(K1L,K2L,K3L,K4L,**args):
-  m = polmap(fx=0,fpx=0,fy=0,fpy=0,fd=0,fs=0)
-  m['fpx'] = Bx(1,K1L) + Bx(2,K2L) + Bx(3,K3L) + Bx(4,K4L)
-  m['fpy'] = By(1,K1L) + By(2,K2L) + By(3,K3L) + By(4,K4L)
+  m = generateDefaultMap()
+  m[XYZD[1]] = PX + Bx(1,K1L) + Bx(2,K2L) + Bx(3,K3L) + Bx(4,K4L)
+  m[XYZD[3]] = PY + By(1,K1L) + By(2,K2L) + By(3,K3L) + By(4,K4L)
   return m
