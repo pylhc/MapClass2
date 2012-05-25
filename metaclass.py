@@ -69,7 +69,7 @@ class twiss(dict):
 #########################
 def matrixForElement(e):
   try:
-    r = identity(6)
+    r = None
     if e.KEYWORD == "DRIFT":
       r = DRIFT(**e._asdict())
     if e.KEYWORD == "QUADRUPOLE":
@@ -89,7 +89,7 @@ def matrixForElement(e):
 
 def mapForElement(e):
   try:
-    m = polmap(fx='x',fpx='px',fy='y',fpy='py',fd='d',fs='s')
+    m = None
     if e.KEYWORD == "QUADRUPOLE":
       if e.L == 0:
         m = MUL(**e._asdict())

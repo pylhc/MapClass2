@@ -52,19 +52,23 @@ class Map2(polmap):
 
   ## Twiss
   def fromTwiss(self, t):
-    R=generateDefaultMap()
+    R = generateDefaultMap()
     for e in t.elems:
-      mtr = matrixForElement(e)
-      M = mtr * U
-      tt = matrixToMap(M, XYZD)
-      t = mapForElement(e)
-      if (mtr == identity(6)).all():
-        R = t(R)
-      else:
-        R = tt(R)
+      try:
+        mtr = matrixForElement(e)
+        if mtr == None:
+          mp = mapForElement(e)
+          R = mp * R
+        else:
+          M = mtr * U
+          mp = matrixToMap(M, XYZD)
+          R = mp * R
+      except Exception:
+        print "No implementation for element: ", e.NAME, e.KEYWORD
       
     for k in XYZD:
       self[k] = R[k]
+
     # Reorder the variables so that they are always in the same order
     # This is important for comparision operations but also for all
     # the other methods
