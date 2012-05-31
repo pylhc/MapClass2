@@ -96,6 +96,13 @@ def mapForElement(e):
     if e.KEYWORD == "MULTIPOLE":
       if e.L == 0:
         m = MUL(**e._asdict())
+    if e.KEYWORD == "SEXTUPOLE" or \
+       e.KEYWORD == "OCTUPOLE" or \
+       e.KEYWORD == "DECAPOLE":
+      if e.L == 0:
+        m = MUL(**e._asdict())
+      else:
+        m = MULTHICK(**e._asdict())
     return m
   except Exception as e:
     print "The Twiss object doesn't have the desired structure"

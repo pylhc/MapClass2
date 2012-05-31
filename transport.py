@@ -107,3 +107,24 @@ def MUL(K1L,K2L,K3L,K4L,**args):
   m[XYZD[1]] = PX + Bx(1,K1L) + Bx(2,K2L) + Bx(3,K3L) + Bx(4,K4L)
   m[XYZD[3]] = PY + By(1,K1L) + By(2,K2L) + By(3,K3L) + By(4,K4L)
   return m
+
+
+# THICK MULTIPOLES - Simpsons approximation
+#
+# Ci/k = (41/840, 9/35, 9/280, 34/105, 9/280, 9/35, 41/840)
+#
+# Note: The list is symetric
+
+CiK = [0.04880952380952381, 0.2571428571428571, 0.03214285714285714, 0.3238095238095238,
+       0.03214285714285714, 0.2571428571428571, 0.04880952380952381]
+
+def MULTHICK(K1L,K2L,K3L,K4L,L,**args):
+  Li = L/6 # Divide the original length in 6 splits
+  m = generateDefaultMap()
+
+  for ck in CiK[:-1]:
+    m = MUL(K1L*ck,K2L*ck,K3L*ck,K4L*ck,**args) * m
+    m = matrixToMap(DRIFT(L=Li,**args) * U, XYZD) * m
+
+  m = MUL(K1L*CiK[-1],K2L*CiK[-1],K3L*CiK[-1],K4L*CiK[-1],**args) * m
+  return m
