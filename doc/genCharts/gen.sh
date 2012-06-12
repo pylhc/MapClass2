@@ -55,9 +55,12 @@ for E in ${ELEMS[@]}; do
 
   echo "[gnuplot] $IMGDIR/$E.$IMGFORM"
   gnuplot <<EOF
-  set term $IMGFORM
+  set term $IMGFORM enhanced
   set output "$IMGDIR/$E.$IMGFORM"
   set title "$KW ($E)"
+  set nokey
+  set ylabel "{/Symbol c}^2"
+  set xlabel "L"
   p "$TMPDIR/$E.$DATEXT"
 EOF
 done
