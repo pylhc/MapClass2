@@ -219,7 +219,7 @@ class TestElems(unittest.TestCase, TwissExtended):
         fortfile = os.path.join(root, "fort.18")
         t = twiss(twissfile)
         self.m = Map2(t)
-        self.mm = Map2(order=10, filename=fortfile)
+        self.mm = Map2(filename=fortfile)
 
 
 def twissSuite():

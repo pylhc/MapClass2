@@ -46,18 +46,19 @@ class Map2(polmap):
 
   def __init__(self, *args, **kwargs):
     if len(args) == 1 and isinstance(args[0], twiss):
-      self.fromTwiss(args[0])
+      self.fromTwiss(args[0], **kwargs)
     else:
       self.fromFort(*args,**kwargs)
 
   ## Twiss
-  def fromTwiss(self, t):
-    R = generateDefaultMap()
+  def fromTwiss(self, t, order=6):
+    R = generateDefaultMap(order=order)
+    U = generateDefaultMatrix(order=order)
     for e in t.elems:
       try:
-        mtr = matrixForElement(e)
+        mtr = matrixForElement(e,order)
         if mtr == None:
-          mp = mapForElement(e)
+          mp = mapForElement(e,order)
           R = mp * R
         else:
           M = mtr * U
@@ -96,7 +97,7 @@ class Map2(polmap):
 
       if "etall" in line:
         if ietall >= 0:
-          p=pol()
+          p=pol(order=order)
           p.fromdict(dct,XYZD)
           fdct[XYZD[ietall]]=p
           dct={}
@@ -167,9 +168,10 @@ class Map2(polmap):
     chi2=0
     if not v: v=XYZD
     for f in v:
-      if len(self[f].items()) < len(m[f].items()) and self[f].vars() == m[f].vars():
+      if len(self[f].items()) < len(m[f].items()) and\
+         self[f].order == self[f].order and\
+         self[f].vars == m[f].vars:
         print "For '", f , "'. Self map has fewer elements than map2 or the dimentions are different!"
-        print "Try applying new_map = map.reorder(map2[f].vars()) to make the variables of both maps be in the same order."
         print "This gives a wrong result"
       for k,v in self[f].iteritems():
         #TODO: Why k[4]?
@@ -184,9 +186,10 @@ class Map2(polmap):
     chi2=0
     if not v: v=XYZD
     for f in v:
-      if len(self[f].items()) < len(m[f].items()) and self[f].vars() == m[f].vars():
+      if len(self[f].items()) < len(m[f].items()) and\
+         self[f].order == self[f].order and\
+         self[f].vars == m[f].vars:
         print "For '", f , "'. Self map has fewer elements than map2 or the dimentions are different!"
-        print "Try applying new_map = map.reorder(map2[f].vars()) to make the variables of both maps be in the same order."
         print "This gives a wrong result"
       for k,v in self[f].iteritems():
         chi2+=(v-m[f].get(k,0))**2
