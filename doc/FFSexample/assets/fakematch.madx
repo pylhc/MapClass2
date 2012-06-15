@@ -1,0 +1,77 @@
+beam, SEQUENCE=BDS ,PARTICLE=electron, energy=1500, RADIATE=false;
+beam, SEQUENCE=NOENTRBDS ,PARTICLE=electron, energy=1500, RADIATE=false;
+beam, SEQUENCE=NOENTRCOLSYS,PARTICLE=electron, energy=1500, RADIATE=false;
+!beam, SEQUENCE=EFF1S ,PARTICLE=electron, energy=1500, RADIATE=false;
+beam, SEQUENCE=fakeline ,PARTICLE=electron, energy=1500, RADIATE=false;
+
+!call, file= "../CLICx";
+!call, file= "../../../CLICx.new";
+!call, file="line4CLIC.madx";
+
+kfqf        =               3.67475361E-02 ;
+kfqd        =              -4.06008999E-02 ;
+kfqf2       =              -3.90222116E-02 ;
+kfqd2       =               6.44991447E-03; 
+
+FQF: quadrupole, l=1, k1:=kfqf;
+FQD: quadrupole, l=1, k1:=kfqd;
+FDD: DRIFT, L:=10;
+FQF2: quadrupole, l=1, k1:=kfqf2;
+FQD2: quadrupole, l=1, k1:=kfqd2;
+
+fakeline: LINE:=(FQF,FDD,FQD,FDD,FQF2,FDD,FQD2  );
+
+
+beta_max=14;
+beta_min=2;
+
+use, period=fakeline;
+match, betx=beta_max, bety=beta_min, alfx=0, alfy=0;
+vary, name=kfqf;
+vary, name=kfqd;
+vary, name=kfqf2;
+vary, name=kfqd2;
+
+constraint, range=#e,betx=14.40156067, bety=2.332275129, alfx= -1.451112785 , alfy=0.00767057496;
+simplex, tolerance=1e-14;
+simplex, tolerance=1e-14;
+simplex, tolerance=1e-14;
+simplex, tolerance=1e-14;
+simplex, tolerance=1e-14;
+!simplex, tolerance=1e-14;
+!simplex, tolerance=1e-14;
+!simplex, tolerance=1e-14;
+!!simplex, tolerance=1e-14;
+!simplex, tolerance=1e-14;
+lmdif, calls=10000,tolerance=1e-14;
+
+lmdif, calls=10000,tolerance=1e-14;
+
+
+lmdif, calls=10000,tolerance=1e-14;
+
+endmatch;
+
+return;
+
+
+stop;
+
+NEWBDS: LINE:=(DIAGNOSTICS,NOENTRBDS);
+
+use, period=NEWBDS;
+twiss, betx=beta_max, bety=beta_min, alfx=alpha_max, alfy=alpha_min,deltap=0.0,file="newbds.twiss",save;
+
+use, period=NOENTRBDS;
+twiss,BETX=374.9998257,BETY=0.9999872268,deltap=0.0,file="nebds.twiss",save;
+
+
+stop;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10;
+!select,flag=ptc_twiss,column=name,s,beta11,beta21,
+!beta12,beta22,disp1,disp3,x,px,y,py, k1l,k2l;
+ptc_normal,icase=5,no=9,deltap=0.00;
+ptc_end;
+stop;*/
