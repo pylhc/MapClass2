@@ -1,6 +1,9 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2.6
 
 import sys
+
+sys.path.append('../../libs')
+
 import argparse
 import time
 from math import *

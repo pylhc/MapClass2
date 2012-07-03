@@ -1,12 +1,32 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.6
 
 import sys
+
+sys.path.append("libs")
+
 import os
 from math import *
-from collections import OrderedDict
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    print "Python 2.7+ OrderedDict collection not available"
+    try:
+        from ordereddict import OrderedDict
+        print "Using backported OrderedDict implementation"
+    except ImportError:
+        print "Backported OrderedDict implementation not available"
+
 import itertools
 import argparse
+
 import unittest
+if sys.version_info[0] == 2 and sys.version_info[1] < 7: 
+    import unittest2
+else:
+    unittest2 = unittest
+    # probably won't work w/ Python 3.0 / 3.1, tested on Python 3.2 and 2.7
+    import unittest
 
 from definitions import *
 from mapclass import Map2
@@ -60,7 +80,7 @@ class TestExtended:
       for [v1, v2] in itertools.combinations(self.xyzd, 2):
         self.assertAlmostEq(self.m.correlation(v1,v2,self.sigmaFFS,self.gaussian), self.mm.correlation(v1,v2,self.sigmaFFS))
 
-  @unittest.skipUnless('-s' in sys.argv, "Slow test")
+  @unittest2.skipUnless('-s' in sys.argv, "Slow test")
   def testCorrelation3(self):
     if self.correlation:
       for [v1, v2, v3] in itertools.combinations(self.xyzd, 3):
@@ -93,7 +113,7 @@ class TestExtended:
 ## Test cases ##
 ################
 
-class Test5var6order(unittest.TestCase, TestExtended):
+class Test5var6order(unittest2.TestCase, TestExtended):
 
   def setUp(self):
     from mapclass25 import Map
@@ -109,7 +129,7 @@ class Test5var6order(unittest.TestCase, TestExtended):
     self.m2 = Map2(order=o,filename=ff)
     self.mm2 = Map(order=o,filename=ff)
 
-class Test5var6orderGaussian(unittest.TestCase, TestExtended):
+class Test5var6orderGaussian(unittest2.TestCase, TestExtended):
 
   def setUp(self):
     from mapclassGaussianDelta25 import Map
@@ -123,7 +143,7 @@ class Test5var6orderGaussian(unittest.TestCase, TestExtended):
     self.m = Map2(order=o,filename=f)
     self.mm = Map(order=o,filename=f)
 
-class Test5var10order(unittest.TestCase, TestExtended):
+class Test5var10order(unittest2.TestCase, TestExtended):
 
   def setUp(self):
     from mapclass25 import Map
@@ -139,7 +159,7 @@ class Test5var10order(unittest.TestCase, TestExtended):
     self.m2 = Map2(order=o,filename=ff)
     self.mm2 = Map(order=o,filename=ff)
 
-class Test5var10orderGaussian(unittest.TestCase, TestExtended):
+class Test5var10orderGaussian(unittest2.TestCase, TestExtended):
 
   def setUp(self):
     from mapclassGaussianDelta25 import Map
@@ -153,7 +173,7 @@ class Test5var10orderGaussian(unittest.TestCase, TestExtended):
     self.m = Map2(order=o,filename=f)
     self.mm = Map(order=o,filename=f)
 
-class Test6var6order(unittest.TestCase, TestExtended):
+class Test6var6order(unittest2.TestCase, TestExtended):
 
   def setUp(self):
     from mapclass25_6var import Map
@@ -167,13 +187,13 @@ class Test6var6order(unittest.TestCase, TestExtended):
     self.m = Map2(order=o,filename=f)
     self.mm = Map(order=o,filename=f)
 
-  @unittest.skip("Unnecessary")
+  @unittest2.skip("Unnecessary")
   def testGenList(self):
     # generatelist isn't clear in mapclass25_6var so override this
     # test to avoid running it
     return
 
-class Test6var10order(unittest.TestCase, TestExtended):
+class Test6var10order(unittest2.TestCase, TestExtended):
 
   def setUp(self):
     from mapclass25_6var import Map
@@ -187,7 +207,7 @@ class Test6var10order(unittest.TestCase, TestExtended):
     self.m = Map2(order=o,filename=f)
     self.mm = Map(order=o,filename=f)
 
-  @unittest.skip("Unnecessary")
+  @unittest2.skip("Unnecessary")
   def testGenList(self):
     # generatelist isn't clear in mapclass25_6var so override this
     # test to avoid running it
@@ -207,7 +227,7 @@ class TwissExtended:
     self.assertTrue(self.m.compc(self.mm, self.xyzd).real < 0.1)
 
 
-class TestElems(unittest.TestCase, TwissExtended):
+class TestElems(unittest2.TestCase, TwissExtended):
 
   def setUp(self):
     from metaclass import twiss
@@ -223,7 +243,7 @@ class TestElems(unittest.TestCase, TwissExtended):
 
 
 def twissSuite():
-  suite = unittest.TestSuite()
+  suite = unittest2.TestSuite()
   suite.addTest(TestElems("compareFortTwiss"))
   return suite
 
@@ -240,8 +260,8 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   if args.twiss:
-    runner = unittest.TextTestRunner(verbosity=2)
+    runner = unittest2.TextTestRunner(verbosity=2)
     test_suite = twissSuite()
     runner.run(test_suite)
   else:
-    unittest.main(verbosity=2,argv=sys.argv[:1])
+    unittest2.main(verbosity=2,argv=sys.argv[:1])

@@ -1,5 +1,5 @@
 from types import FunctionType
-from numpy import matrix, nditer
+from numpy import matrix, ndenumerate
 from math import factorial
 
 from definitions import *
@@ -10,9 +10,9 @@ class mtrx(matrix):
 #########################
   def __call__(self, *args, **kwargs):
     m = self.copy()
-    for p in nditer(m, flags=['refs_ok'], op_flags=['readwrite']):
-      if type(p.item()) is FunctionType:
-        p[...] = p.item()(**kwargs)
+    for i,v in ndenumerate(m):
+      if type(v) is FunctionType:
+        m[i] = v(**kwargs)
     return m
 
 
