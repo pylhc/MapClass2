@@ -1,0 +1,2 @@
+- Python 2.6 or higher is required (not tested with Python 3.X)
+- numpy library must be installed or add it to the 'libs' folder
