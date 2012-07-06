@@ -5,6 +5,16 @@ from transport import *
 from pytpsa import polmap
 
 #########################
+# Auxiliar elements
+#########################
+class dct(dict):
+  def __getattr__(self, attr):
+    try:
+      return self[attr]
+    except:
+      raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
+
+#########################
 class twiss(dict):
 #########################
   "Twiss parameters from madx output (with free choice of select items)"
@@ -38,7 +48,6 @@ class twiss(dict):
 
       if "* " in line or "*\t" in line:
         labels = splt[1:]
-        Elem = namedtuple("Elem", labels)
         print "labels ",len(labels)
 
       if "$ " in line or "$\t" in line:
@@ -53,7 +62,7 @@ class twiss(dict):
             vals.append(float(splt[j]))
           if "s" in types[j]:
             vals.append(splt[j].strip('"'))
-        self.elems.append(Elem(*vals))
+        self.elems.append(dct(zip(labels,vals)))
 
     f.close()
     try:
@@ -71,15 +80,15 @@ def matrixForElement(e,order):
   try:
     r = None
     if e.KEYWORD == "DRIFT":
-      r = DRIFT(order=order,**e._asdict())
+      r = DRIFT(order=order,**e)
     if e.KEYWORD == "QUADRUPOLE":
       if e.L != 0:
         if e.K1L > 0:
-          r = QF(order=order,**e._asdict())
+          r = QF(order=order,**e)
         else:
-          r = QD(order=order,**e._asdict())
+          r = QD(order=order,**e)
     if e.KEYWORD == "SBEND":
-      r = DI(order=order,**e._asdict())
+      r = DI(order=order,**e)
     return r
   except Exception as e:
     print "The Twiss object doesn't have the desired structure"
@@ -92,17 +101,17 @@ def mapForElement(e,order):
     m = None
     if e.KEYWORD == "QUADRUPOLE":
       if e.L == 0:
-        m = MUL(order=order,**e._asdict())
+        m = MUL(order=order,**e)
     if e.KEYWORD == "MULTIPOLE":
       if e.L == 0:
-        m = MUL(order=order,**e._asdict())
+        m = MUL(order=order,**e)
     if e.KEYWORD == "SEXTUPOLE" or \
        e.KEYWORD == "OCTUPOLE" or \
        e.KEYWORD == "DECAPOLE":
       if e.L == 0:
-        m = MUL(order=order,**e._asdict())
+        m = MUL(order=order,**e)
       else:
-        m = MULTHICK(order=order,**e._asdict())
+        m = MULTHICK(order=order,**e)
     return m
   except Exception as e:
     print "The Twiss object doesn't have the desired structure"
