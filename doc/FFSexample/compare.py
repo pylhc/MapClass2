@@ -65,8 +65,8 @@ sigmaFFS=[sqrt(ex*betx/gamma), sqrt(ex/betx/gamma), sqrt(ey*bety/gamma), sqrt(ey
 print "@@@@@@@@ Sigma"
 
 for i in v:
-    print "[T][%s] %e" % (i, m.sigma(i,sigmaFFS,args.gaussian).real)
-    print "[F][%s] %e" % (i, mm.sigma(i,sigmaFFS,args.gaussian).real)
+    print "[T][%s] %e" % (i, sqrt(m.sigma(i,sigmaFFS,args.gaussian).real))
+    print "[F][%s] %e" % (i, sqrt(mm.sigma(i,sigmaFFS,args.gaussian).real))
 
 print ''
 print "@@@@@@@@ Offset"
