@@ -69,7 +69,7 @@ class twiss(dict):
       labels
       types
     except:
-      print "From Metaclass: Bad format or empy file ", filename
+      print "From Metaclass: Bad format or empty file ", filename
       print "Leaving Metaclass"
       exit()
 
