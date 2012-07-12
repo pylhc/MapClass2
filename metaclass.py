@@ -73,6 +73,12 @@ class twiss(dict):
       print "Leaving Metaclass"
       exit()
 
+  # Add a BEAMBEAM element - by default it adds at the end
+  def addBeamBeam(self, name, K, sigmax, sigmay, xm, ym, position = None, t = "ROUNDBB"):
+    e = dct({'KEYWORD': t, 'NAME':name, 'K':K, 'SIGMAX':sigmax, 'SIGMAY':sigmay, 'XM':xm, 'YM':ym})
+    if position == None: position = len(self.elems)
+    self.elems.insert(position, e)
+
 ######################### 
 ## Twiss functionality   
 #########################
@@ -112,6 +118,8 @@ def mapForElement(e,order):
         m = MUL(order=order,**e)
       else:
         m = MULTHICK(order=order,**e)
+    if e.KEYWORD == "ROUNDBB":
+      m = ROUNDBB(order=order, **e)
     return m
   except Exception as e:
     print "The Twiss object doesn't have the desired structure"

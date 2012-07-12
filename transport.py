@@ -129,3 +129,15 @@ def MULTHICK(K1L,K2L,K3L,K4L,L,order,**args):
 
   m = MUL(K1L*CiK[-1],K2L*CiK[-1],K3L*CiK[-1],K4L*CiK[-1],order,**args) * m
   return m
+
+
+# BEAMBEAM element - round beam approximation
+# http://frs.web.cern.ch/frs/PTC_reference_manual/node85.html
+#
+# !!! Attention: XM and YM != 0, due to constraints in the pytpsa library
+
+def ROUNDBB(K,SIGMAX,SIGMAY,XM,YM,order,**args):
+  m = generateDefaultMap(order)
+  m[XYZD[1]] = (K/(1+D))*((X-XM)/((X-XM)**2+(Y-YM)**2))*(1-exp(-((X-XM)**2+(Y-YM)**2)/(float(SIGMAX)**2+float(SIGMAY)**2)))
+  m[XYZD[3]] = (K/(1+D))*((Y-YM)/((X-XM)**2+(Y-YM)**2))*(1-exp(-((X-XM)**2+(Y-YM)**2)/(float(SIGMAX)**2+float(SIGMAY)**2)))
+  return m
