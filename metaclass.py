@@ -69,7 +69,7 @@ class twiss(dict):
           self.markers.append(e)
         else:
           self.elems.append(e)
-      
+
     f.close()
     try:
       labels
@@ -89,10 +89,10 @@ class twiss(dict):
     else:
       prevE = self.markers[0]
 
-    betX0 = prevE.BETX 
+    betX0 = prevE.BETX
     alfX0 = prevE.ALFX
     gamX0 = (1+alfX0**2)/betX0
- 
+
     betY0 = prevE.BETY
     alfY0 = prevE.ALFY
     gamY0 = (1+alfY0**2)/betY0
@@ -109,8 +109,8 @@ class twiss(dict):
 
     # Copy element of interest and change its length to location of interest, s
     # Calculate transport matrix for this element assuming D=0
-    e = self.elems[nE]                
-    e['L'] = s                       
+    e = self.elems[nE]
+    e['L'] = s
     eTransport = matrixForElement(e, 6)    # NOTE: Take order 6
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to DRIFT and recalculate transport matrix
     if eTransport == None:
@@ -132,7 +132,7 @@ class twiss(dict):
                               [-a*c, b*c + a*d, -b*d],
                               [c**2, -2*c*d, d**2] ])
       para.append(twissTransform*paraInitial[i])
-   
+
     return dict([('BETX',para[0].item(0)),
                  ('ALFX',para[0].item(1)),
                  ('GAMX',para[0].item(2)),
@@ -140,8 +140,8 @@ class twiss(dict):
                  ('ALFY',para[1].item(1)),
                  ('GAMY',para[1].item(2))])
 
-######################### 
-## Twiss functionality   
+#########################
+## Twiss functionality
 #########################
 def matrixForElement(e,order):
   try:
