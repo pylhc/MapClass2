@@ -11,7 +11,7 @@ class mtrx(matrix):
   def __call__(self, *args, **kwargs):
     m = self.copy()
     for i,v in ndenumerate(m):
-      if type(v) is FunctionType:
+      if type(v) is FunctionType or type(v) is pol:
         m[i] = v(**kwargs)
     return m
 
