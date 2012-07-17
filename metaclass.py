@@ -133,12 +133,45 @@ class twiss(dict):
                               [c**2, -2*c*d, d**2] ])
       para.append(twissTransform*paraInitial[i])
 
-    return dict([('BETX',para[0].item(0)),
-                 ('ALFX',para[0].item(1)),
-                 ('GAMX',para[0].item(2)),
-                 ('BETY',para[1].item(0)),
-                 ('ALFY',para[1].item(1)),
-                 ('GAMY',para[1].item(2))])
+    return dct([('BETX',para[0].item(0)),
+                ('ALFX',para[0].item(1)),
+                ('GAMX',para[0].item(2)),
+                ('BETY',para[1].item(0)),
+                ('ALFY',para[1].item(1)),
+                ('GAMY',para[1].item(2))])
+
+  #Calculate DISPERSION at location s in element nE
+  # nE = number of element of interest, s = location of interest within element nE
+  def getDisp(self, nE, s):
+    # Get initial beta, alpha and gamma at end of previous element
+    # If nE is first element, use start marker as initial; if nE any other element, use previous element
+    if nE != 0:
+      prevE = self.elems[nE-1]
+    else:
+      prevE = self.markers[0]
+    disp0 = mtrx( [ [prevE.DX],
+                    [prevE.DPX],
+                    [prevE.DY],
+                    [prevE.DPY],
+                    [1],
+                    [0] ])
+
+    e = self.elems[nE]
+    e['L'] = s
+    m = matrixForElement(e, 6)   # NOTE: Take order 6
+    # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to DRIFT and recalculate transport matrix
+    if m == None:
+      e['KEYWORD']="DRIFT"
+      m = matrixForElement(e, 6)
+    m = m(d=0)
+
+    # Multiply initial dispersions by transport matrix (Needs more explanation?)
+    disp = m*disp0
+
+    return dct([ ('DX',disp.item(0)),
+                 ('DPX',disp.item(1)),
+                 ('DY',disp.item(2)),
+                 ('DPY',disp.item(3)) ])
 
 #########################
 ## Twiss functionality
