@@ -224,6 +224,22 @@ class TwissExtended:
   def compareFortTwiss(self):
     self.assertTrue(self.m.compc(self.mm, self.xyzd).real < 0.1)
 
+  def testBeta(self):
+    for i in range(len(self.t.elems)):
+      e = self.t.elems[i]
+      self.assertEqual(e.BETX, self.t.getBeta(i,e.L).BETX)
+      self.assertEqual(e.BETY, self.t.getBeta(i,e.L).BETY)
+      self.assertEqual(e.ALFX, self.t.getBeta(i,e.L).ALFX)
+      self.assertEqual(e.ALFY, self.t.getBeta(i,e.L).ALFY)
+
+  def testDisp(self):
+    for i in range(len(self.t.elems)):
+      e = self.t.elems[i]
+      self.assertEqual(e.DX, self.t.getDisp(i,e.L).DX)
+      self.assertEqual(e.DY, self.t.getDisp(i,e.L).DY)
+      self.assertEqual(e.DPX, self.t.getDisp(i,e.L).DPX)
+      self.assertEqual(e.DPY, self.t.getDisp(i,e.L).DPY)
+
 
 class TestElems(unittest2.TestCase, TwissExtended):
 
@@ -235,14 +251,16 @@ class TestElems(unittest2.TestCase, TwissExtended):
         print "\nTesting: ", root
         twissfile = os.path.join(root, "twiss")
         fortfile = os.path.join(root, "fort.18")
-        t = twiss(twissfile)
-        self.m = Map2(t)
+        self.t = twiss(twissfile)
+        self.m = Map2(self.t)
         self.mm = Map2(filename=fortfile)
 
 
 def twissSuite():
   suite = unittest2.TestSuite()
   suite.addTest(TestElems("compareFortTwiss"))
+  suite.addTest(TestElems("testBeta"))
+  suite.addTest(TestElems("testDisp"))
   return suite
 
 ####################
