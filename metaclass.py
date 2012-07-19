@@ -178,6 +178,12 @@ class twiss(dict):
                  ('DY',disp.item(2)),
                  ('DPY',disp.item(3)) ])
 
+  ## FIND ELEMENT: For a given s along the whole beamline, find in which element, i,  it is
+  def findElem(self, s):
+    for i in range(len(self.elems)):
+      if s <= self.elems[i].S:
+        return i
+
 #########################
 ## Twiss functionality
 #########################
