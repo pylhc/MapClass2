@@ -216,9 +216,7 @@ def mapForElement(e,order):
     if e.KEYWORD == "MULTIPOLE":
       if e.L == 0:
         m = MUL(order=order,**e)
-    if e.KEYWORD == "SEXTUPOLE" or \
-       e.KEYWORD == "OCTUPOLE" or \
-       e.KEYWORD == "DECAPOLE":
+    if e.KEYWORD in ["SEXTUPOLE", "OCTUPOLE", "DECAPOLE"]:
       if e.L == 0:
         m = MUL(order=order,**e)
       else:
