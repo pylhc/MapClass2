@@ -1,7 +1,9 @@
 from collections import namedtuple
 from numpy import identity
+from copy import copy
 
 from transport import *
+import mapclass
 from pytpsa import polmap
 
 #########################
@@ -183,6 +185,27 @@ class twiss(dict):
     for i in range(len(self.elems)):
       if s <= self.elems[i].S:
         return i
+
+  ## NATURAL CHROMATICITY: Given a design Beta (or B*) and optionally
+  ## the initial beta it calculates the natural chromaticity
+  def getNatChrom(self, BetStar, BetY0 = None):
+    newT = copy(self)
+    newT.elems = []
+    # Strip higher order elements from current twiss and store in a
+    # new one
+    for e in self.elems:
+      if e.KEYWORD in ['DRIFT', 'QUADRUPOLE', 'SBEND'] and e.L != 0:
+        newT.elems.append(e)
+    # Calculate the map of the new twiss
+    m = mapclass.Map2(newT)
+    # For Xy, 001010 and Xy, 000110
+    # Fr = gamma( (1+j+j') / 2 ) * gamma(...) * ... * gamma(3/2)
+    Fr = 4.373354581906215 # gamma(1./2)**3 * gamma(3./2)**2
+    # C = 2**((2+j+k+l+m+j'+k'+l'+m')/2) / pi**2.5
+    C = 0.4573148512298903 # 8*pow(pi,-2.5)
+    if BetY0 is None: BetY0 = self.markers[0].BETY
+    return Fr*C*(m['y'][(0,0,1,0,1,0)]**2*BetY0/BetStar +
+                 m['y'][(0,0,0,1,1,0)]**2/(BetY0*BetStar)).real
 
 #########################
 ## Twiss functionality
