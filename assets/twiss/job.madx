@@ -2,7 +2,9 @@ DEGREE:=PI/180.0;
 
 dr : DRIFT, L=3;
 
-q: quadrupole, L=0, K1=0.5;
+qf: quadrupole, L=3, K1=0.5;
+qd: quadrupole, L=3, K1=-0.5;
+qthin: quadrupole, L=0, K1=0.5;
 
 di: SBEND, L=3.0,ANGLE=15.0*DEGREE;
 
