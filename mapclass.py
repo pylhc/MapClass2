@@ -66,7 +66,7 @@ class Map2(polmap):
           R = mp * R
       except Exception:
         print "No implementation for element: ", e.NAME, e.KEYWORD
-      
+
     for k in XYZD:
       self[k] = R[k]
 
@@ -74,11 +74,11 @@ class Map2(polmap):
     # This is important for comparision operations but also for all
     # the other methods
     self.reorder(XYZD)
-  
+
   ## fort.18
   def fromFort(self, order=6, filename='fort.18'):
     ietall=-1
-    
+
     dct={}
     fdct={}
 
@@ -282,15 +282,18 @@ class Map2(polmap):
       Gammasumln = reduce(add,map(lambda x: gammln(0.5+x/2.), indl))
     return Gammasumln
 
-  def __factor(self, ind, gaussianDelta, c=2.):
+  def __factor(self, ind, gaussianDelta, poten = 2. ):
+    l = len(ind)
     if (gaussianDelta):
-      factor = pow(2, sum(ind)/2.)/pow(pi, 2.5)
+        if l == 5:
+          poten = 2.5
+        if l == 6:
+          poten = 3.0
+        factor = pow(2, sum(ind)/2.)/pow(pi, poten)
     else:
-      if len(ind) > 5:
-        c = 2.5
-      indl = list(ind)
-      del indl[4]
-      factor = pow(2, sum(indl)/2.)/pow(pi, c)/(ind[4]+1)
+      if l > 5:
+        poten = 2.5
+      factor = pow(2, sum(ind[:4]+ind[5:])/2)/pow(pi, poten)/(ind[4]+1.0)
     return factor
 
 
