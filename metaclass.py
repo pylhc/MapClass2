@@ -1,7 +1,9 @@
 from collections import namedtuple
 from numpy import identity
+from copy import copy
 
 from transport import *
+import mapclass
 from pytpsa import polmap
 
 #########################
@@ -21,6 +23,8 @@ class twiss(dict):
 
   def __init__(self, filename='twiss'):
     self.elems = []
+    # Markers
+    self.markers = []
 
     f = open(filename, 'r')
 
@@ -53,7 +57,7 @@ class twiss(dict):
       if "$ " in line or "$\t" in line:
         types = splt[1:]
 
-      if "@" not in line and "*" not in line and "$" not in line:
+      if "@" not in line and "*" not in line and "%" not in line:
         vals = []
         for j in range(0,len(labels)):
           if "%hd" in types[j]:
@@ -62,7 +66,11 @@ class twiss(dict):
             vals.append(float(splt[j]))
           if "s" in types[j]:
             vals.append(splt[j].strip('"'))
-        self.elems.append(dct(zip(labels,vals)))
+        e = dct(zip(labels,vals))
+        if "$" in line:
+          self.markers.append(e)
+        else:
+          self.elems.append(e)
 
     f.close()
     try:
@@ -79,8 +87,134 @@ class twiss(dict):
     if position == None: position = len(self.elems)
     self.elems.insert(position, e)
 
-######################### 
-## Twiss functionality   
+  ## BETA FUNCTION: Find beta, alpha and gamma functions at location s in element nE
+  # nE = number of element of interest, s = location of interest within element nE
+  def getBeta(self,nE,s):
+    # Get initial beta, alpha and gamma at end of previous element
+    # If nE is first element, use start marker as initial; if nE any other element, use previous element
+    if nE != 0:
+      prevE = self.elems[nE-1]
+    else:
+      prevE = self.markers[0]
+
+    betX0 = prevE.BETX
+    alfX0 = prevE.ALFX
+    gamX0 = (1+alfX0**2)/betX0
+
+    betY0 = prevE.BETY
+    alfY0 = prevE.ALFY
+    gamY0 = (1+alfY0**2)/betY0
+
+    paraX0 = mtrx([ [betX0],
+                    [alfX0],
+                    [gamX0] ])
+
+    paraY0 = mtrx([ [betY0],
+                    [alfY0],
+                    [gamY0] ])
+
+    paraInitial = [paraX0, paraY0]
+
+    # Copy element of interest and change its length to location of interest, s
+    # Calculate transport matrix for this element assuming D=0
+    # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to DRIFT and recalculate transport matrix
+    e = dct(self.elems[nE])
+    e['L'] = s
+    eTransport = matrixForElement(e, 6)    # NOTE: Take order 6
+    if eTransport == None:
+      e['KEYWORD']="DRIFT"
+      eTransport = matrixForElement(e, 6)
+    eTransport = eTransport(d=0)
+
+    # Extract required elements from transport matrix to form transform matrix
+    # i=0 for horizontal x-direction; i=1 for vertical y-direction
+    # a=C, b=S, c=C', d=S' according to standard notation
+    para = []
+    for i in [0, 1]:
+      j = 2*i
+      a = eTransport.item((j,j))    # Equivalent to item((0,0)) for x-direction; item((2,2)) for y-direction
+      b = eTransport.item((j,j+1))
+      c = eTransport.item((j+1,j))
+      d = eTransport.item((j+1,j+1))
+      twissTransform = mtrx([ [a**2, -2*a*b, b**2],  # Create transform matrix
+                              [-a*c, b*c + a*d, -b*d],
+                              [c**2, -2*c*d, d**2] ])
+      para.append(twissTransform*paraInitial[i])
+
+    return dct([('BETX',para[0].item(0)),
+                ('ALFX',para[0].item(1)),
+                ('GAMX',para[0].item(2)),
+                ('BETY',para[1].item(0)),
+                ('ALFY',para[1].item(1)),
+                ('GAMY',para[1].item(2))])
+
+  ## DISPERSION at location s in element nE
+  # nE = number of element of interest, s = location of interest within element nE
+  def getDisp(self, nE, s):
+    # Get initial dispersion values DX, DPX, DY, DPY
+    # If nE is first element, use start marker as initial; if nE any other element, use previous element
+    if nE != 0:
+      prevE = self.elems[nE-1]
+    else:
+      prevE = self.markers[0]
+
+    # Use same set-up as for new positions/angles to enable use of transport matrix as is
+    # disp0 = [x=DX, px=DPX, y=DY, py=DPY, D=1, S=0]
+    disp0 = mtrx( [ [prevE.DX],
+                    [prevE.DPX],
+                    [prevE.DY],
+                    [prevE.DPY],
+                    [1],
+                    [0] ])
+
+    # Copy element of interest and change length to location of interest, s. Get transport matrix assuming D=0
+    # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to DRIFT and recalculate transport matrix
+    e = dct(self.elems[nE])
+    e['L'] = s
+    m = matrixForElement(e, 6)   # NOTE: Take order 6
+    if m == None:
+      e['KEYWORD']="DRIFT"
+      m = matrixForElement(e, 6)
+    m = m(d=0)
+
+    # Multiply initial dispersions by transport matrix.
+    # Equivalent to [n, n', 1]_new = [ [C S D], [C', S', D'], [0 0 1] ] * [n, n', 1]_old
+    disp = m*disp0
+
+    return dct([ ('DX',disp.item(0)),
+                 ('DPX',disp.item(1)),
+                 ('DY',disp.item(2)),
+                 ('DPY',disp.item(3)) ])
+
+  ## FIND ELEMENT: For a given s along the whole beamline, find in which element, i,  it is
+  def findElem(self, s):
+    for i in range(len(self.elems)):
+      if s <= self.elems[i].S:
+        return i
+
+  ## NATURAL CHROMATICITY: Given a design Beta (or B*) and optionally
+  ## the initial beta it calculates the natural chromaticity
+  def getNatChrom(self, BetStar, BetY0 = None):
+    newT = copy(self)
+    newT.elems = []
+    # Strip higher order elements from current twiss and store in a
+    # new one
+    for e in self.elems:
+      if e.KEYWORD in ['DRIFT', 'QUADRUPOLE', 'SBEND'] and e.L != 0:
+        newT.elems.append(e)
+    # Calculate the map of the new twiss
+    m = mapclass.Map2(newT)
+    # For Xy, 001010 and Xy, 000110
+    # Fr = gamma( (1+j+j') / 2 ) * gamma(...) * ... * gamma(3/2)
+    Fr = 4.373354581906215 # gamma(1./2)**3 * gamma(3./2)**2
+    # C = 2**((2+j+k+l+m+j'+k'+l'+m')/2) / pi**2.5
+    C = 0.4573148512298903 # 8*pow(pi,-2.5)
+    if BetY0 is None: BetY0 = self.markers[0].BETY
+    return Fr*C*(m['y'][(0,0,1,0,1,0)]**2*BetY0/BetStar +
+                 m['y'][(0,0,0,1,1,0)]**2/(BetY0*BetStar)).real
+
+#########################
+## Twiss functionality
 #########################
 def matrixForElement(e,order):
   try:
@@ -111,9 +245,7 @@ def mapForElement(e,order):
     if e.KEYWORD == "MULTIPOLE":
       if e.L == 0:
         m = MUL(order=order,**e)
-    if e.KEYWORD == "SEXTUPOLE" or \
-       e.KEYWORD == "OCTUPOLE" or \
-       e.KEYWORD == "DECAPOLE":
+    if e.KEYWORD in ["SEXTUPOLE", "OCTUPOLE", "DECAPOLE"]:
       if e.L == 0:
         m = MUL(order=order,**e)
       else:
