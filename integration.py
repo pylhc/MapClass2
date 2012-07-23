@@ -20,7 +20,7 @@ def simpson(f, a, b, n):
     F = h*S/3
 
     return F
-    
+
 # TRAPEZIUM RULE
 # f = function (e.g. I5)
 # a = start point, b = end point, n = no. integration intervals
