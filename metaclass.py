@@ -18,8 +18,11 @@ class dct(dict):
     except:
       raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
 
+  def __setattr__(self, attr, val):
+    self[attr] = val
+
 #########################
-class twiss(dict):
+class twiss(dct):
 #########################
   "Twiss parameters from madx output (with free choice of select items)"
 
