@@ -101,6 +101,14 @@ class twiss(dict):
     alfY0 = prevE.ALFY
     gamY0 = (1+alfY0**2)/betY0
 
+    if s == 0:
+      return  dct([ ('BETX',betX0),
+                    ('ALFX',alfX0),
+                    ('GAMX',gamX0),
+                    ('BETY',betY0),
+                    ('ALFY',alfY0),
+                    ('GAMY',gamY0) ])
+
     paraX0 = mtrx([ [betX0],
                     [alfX0],
                     [gamX0] ])
@@ -153,6 +161,12 @@ class twiss(dict):
       prevE = self.elems[nE-1]
     else:
       prevE = self.markers[0]
+
+    if s == 0:
+      return  dct([ ('DX',prevE.DX),
+                    ('DPX',prevE.DPX),
+                    ('DY',prevE.DY),
+                    ('DPY',prevE.DPY) ])
 
     # Use same set-up as for new positions/angles to enable use of transport matrix as is
     # disp0 = [x=DX, px=DPX, y=DY, py=DPY, D=1, S=0]
