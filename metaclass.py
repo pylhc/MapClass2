@@ -5,6 +5,8 @@ from copy import copy
 from transport import *
 import mapclass
 from pytpsa import polmap
+import math
+from integration import simpson
 
 #########################
 # Auxiliar elements
@@ -16,8 +18,11 @@ class dct(dict):
     except:
       raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
 
+  def __setattr__(self, attr, val):
+    self[attr] = val
+
 #########################
-class twiss(dict):
+class twiss(dct):
 #########################
   "Twiss parameters from madx output (with free choice of select items)"
 
@@ -105,6 +110,14 @@ class twiss(dict):
     alfY0 = prevE.ALFY
     gamY0 = (1+alfY0**2)/betY0
 
+    if s == 0:
+      return  dct([ ('BETX',betX0),
+                    ('ALFX',alfX0),
+                    ('GAMX',gamX0),
+                    ('BETY',betY0),
+                    ('ALFY',alfY0),
+                    ('GAMY',gamY0) ])
+
     paraX0 = mtrx([ [betX0],
                     [alfX0],
                     [gamX0] ])
@@ -157,6 +170,12 @@ class twiss(dict):
       prevE = self.elems[nE-1]
     else:
       prevE = self.markers[0]
+
+    if s == 0:
+      return  dct([ ('DX',prevE.DX),
+                    ('DPX',prevE.DPX),
+                    ('DY',prevE.DY),
+                    ('DPY',prevE.DPY) ])
 
     # Use same set-up as for new positions/angles to enable use of transport matrix as is
     # disp0 = [x=DX, px=DPX, y=DY, py=DPY, D=1, S=0]
@@ -212,6 +231,30 @@ class twiss(dict):
     if BetY0 is None: BetY0 = self.markers[0].BETY
     return Fr*C*(m['y'][(0,0,1,0,1,0)]**2*BetY0/BetStar +
                  m['y'][(0,0,0,1,1,0)]**2/(BetY0*BetStar)).real
+
+  ## OIDE EFFECT
+  def oide(self,n=100):
+    re = 2.817940325e-15
+    lame = 3.861592678e-13
+    emi = 0.2e-7
+    betas = 17.92472388e-6
+    gamma = 1500/0.000511
+    coeff = 110*re*lame*(gamma**5)/(3*math.sqrt(6*math.pi))
+    print coeff
+    Kq = 0.1158931845985401
+    Lq = 2.74
+    ls = 3.5
+    c = math.sqrt(Kq)*Lq
+    def f(x):
+      return math.sin(x) + math.sqrt(Kq)*ls*math.cos(x)
+    def g(y):
+      return (abs(math.sin(y) + math.sqrt(Kq)*ls*math.cos(y))**3)*(simpson(f,0,y,n))**2
+    integral = simpson(g,0,c,n)
+    ta = coeff*integral*(emi/(betas*gamma))**2.5
+    tb = emi*betas/gamma
+    ans = math.sqrt(ta+tb)
+    return integral, ans
+
 
 #########################
 ## Twiss functionality
