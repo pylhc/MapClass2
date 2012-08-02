@@ -19,7 +19,7 @@ import itertools
 import argparse
 
 import unittest
-if sys.version_info[0] == 2 and sys.version_info[1] < 7: 
+if sys.version_info[0] == 2 and sys.version_info[1] < 7:
     import unittest2
 else:
     unittest2 = unittest
@@ -30,6 +30,7 @@ from definitions import *
 from mapclass import Map2
 
 sys.path.append("old")
+
 
 # Make sets of strings to compare them because oldMapClass might
 # return less elements than MapClass2
@@ -48,16 +49,16 @@ class TestExtended:
   correlation = False
   gaussian = False
 
-  ###
-  betx=66.14532014
-  bety=17.92472388
-  gamma=3e6
-  ex=68e-8
-  ey=2e-8
-  sigmaFFS=[sqrt(ex*betx/gamma), sqrt(ex/betx/gamma), sqrt(ey*bety/gamma), sqrt(ey/bety/gamma), 0.01]
+  ### Example values
+  betx = 66.14532014
+  bety = 17.92472388
+  gamma = 3e6
+  ex = 68e-8
+  ey = 2e-8
+  sigmaFFS = [sqrt(ex*betx/gamma), sqrt(ex/betx/gamma), sqrt(ey*bety/gamma), sqrt(ey/bety/gamma), 0.01]
   ###
 
-  def assertAlmostEq(self,a,b):
+  def assertAlmostEq(self, a, b):
     self.assertEqual(self.sf % a, self.sf % b)
 
   def testEqual(self):
@@ -107,6 +108,7 @@ class TestExtended:
         l = len(ind1)/2
         self.assertTrue((ind1[:l] == ind2[:l] or ind1[:l] == ind2[l:]) and (ind1[l:] == ind2[:l] or ind1[l:] == ind2[l:]))
 
+
 ################
 ## Test cases ##
 ################
@@ -122,10 +124,11 @@ class Test5var6order(unittest2.TestCase, TestExtended):
     self.compare = True
     self.vals = OrderedDict([('x',self.sigmaFFS[0]),('px',self.sigmaFFS[1]),('y',self.sigmaFFS[2]),('py',self.sigmaFFS[3]),('d',self.sigmaFFS[4]),('s',0)])
 
-    self.m = Map2(order=o,filename=f)
-    self.mm = Map(order=o,filename=f)
-    self.m2 = Map2(order=o,filename=ff)
-    self.mm2 = Map(order=o,filename=ff)
+    self.m = Map2(order=o, filename=f)
+    self.mm = Map(order=o, filename=f)
+    self.m2 = Map2(order=o, filename=ff)
+    self.mm2 = Map(order=o, filename=ff)
+
 
 class Test5var6orderGaussian(unittest2.TestCase, TestExtended):
 
@@ -138,8 +141,9 @@ class Test5var6orderGaussian(unittest2.TestCase, TestExtended):
     self.correlation = True
     self.vals = OrderedDict([('x',self.sigmaFFS[0]),('px',self.sigmaFFS[1]),('y',self.sigmaFFS[2]),('py',self.sigmaFFS[3]),('d',self.sigmaFFS[4]),('s',0)])
 
-    self.m = Map2(order=o,filename=f)
-    self.mm = Map(order=o,filename=f)
+    self.m = Map2(order=o, filename=f)
+    self.mm = Map(order=o, filename=f)
+
 
 class Test5var10order(unittest2.TestCase, TestExtended):
 
@@ -152,10 +156,11 @@ class Test5var10order(unittest2.TestCase, TestExtended):
     self.compare = True
     self.vals = OrderedDict([('x',self.sigmaFFS[0]),('px',self.sigmaFFS[1]),('y',self.sigmaFFS[2]),('py',self.sigmaFFS[3]),('d',self.sigmaFFS[4]),('s',0)])
 
-    self.m = Map2(order=o,filename=f)
-    self.mm = Map(order=o,filename=f)
-    self.m2 = Map2(order=o,filename=ff)
-    self.mm2 = Map(order=o,filename=ff)
+    self.m = Map2(order=o, filename=f)
+    self.mm = Map(order=o, filename=f)
+    self.m2 = Map2(order=o, filename=ff)
+    self.mm2 = Map(order=o, filename=ff)
+
 
 class Test5var10orderGaussian(unittest2.TestCase, TestExtended):
 
@@ -168,49 +173,50 @@ class Test5var10orderGaussian(unittest2.TestCase, TestExtended):
     self.correlation = True
     self.vals = OrderedDict([('x',self.sigmaFFS[0]),('px',self.sigmaFFS[1]),('y',self.sigmaFFS[2]),('py',self.sigmaFFS[3]),('d',self.sigmaFFS[4]),('s',0)])
 
-    self.m = Map2(order=o,filename=f)
-    self.mm = Map(order=o,filename=f)
+    self.m = Map2(order=o, filename=f)
+    self.mm = Map(order=o, filename=f)
+
 
 class Test6var6order(unittest2.TestCase, TestExtended):
 
   def setUp(self):
     from mapclass25_6var import Map
 
-    self.sigmaFFS = [0.000227,9.306e-5, 5.02e-4, 4.21e-5,0.00666,0.002]
+    self.sigmaFFS = [0.000227, 9.306e-5, 5.02e-4, 4.21e-5, 0.00666, 0.002]
 
     o = 6
     f = 'assets/6Dfort.18'
     self.vals = OrderedDict([('x',self.sigmaFFS[0]),('px',self.sigmaFFS[1]),('y',self.sigmaFFS[2]),('py',self.sigmaFFS[3]),('d',self.sigmaFFS[4]),('s',self.sigmaFFS[5])])
 
-    self.m = Map2(order=o,filename=f)
-    self.mm = Map(order=o,filename=f)
+    self.m = Map2(order=o, filename=f)
+    self.mm = Map(order=o, filename=f)
 
   @unittest2.skip("Unnecessary")
   def testGenList(self):
     # generatelist isn't clear in mapclass25_6var so override this
     # test to avoid running it
     return
+
 
 class Test6var10order(unittest2.TestCase, TestExtended):
 
   def setUp(self):
     from mapclass25_6var import Map
 
-    self.sigmaFFS = [0.000227,9.306e-5, 5.02e-4, 4.21e-5,0.00666,0.002]
+    self.sigmaFFS = [0.000227, 9.306e-5, 5.02e-4, 4.21e-5, 0.00666, 0.002]
 
     o = 10
     f = 'assets/6Dfort.18'
     self.vals = OrderedDict([('x',self.sigmaFFS[0]),('px',self.sigmaFFS[1]),('y',self.sigmaFFS[2]),('py',self.sigmaFFS[3]),('d',self.sigmaFFS[4]),('s',self.sigmaFFS[5])])
 
-    self.m = Map2(order=o,filename=f)
-    self.mm = Map(order=o,filename=f)
+    self.m = Map2(order=o, filename=f)
+    self.mm = Map(order=o, filename=f)
 
   @unittest2.skip("Unnecessary")
   def testGenList(self):
     # generatelist isn't clear in mapclass25_6var so override this
     # test to avoid running it
     return
-
 
 
 ########################
@@ -227,25 +233,25 @@ class TwissExtended:
   def testBeta(self):
     for i in range(len(self.t.elems)):
       e = self.t.elems[i]
-      self.assertEqual(e.BETX, self.t.getBeta(i,e.L).BETX)
-      self.assertEqual(e.BETY, self.t.getBeta(i,e.L).BETY)
-      self.assertEqual(e.ALFX, self.t.getBeta(i,e.L).ALFX)
-      self.assertEqual(e.ALFY, self.t.getBeta(i,e.L).ALFY)
+      self.assertEqual(e.BETX, self.t.getBeta(i, e.L).BETX)
+      self.assertEqual(e.BETY, self.t.getBeta(i, e.L).BETY)
+      self.assertEqual(e.ALFX, self.t.getBeta(i, e.L).ALFX)
+      self.assertEqual(e.ALFY, self.t.getBeta(i, e.L).ALFY)
 
   def testDisp(self):
     for i in range(len(self.t.elems)):
       e = self.t.elems[i]
-      self.assertEqual(e.DX, self.t.getDisp(i,e.L).DX)
-      self.assertEqual(e.DY, self.t.getDisp(i,e.L).DY)
-      self.assertEqual(e.DPX, self.t.getDisp(i,e.L).DPX)
-      self.assertEqual(e.DPY, self.t.getDisp(i,e.L).DPY)
+      self.assertEqual(e.DX, self.t.getDisp(i, e.L).DX)
+      self.assertEqual(e.DY, self.t.getDisp(i, e.L).DY)
+      self.assertEqual(e.DPX, self.t.getDisp(i, e.L).DPX)
+      self.assertEqual(e.DPY, self.t.getDisp(i, e.L).DPY)
 
 
 class TestElems(unittest2.TestCase, TwissExtended):
 
   def setUp(self):
     from metaclass import twiss
-    
+
     for root, subFolders, files in os.walk('assets/twiss/'):
       if 'twiss' in files and 'fort.18' in files:
         print "\nTesting: ", root
@@ -269,10 +275,8 @@ def twissSuite():
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Tester for MapClass')
-  parser.add_argument('-s', help='Run the slow tests as well',
-                    action='store_true', dest='slow')
-  parser.add_argument('-t', help="Test the import from Twiss and compare with fort.18. It doesn't run any of the other tests.",
-                      action='store_true', dest='twiss')
+  parser.add_argument('-s', help='Run the slow tests as well', action='store_true', dest='slow')
+  parser.add_argument('-t', help="Test the import from Twiss and compare with fort.18. It doesn't run any of the other tests.", action='store_true', dest='twiss')
   args = parser.parse_args()
 
   if args.twiss:
@@ -280,4 +284,4 @@ if __name__ == '__main__':
     test_suite = twissSuite()
     runner.run(test_suite)
   else:
-    unittest2.main(verbosity=2,argv=sys.argv[:1])
+    unittest2.main(verbosity=2, argv=sys.argv[:1])
