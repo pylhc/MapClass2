@@ -34,7 +34,7 @@ def gammlnGOOD(xx):
 
 
 #########################
-class Map2(polmap):
+class Map2(polmap,metaclass.dct):
 #########################
   '''
   MAP coefficients from madx-PTC output
@@ -287,11 +287,3 @@ class Map2(polmap):
         poten = 2.5
       factor = pow(2, sum(ind[:4] + ind[5:]) / 2) / pow(pi, poten) / (ind[4] + 1.0)
     return factor
-
-  ## Overloaded methods
-  # Fancy/easier access to things
-  def __getattr__(self, attr):
-    try:
-      return self[attr]
-    except:
-      raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
