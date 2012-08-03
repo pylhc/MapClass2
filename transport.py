@@ -9,7 +9,22 @@ from pytpsa import *
 #########################
 class mtrx(matrix):
 #########################
+  """
+  A specialisation of the matrix class from NumPy. This class overrides the call method
+  so that calling a matrix object is possible (e.g. if m is a matrix, m(x=1) ).
+  """
   def __call__(self, *args, **kwargs):
+    """
+    For each element of the matrix it will check if it is a function or a pol, if this
+    is true it will call them with the exact same arguments that the matrix was called
+    with and store the result in the same position of the matrix, returning a new matrix
+    with some of the elements altered.
+
+    For example, a drift is a mtrx where some of the elements are functions. Once the attributes
+    of the drift are known (i.e. its length) the matrix will be called with this information
+    (e.g. drift(L=3)) and return a matrix of numbers and "pol"s where L has already been
+    substituted.
+    """
     m = self.copy()
     for i, v in ndenumerate(m):
       if type(v) is FunctionType or type(v) is pol:
@@ -19,6 +34,9 @@ class mtrx(matrix):
 
 #### Helper functions ####
 def matrixToMap(m, vrs):
+  """
+  A simple function that turns a transport matrix into its map representation.
+  """
   mp = polmap()
   for i in range(0, len(vrs)):
     mp[vrs[i]] = m.item(i)

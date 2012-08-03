@@ -1,42 +1,55 @@
-.. MapClass2 documentation master file, created by
-   sphinx-quickstart on Mon Jun  4 11:08:02 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to MapClass2's documentation!
+MapClass2 documentation
 =====================================
 
-Contents:
+Requires Python 2.6 or higher with the NumPy library installed.
 
-.. toctree::
-   :maxdepth: 2
+Map2
+-----
 
 .. automodule:: mapclass
+   :members:
 
-.. autoclass:: Map2
-    :members: 
+metaclass
+----------
 
 .. automodule:: metaclass
+   :members:
 
-.. autoclass:: twiss
-    :members:
-
-.. automodule:: transport
+definitions
+-----------
 
 .. automodule:: definitions
+   :members:
+   :special-members:
+
+transport
+---------
+
+.. automodule:: transport
+   :members:
+   :special-members:
+
+integration
+============
+
+.. automodule:: integration
+   :members:
+
+pytpsa
+=======
 
 .. automodule:: pytpsa
 
+pol
+---
 .. autoclass:: pol
-    :members:
+   :members:
+   :special-members:
 
+polmap
+------
 .. autoclass:: polmap
-    :members:
+   :members:
+   :special-members:
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 

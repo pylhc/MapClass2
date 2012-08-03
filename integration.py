@@ -1,10 +1,15 @@
-# SIMPSONS RULE (1/3)
-# f = function (e.g. I5)
-# a = start point, b = end point, n = no. integration intervals
-
-##### n MUST BE EVEN #####
-
 def simpson(f, a, b, n):
+    """
+    Simpsons rule
+
+    :param function f: a unary function
+    :param int a: start point
+    :param int b: end point
+    :param int n: no. integration intervals (must be even)
+
+    :return: result of the integral
+    """
+
     h = (float(b) - a) / n
     S = f(float(a))
 
@@ -21,10 +26,19 @@ def simpson(f, a, b, n):
 
     return F
 
-# TRAPEZIUM RULE
-# f = function (e.g. I5)
-# a = start point, b = end point, n = no. integration intervals
+
 def trap(f, a, b, n):
+    """
+    Trapezium rule
+
+    :param function f: a unary function
+    :param int a: start point
+    :param int b: end point
+    :param int n: no. integration intervals (must be even)
+
+    :return: result of the integral
+    """
+
     h = (float(b) - float(a)) / float(n)
     S = f(float(a)) + f(float(b))
 
