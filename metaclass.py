@@ -2,27 +2,12 @@ from collections import namedtuple
 from numpy import identity
 from copy import copy
 
+from definitions import dct
 from transport import *
 import mapclass
 from pytpsa import polmap
 import math
 from integration import simpson
-
-
-#########################
-# Auxiliar elements
-#########################
-
-class dct(dict):
-
-  def __getattr__(self, attr):
-    try:
-      return self[attr]
-    except:
-      raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
-
-  def __setattr__(self, attr, val):
-    self[attr] = val
 
 
 #########################
@@ -236,11 +221,12 @@ class twiss(dct):
     """
     Returns the natural chromaticity of the beamline
 
-    These parameters are optional and are otherwise read from the twiss markers
     :param float BetStarX: design beta in x-direction
     :param float BetX0: initial beta in x-direction
     :param float BetStarY: design beta in y-direction
     :param float BetY0: initial beta in y-direction
+
+    These parameters are optional and are otherwise read from the twiss markers
     """
 
     newT = copy(self)

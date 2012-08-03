@@ -20,3 +20,27 @@ def generateDefaultMatrix(order):
 
 def generateDefaultMap(order):
   return polmap(zip(XYZD, XYZD), order=order)
+
+#########################
+# Auxiliar elements
+#########################
+
+class dct(dict):
+  '''
+  Ladi da
+  '''
+
+  def __getattr__(self, attr):
+    '''
+    diii
+    '''
+    try:
+      return self[attr]
+    except:
+      raise AttributeError("%r object has no attribute %r" % (type(self).__name__, attr))
+
+  def __setattr__(self, attr, val):
+    '''
+    ddd
+    '''
+    self[attr] = val

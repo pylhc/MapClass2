@@ -34,13 +34,16 @@ def gammlnGOOD(xx):
 
 
 #########################
-class Map2(polmap,metaclass.dct):
+class Map2(polmap, dct):
 #########################
   '''
-  MAP coefficients from madx-PTC output
+  MAP2 coefficients from madx-PTC output
 
-  :param int order: Calculate map up to this order
-  :param string filename: Input filename
+  :param int order: calculate map up to this order
+  :param string filename: input filename
+  :param twiss t: the twiss object
+
+  Either filename is used or twiss object to construct a Map2
   '''
 
   def __init__(self, *args, **kwargs):
@@ -111,9 +114,11 @@ class Map2(polmap,metaclass.dct):
     '''
     Calculate the beam offset
 
-    :param string xory: Which coordinate to calculate for (x,y,px, or py)
+    :param string xory: Which dimension to calculate for (x,y,px, or py)
     :param list i: Size of beam in sigma [x,px,y,py]
     :param boolean gaussianDelta: Use gaussian energy delta or not
+
+    :return: the offset in the desired dimension
     '''
     sx = 0
     if gaussianDelta:
@@ -137,6 +142,8 @@ class Map2(polmap,metaclass.dct):
     :param string xory: Which coordinate to calculate for (x,y,px, or py)
     :param list i: Size of beam in sigma [x,px,y,py]
     :param boolean gaussianDelta: Use gaussian energy delta or not
+
+    :return: sigma for xory dimension
     '''
     sx = 0
     for ind1, coeff1 in self[xory].iteritems():
@@ -156,8 +163,14 @@ class Map2(polmap,metaclass.dct):
 
   def comp(self, m, v=None):
     '''
-    :m another map
-    :v list of variables used to compare the maps by default it's XYZD
+    Compares two maps and returns the chi2. This comparison is only made on the elements for
+    which d is 0. It takes two parameters: m for the second map to compare it with and v which
+    is a list of the dimensions to be compared, it defaults to the values in XYZD (see definitions.py).
+
+    :param Map2 m: another map
+    :param list str v: list of variables used to compare the maps by default it's XYZD
+
+    :return: chi2
     '''
     chi2 = 0
     if v == None:
@@ -176,8 +189,15 @@ class Map2(polmap,metaclass.dct):
 
   def compc(self, m, v=None):
     '''
-    :m another map
-    :v list of variables used to compare the maps by default it's XYZD
+    Compares two maps and returns the chi2. It takes two parameters: m for the second map to
+    compare it with and v which is a list of the dimensions to be compared, it defaults to the
+    values in XYZD (see definitions.py).
+
+
+    :param Map2 m: another map
+    :param list str v: list of variables used to compare the maps by default it's XYZD
+
+    :return: chi2
     '''
     chi2 = 0
     if v == None:
@@ -194,6 +214,17 @@ class Map2(polmap,metaclass.dct):
 
   #Correlation from mapclass.py originally
   def correlation(self, v1, v2, i, gaussianDelta=False):
+    '''
+    It calculates the correlation between two dimensions for some given initial sigmas (parameter
+    i). Alternatively it can be set to assume a gaussian distribution of the particles.
+
+    :param str v1: name of the first dimension to correlate
+    :param str v2: name of the second dimension to correlate
+    :param list int i: initial sigmas
+    :param boolean gaussianDelta: Use gaussian energy delta or not
+
+    :return: correlation
+    '''
     sx = 0
     for ind1, coeff1 in self[v1].iteritems():
       for ind2, coeff2 in self[v2].iteritems():
@@ -212,6 +243,18 @@ class Map2(polmap,metaclass.dct):
 
   #Correlation3 from mapclass.GaussianDelta.py
   def correlation3(self, v1, v2, v3, i, gaussianDelta=False):
+    '''
+    It calculates the correlation between two dimensions for some given initial sigmas (parameter
+    i). Alternatively it can be set to assume a gaussian distribution of the particles.
+
+    :param str v1: name of the first dimension to correlate
+    :param str v2: name of the second dimension to correlate
+    :param str v3: name of the third dimension to correlate
+    :param list int i: initial sigmas
+    :param boolean gaussianDelta: Use gaussian energy delta or not
+
+    :return: correlation
+    '''
     sx = 0
     for ind1, coeff1 in self[v1].iteritems():
       for ind2, coeff2 in self[v2].iteritems():
@@ -227,6 +270,16 @@ class Map2(polmap,metaclass.dct):
     return sx
 
   def generatelist(self, xory, i, gaussianDelta=False):
+    '''
+    Provides a list of the largest contributions to the sigmas assuming a Gaussian distribution
+    or a uniform one.
+
+    :param str xory: name of the dimension
+    :param list int i: initial sigmas
+    :param boolean gaussianDelta: Use gaussian energy delta or not
+
+    :return: list of contributions
+    '''
     sx = 0
     l = []
     if gaussianDelta:
