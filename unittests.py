@@ -233,10 +233,11 @@ class TwissExtended:
   def testBeta(self):
     for i in range(len(self.t.elems)):
       e = self.t.elems[i]
-      self.assertEqual(e.BETX, self.t.getBeta(i, e.L).BETX)
-      self.assertEqual(e.BETY, self.t.getBeta(i, e.L).BETY)
-      self.assertEqual(e.ALFX, self.t.getBeta(i, e.L).ALFX)
-      self.assertEqual(e.ALFY, self.t.getBeta(i, e.L).ALFY)
+      if e.L != 0:
+          self.assertEqual(e.BETX, self.t.getBeta(i, e.L).BETX)
+          self.assertEqual(e.BETY, self.t.getBeta(i, e.L).BETY)
+          self.assertEqual(e.ALFX, self.t.getBeta(i, e.L).ALFX)
+          self.assertEqual(e.ALFY, self.t.getBeta(i, e.L).ALFY)
 
   def testDisp(self):
     for i in range(len(self.t.elems)):
