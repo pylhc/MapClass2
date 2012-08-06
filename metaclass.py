@@ -371,6 +371,7 @@ class twiss(dct):
 
     :param float s: location of interest along beamline
     :param float gamma: energy
+    :param string fun: name of the function given to the integral for the calculations
     :param float s0: start location along beamline (optional)
     :param int n: number of intervals for integrations (optional)
     """
