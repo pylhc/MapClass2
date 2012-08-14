@@ -204,6 +204,51 @@ class twiss(dct):
                 ('DY', disp.item(2)),
                 ('DPY', disp.item(3))])
 
+  def getPhase(self,nE,s):
+    """
+    Calculates phase at location s in element nE.
+
+    :param int nE: number of element of interest - where the first element is 0
+    :param float s: location of interest within element nE
+
+    :return: dct of MUX and MUY
+    """
+
+    # Get initial phase values MUX and MUY from previous element
+    # or start marker (if nE=0)
+    if nE != 0:
+      prevE = self.elems[nE-1]
+    else:
+      prevE = self.markers[0]
+
+    if s == 0:
+      return  dct([('MUX', prevE.MUX),
+                   ('MUY', prevE.MUY)])
+
+    para = self.getBeta(nE,s)
+
+    # Copy element nE and change length to location of interest, s
+    # Calculate transport matrix for this element assuming D=0
+    # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
+    # DRIFT and recalculate transport matrix
+    e = dct(self.elems[nE])
+    e['L'] = s
+    m = matrixForElement(e, 6)  # NOTE: Takes order 6
+    if m == None:
+      e['KEYWORD']="DRIFT"
+      m = matrixForElement(e, 6)
+    m = m(d=0)
+
+    # Calculate cos(delta Phi) and sin(delta Phi) in x and y planes
+    xy = m.item((0,1)) / math.sqrt(prevE.BETX * para.BETX)
+    xx = (math.sqrt(prevE.BETX) * m.item((0,0)) / math.sqrt(para.BETX)) - (prevE.ALFX * xy)
+
+    yy = m.item((2,3)) / math.sqrt(prevE.BETY * para.BETY)
+    yx = (math.sqrt(prevE.BETY) * m.item((2,2)) / math.sqrt(para.BETY)) - (prevE.ALFY * yy)
+
+    return  dct([('MUX', math.atan2(xy,xx) / (2 * math.pi) + prevE.MUX),
+                 ('MUY', math.atan2(yy,yx) / (2 * math.pi) + prevE.MUY)])
+
   def findElem(self, s):
     """
     Finds in which element a given location along the beamline is present
@@ -272,7 +317,7 @@ class twiss(dct):
       ss = s - (e.S - e.L)
       bet = self.getBeta(nE, ss)
       if e.K1L != 0:
-        return bet.BETX * e.K1L / e.L
+        return bet.BETX * -e.K1L / e.L  # Correct to make negative?
       else:
         return 0
 
@@ -282,7 +327,7 @@ class twiss(dct):
       ss = s - (e.S - e.L)
       bet = self.getBeta(nE, ss)
       if e.K1L != 0:
-        return bet.BETY * -e.K1L / e.L  # Correct to make negative?
+        return bet.BETY * e.K1L / e.L
       else:
         return 0
 
@@ -345,27 +390,7 @@ class twiss(dct):
     return dct([('HX', HX),
                 ('HY', HY)])
 
-  # NB: Result varies greatly for different values of n for
-  # quadrupoles, needs large n (~500) which is very slow
-  def getPhase(self, s, s0=0, n=500):
-    """
-    Returns phase between s0 and s
-
-    :param float s: end location along beamline
-    :param float s0: start location along beamline (optional)
-    :param int n: number of intervals for integration (optional)
-    """
-
-    def f(s):
-      nE = self.findElem(s)
-      e = self.elems[nE]
-      ss = s - (e.S - e.L)
-      betX = self.getBeta(nE, ss).BETX
-      return 1 / betX
-
-    return simpson(f, s0, s, n)
-
-  def sigmaBends(self, s, gamma, fun="f2", s0=0, n=100):
+  def sigmaBends(self, gamma, s=None, s0=0, n=100):
     """
     Returns delta(sigma^2) due to bends (dipoles)
 
@@ -375,9 +400,10 @@ class twiss(dct):
     :param float s0: start location along beamline (optional)
     :param int n: number of intervals for integrations (optional)
     """
+    if s is None: s = self.markers[1].S
 
     # Calculates H/P^3 cos(phi)^2 at location s along the beamline
-    def f1(s):
+    def f(s):
       nE = self.findElem(s)
       e = self.elems[nE]
 
@@ -385,31 +411,20 @@ class twiss(dct):
       if e.ANGLE != 0:
         # ss from beginning of element nE == s from beginning of beamline
         ss = s - (e.S - e.L)
-        #phi = self.getPhase(s)
-        #cosPhi = (math.cos(phi) ** 2).real
+        para = self.getBeta(nE,ss)
+        disp = self.getDisp(nE,ss)
+        alpha = math.atan(-para.ALFX + para.BETX * disp.DPX / disp.DX)
+        phi = self.getPhase(nE,ss).MUX + alpha
+        cosPhi = (math.cos(phi) ** 2).real + para.ALFX
         H = self.getH(nE, ss)
         P = abs(e.L / e.ANGLE)
-        return H.HX / P**3
-        #return H.HX * cosPhi / P**3
-      else:
-        return 0
-
-    # Calculates D^2 / P^3 at location s along the beamline
-    def f2(s):
-      nE = self.findElem(s)
-      e = self.elems[nE]
-      if e.ANGLE != 0:
-        P = abs(e.L / e.ANGLE)
-        D = P * (1 - math.cos(e.ANGLE * s / e.L))
-        return D**2 / P**3
+        return H.HX * cosPhi / P**3
       else:
         return 0
 
     c2 = 4.13e-11  # m^2(GeV)^-5
-    coeff = c2 * gamma**5
-    if fun == "f1":
-      return coeff * simpson(f1, s0, s, n)
-    return coeff * simpson(f2, s0, s, n)
+    coeff = c2 * gamma**5 * self.markers[1].BETX  # Check this! x or y?
+    return coeff * simpson(f, s0, s, n)
 
 
 #########################
