@@ -1,6 +1,6 @@
 from collections import namedtuple
 from numpy import identity
-from copy import copy
+from copy import copy, deepcopy
 
 from definitions import dct
 from transport import *
@@ -334,15 +334,15 @@ class twiss(dct):
     return dct([('ChromX', -simpson(fX, s0, s, n) / (4 * math.pi)),
                 ('ChromY', -simpson(fY, s0, s, n) / (4 * math.pi))])
 
-  def oide(self, emi, gamma, n=100):
+  def oide(self, emi, n=100):
     """
     Returns delta(sigma^2) due to Oide Effect
 
     :param float emi: emittance
-    :param float gamma: energy
     :param int n: number of intervals for integration (optional)
     """
 
+    gamma = 2934846.4097045588 # 1500/0.0005111 relativistic parameter
     re = 2.817940325e-15
     lame = 3.861592678e-13
     betas = self.markers[1].BETY  # 17.92472388e-6 from mathematica
@@ -425,6 +425,97 @@ class twiss(dct):
     c2 = 4.13e-11  # m^2(GeV)^-5
     coeff = c2 * gamma**5 * self.markers[1].BETX  # Check this! x or y?
     return coeff * simpson(f, s0, s, n)
+
+  def alterElem(self, nE, dL=None, dPos=None):
+    """
+    Returns a new twiss object having altered the length or position (or both)
+    of an element.
+
+    Changes the twiss parameters (BETX, BETY, ALFX, ALFY), the dispersion
+    (DX, DPX, DY, DPY) and the phase (MUX, MUY) accordingly. Other parameters
+    will maintain the values from the original twiss object and, therefore,
+    may be incorrect.
+
+    :param int nE: number of element whose properties are to be altered
+    :param float dL: change in length (e.g. dL = 2 adds 1 unit to each end of the element)
+    :param float dPos: change in position (e.g. dPos = 2 moves it 2 units forward along the line)
+    """
+
+    # Sets dL and dPos to zero if nothing entered
+    if dL == None: dL = 0
+    if dPos == None: dPos = 0
+
+    # Tests that element is not first or last in the line
+    if nE < 1 or nE > len(self.elems) - 2:
+      print "Element out of bounds"
+      return
+
+    # Tests that element is surrounded by drifts
+    prev = self.elems[nE-1]
+    nxt = self.elems[nE+1]
+    if all("DRIFT" != k.KEYWORD for k in [prev, nxt]):
+      print "Element not surrounded by drifts"
+      return
+
+    # Tests that dL not longer than surrounding drift space
+    if dL > (prev.L + nxt.L):
+      print "dL too long"
+      return
+
+    # Tests that dPos does not exceed available drift space
+    if dPos < 0:
+      if abs(dPos) > prev.L:
+        print "dPos out of range"
+        return
+    if dPos > 0:
+      if dPos > nxt.L:
+        print "dPos out of range"
+        return
+
+    # Makes a copy of the twiss object
+    t = deepcopy(self)
+    prev = t.elems[nE-1]
+    curr = t.elems[nE]
+    nxt = t.elems[nE+1]
+
+    # Modifies L and S of twiss copy according to length change, dL
+    # Length is added/subtracted symmetrically from each side of the element
+    prev.L = prev.L - dL / 2
+    curr.L = curr.L + dL
+    nxt.L = nxt.L - dL / 2
+
+    prev.S = prev.S - dL / 2
+    curr.S = curr.S + dL / 2
+
+    # Modifies L and S of twiss copy according to position change, dPos
+    prev.L = prev.L + dPos
+    nxt.L = nxt.L - dPos
+
+    prev.S = prev.S + dPos
+    curr.S = curr.S + dPos
+
+    # If Quadrupole or Dipole, change twiss parameters, dispersion and
+    # phase till the end of the line
+    # If any other element, change till the end of the second drift
+    # (as they are modelled as drifts anyway)
+    if curr.KEYWORD in ["QUADRUPOLE", "SBEND"]:
+      end = len(t.elems)
+    else:
+      end = nE + 1
+
+    for i in range(nE-1, end):
+      e = t.elems[i]
+      para = t.getBeta(i,e.L)
+      disp = t.getDisp(i,e.L)
+      mu = t.getPhase(i,e.L)
+      for k in para.keys():
+        e[k] = para[k]
+      for k in disp.keys():
+        e[k] = disp[k]
+      for k in mu.keys():
+        e[k] = mu[k]
+
+    return t
 
 
 #########################
