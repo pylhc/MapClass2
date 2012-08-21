@@ -47,7 +47,7 @@ for E in ${ELEMS[@]}; do
   for L in $(seq $LMIN $LINC $LMAX); do
     echo -n "."
     sed -e "s/L=/L=$L/" $MADXFILE | sed -e "s/LINE:=/LINE:=\($E\)/" | $MADX > /dev/null
-    
+
     CHI2=$($PYFILE $PYDIR | tail -n 1)
     echo $L $CHI2 >> "$E.$DATEXT"
   done
@@ -55,12 +55,16 @@ for E in ${ELEMS[@]}; do
 
   echo "[gnuplot] $IMGDIR/$E.$IMGFORM"
   gnuplot <<EOF
+  # f (x) = a*x**b
+  # a = 0; b = 2;
+  # fit f(x) '$TMPDIR/$E.$DATEXT' via a,b
+  set logscale y
   set term $IMGFORM enhanced
   set output "$IMGDIR/$E.$IMGFORM"
   set title "$KW ($E)"
-  set nokey
   set ylabel "{/Symbol c}^2"
   set xlabel "L"
-  p "$TMPDIR/$E.$DATEXT"
+  p "$TMPDIR/$E.$DATEXT" title 'Data'
+  # p "$TMPDIR/$E.$DATEXT" title 'Data', a*x**b title sprintf("Approximation %dx^{%d}",a,b)
 EOF
 done
