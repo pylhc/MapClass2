@@ -251,14 +251,14 @@ class TwissExtended:
 class TestElems(unittest2.TestCase, TwissExtended):
 
   def setUp(self):
-    from metaclass import twiss
+    from metaclass2 import twiss2
 
     for root, subFolders, files in os.walk('assets/twiss/'):
       if 'twiss' in files and 'fort.18' in files:
         print "\nTesting: ", root
         twissfile = os.path.join(root, "twiss")
         fortfile = os.path.join(root, "fort.18")
-        self.t = twiss(twissfile)
+        self.t = twiss2(twissfile)
         self.m = Map2(self.t)
         self.mm = Map2(filename=fortfile)
 

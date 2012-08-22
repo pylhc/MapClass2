@@ -8,7 +8,7 @@ from math import *
 
 sys.path.append('../../')
 
-from metaclass import twiss
+from metaclass2 import twiss2
 from mapclass import Map2
 
 ### Argument reading
@@ -25,7 +25,7 @@ args = parser.parse_args()
 
 startTime = time.time()
 
-t = twiss('assets/ffs.twiss')
+t = twiss2('assets/ffs.twiss')
 
 m = Map2(t,order=args.order)
 

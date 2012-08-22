@@ -9,10 +9,10 @@ Map2
 .. automodule:: mapclass
    :members:
 
-metaclass
+metaclass2
 ----------
 
-.. automodule:: metaclass
+.. automodule:: metaclass2
    :members:
 
 definitions

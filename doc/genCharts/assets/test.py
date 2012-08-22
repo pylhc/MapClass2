@@ -8,10 +8,10 @@ if len(sys.argv) < 2:
 
 sys.path.append(sys.argv[1])
 
-from metaclass import twiss
+from metaclass2 import twiss2
 from mapclass import Map2
 
-t = twiss()
+t = twiss2()
 
 m = Map2(t)
 

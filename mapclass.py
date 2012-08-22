@@ -4,7 +4,7 @@ from operator import *
 from numpy import identity, matrix
 
 from definitions import *
-import metaclass
+import metaclass2
 from transport import *
 
 from pytpsa import pol, polmap
@@ -41,13 +41,13 @@ class Map2(polmap, dct):
 
   :param int order: calculate map up to this order
   :param string filename: input filename
-  :param twiss t: the twiss object
+  :param twiss2 t: the twiss2 object
 
   Either filename is used or twiss object to construct a Map2
   '''
 
   def __init__(self, *args, **kwargs):
-    if len(args) == 1 and isinstance(args[0], metaclass.twiss):
+    if len(args) == 1 and isinstance(args[0], metaclass2.twiss2):
       self.fromTwiss(args[0], **kwargs)
     else:
       self.fromFort(*args, **kwargs)
@@ -58,13 +58,13 @@ class Map2(polmap, dct):
     U = generateDefaultMatrix(order=order)
     for e in t.elems:
       try:
-        mtr = metaclass.matrixForElement(e, order)
+        mtr = metaclass2.matrixForElement(e, order)
         if mtr == None:
-          mp = metaclass.mapForElement(e, order)
+          mp = metaclass2.mapForElement(e, order)
           R = mp * R
         else:
           M = mtr * U
-          mp = metaclass.matrixToMap(M, XYZD)
+          mp = metaclass2.matrixToMap(M, XYZD)
           R = mp * R
       except Exception:
         print "No implementation for element: ", e.NAME, e.KEYWORD

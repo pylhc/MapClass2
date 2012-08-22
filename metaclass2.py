@@ -1,4 +1,3 @@
-from collections import namedtuple
 from numpy import identity
 from copy import copy, deepcopy
 
@@ -11,7 +10,7 @@ from integration import simpson
 
 
 #########################
-class twiss(dct):
+class twiss2(dct):
 #########################
   "Twiss parameters from madx output (with free choice of select items)"
 
