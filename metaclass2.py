@@ -425,7 +425,7 @@ class twiss2(dct):
     coeff = c2 * gamma**5 * self.markers[1].BETX  # Check this! x or y?
     return coeff * simpson(f, s0, s, n)
 
-  def alterElem(self, nE, dL=None, dPos=None):
+  def alterElem(self, nE, dL=0, dPos=0):
     """
     Returns a new twiss object having altered the length or position (or both)
     of an element.
@@ -439,10 +439,6 @@ class twiss2(dct):
     :param float dL: change in length (e.g. dL = 2 adds 1 unit to each end of the element)
     :param float dPos: change in position (e.g. dPos = 2 moves it 2 units forward along the line)
     """
-
-    # Sets dL and dPos to zero if nothing entered
-    if dL == None: dL = 0
-    if dPos == None: dPos = 0
 
     # Tests that element is not first or last in the line
     if nE < 1 or nE > len(self.elems) - 2:
