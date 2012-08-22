@@ -110,12 +110,12 @@ class Map2(polmap, dct):
     fdct[XYZD[ietall]] = p
     self.update(fdct)
 
-  def offset(self, xory, i, gaussianDelta=False):
+  def offset(self, xory, sig, gaussianDelta=False):
     '''
     Calculate the beam offset
 
     :param string xory: Which dimension to calculate for (x,y,px, or py)
-    :param list i: Size of beam in sigma [x,px,y,py]
+    :param list sig: Initial size of beam (sigma) for [x,px,y,py,d,s]
     :param boolean gaussianDelta: Use gaussian energy delta or not
 
     :return: the offset in the desired dimension
@@ -135,12 +135,12 @@ class Map2(polmap, dct):
           sx += coeff * factor * exp(Gammasumln) * sigmaprod
     return sx
 
-  def sigma(self, xory, i, gaussianDelta=False):
+  def sigma(self, xory, sig, gaussianDelta=False):
     '''
     Calculate the beam size in sigma.
 
     :param string xory: Which coordinate to calculate for (x,y,px, or py)
-    :param list i: Size of beam in sigma [x,px,y,py]
+    :param list sig: Initial size of beam (sigma) for [x,px,y,py,d,s]
     :param boolean gaussianDelta: Use gaussian energy delta or not
 
     :return: sigma for xory dimension
@@ -213,14 +213,14 @@ class Map2(polmap, dct):
     return chi2
 
   #Correlation from mapclass.py originally
-  def correlation(self, v1, v2, i, gaussianDelta=False):
+  def correlation(self, v1, v2, sig, gaussianDelta=False):
     '''
     It calculates the correlation between two dimensions for some given initial sigmas (parameter
     i). Alternatively it can be set to assume a gaussian distribution of the particles.
 
     :param str v1: name of the first dimension to correlate
     :param str v2: name of the second dimension to correlate
-    :param list int i: initial sigmas
+    :param list sig: Initial size of beam (sigma) for [x,px,y,py,d,s]
     :param boolean gaussianDelta: Use gaussian energy delta or not
 
     :return: correlation
@@ -242,7 +242,7 @@ class Map2(polmap, dct):
     return sx
 
   #Correlation3 from mapclass.GaussianDelta.py
-  def correlation3(self, v1, v2, v3, i, gaussianDelta=False):
+  def correlation3(self, v1, v2, v3, sig, gaussianDelta=False):
     '''
     It calculates the correlation between two dimensions for some given initial sigmas (parameter
     i). Alternatively it can be set to assume a gaussian distribution of the particles.
@@ -250,7 +250,7 @@ class Map2(polmap, dct):
     :param str v1: name of the first dimension to correlate
     :param str v2: name of the second dimension to correlate
     :param str v3: name of the third dimension to correlate
-    :param list int i: initial sigmas
+    :param list sig: Initial size of beam (sigma) for [x,px,y,py,d,s]
     :param boolean gaussianDelta: Use gaussian energy delta or not
 
     :return: correlation
@@ -269,13 +269,13 @@ class Map2(polmap, dct):
               sx += coeff1 * coeff2 * coeff3 * factor * exp(Gammasumln) * sigmaprod
     return sx
 
-  def generatelist(self, xory, i, gaussianDelta=False):
+  def generatelist(self, xory, sig, gaussianDelta=False):
     '''
     Provides a list of the largest contributions to the sigmas assuming a Gaussian distribution
     or a uniform one.
 
     :param str xory: name of the dimension
-    :param list int i: initial sigmas
+    :param list sig: Initial size of beam (sigma) for [x,px,y,py,d,s]
     :param boolean gaussianDelta: Use gaussian energy delta or not
 
     :return: list of contributions
