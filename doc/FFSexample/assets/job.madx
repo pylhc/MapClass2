@@ -11,7 +11,7 @@ use, period=EFF1S;
 call, file="v_10_10_11/coll_sexts_octs.madx";
 call, file="v_10_10_11/values.disp085.ind92";
 select, flag=twiss, clear;
-select, flag=twiss, column=name,s,betx,bety,alfx,alfy,dx,mux,muy,l,k1l,k2l,keyword, angle, k3l, k4l, k5l, k6l;
+select, flag=twiss, full;!, column=name,s,betx,bety,alfx,alfy,dx,mux,muy,l,k1l,k2l,keyword, angle, k3l, k4l, k5l, k6l;
 
 twiss,BETX=64.99988501,BETY=17.99971417,deltap=0.0,file="ffs.twiss",save;
 
