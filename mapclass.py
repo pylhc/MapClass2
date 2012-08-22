@@ -154,7 +154,7 @@ class Map2(polmap, dct):
             countfactor = 1.0
           ind = [sum(a) for a in zip(ind1, ind2)]
           if all(n % 2 == 0 for n in ind):
-            sigmaprod = self.__sigma(ind, i, gaussianDelta)
+            sigmaprod = self.__sigma(ind, sig, gaussianDelta)
             if sigmaprod > 0:
               Gammasumln = self.__gamma(ind, gaussianDelta)
               factor = countfactor * self.__factor(ind, gaussianDelta)
@@ -234,7 +234,7 @@ class Map2(polmap, dct):
             countfactor = 1.0
           ind = [sum(a) for a in zip(ind1, ind2)]
           if all(n % 2 == 0 for n in ind):
-            sigmaprod = self.__sigma(ind, i, gaussianDelta)
+            sigmaprod = self.__sigma(ind, sig, gaussianDelta)
             if sigmaprod > 0:
               Gammasumln = self.__gamma(ind, gaussianDelta)
               factor = countfactor * self.__factor(ind, gaussianDelta)
@@ -262,7 +262,7 @@ class Map2(polmap, dct):
           countfactor = 1.0
           ind = [sum(a) for a in zip(ind1, ind2, ind3)]
           if all(n % 2 == 0 for n in ind):
-            sigmaprod = self.__sigma(ind, i, gaussianDelta)
+            sigmaprod = self.__sigma(ind, sig, gaussianDelta)
             if sigmaprod > 0:
               Gammasumln = self.__gamma(ind, gaussianDelta)
               factor = countfactor * self.__factor(ind, gaussianDelta)
@@ -295,7 +295,7 @@ class Map2(polmap, dct):
             countfactor = 1.0
           ind = [sum(a) for a in zip(ind1, ind2)]
           if all(n % 2 == 0 for n in ind):
-            sigmaprod = self.__sigma(ind, i, gaussianDelta)
+            sigmaprod = self.__sigma(ind, sig, gaussianDelta)
             if sigmaprod > 0:
               Gammasumln = self.__gamma(ind, gaussianDelta)
               factor = countfactor * self.__factor(ind, gaussianDelta)
