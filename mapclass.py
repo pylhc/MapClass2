@@ -53,19 +53,33 @@ class Map2(polmap, dct):
       self.fromFort(*args, **kwargs)
 
   ## Twiss
-  def fromTwiss(self, t, order=6):
+  def fromTwiss(self, t, align=None, order=6):
     R = generateDefaultMap(order=order)
     U = generateDefaultMatrix(order=order)
-    for e in t.elems:
+    for i in xrange(len(t.elems)):
+      e = t.elems[i]
       try:
         mtr = metaclass2.matrixForElement(e, order)
         if mtr == None:
           mp = metaclass2.mapForElement(e, order)
-          R = mp * R
         else:
           M = mtr * U
           mp = metaclass2.matrixToMap(M, XYZD)
-          R = mp * R
+
+        # Apply misalignments here if any
+        if align is not None:
+          if isinstance(align, metaclass2.twiss2):
+            dx = align.elems[i].DX
+            dy = align.elems[i].DY
+            if dx != 0:
+              mp = mp(x=X+dx)
+            if dy != 0:
+              mp = mp(y=Y+dy)
+          else:
+            raise TypeError("The 'align' attribute has to be of the type 'twiss2'.")
+
+        # Combine the map with everything else
+        R = mp * R
       except Exception:
         print "No implementation for element: ", e.NAME, e.KEYWORD
 
