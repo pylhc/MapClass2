@@ -128,7 +128,7 @@ class Map2(polmap, dct):
         xory = XYZD[2]
     for ind, coeff in self[xory].iteritems():
       if all(n % 2 == 0 for n in ind):
-        sigmaprod = self.__sigma(ind, i, gaussianDelta, dv=2)
+        sigmaprod = self.__sigma(ind, sig, gaussianDelta, dv=2)
         if sigmaprod > 0:
           Gammasumln = self.__gamma(ind, gaussianDelta)
           factor = self.__factor(ind, gaussianDelta)
