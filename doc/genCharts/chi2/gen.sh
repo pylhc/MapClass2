@@ -9,7 +9,7 @@ DATEXT="dat"
 IMGFORM="png"
 
 ASSETSDIR="$CURRDIR/assets"
-PYDIR="$CURRDIR/../../"
+PYDIR="$CURRDIR/../../../"
 
 MADXFILE="$ASSETSDIR/test.madx"
 PYFILE="$ASSETSDIR/test.py"

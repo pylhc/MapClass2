@@ -1,0 +1,23 @@
+beam, SEQUENCE=DIAGCOLL ,PARTICLE=electron, energy=1500, RADIATE=false;
+beam, SEQUENCE=NEWBDS ,PARTICLE=electron, energy=1500, RADIATE=false;
+
+option, -echo, -info;
+
+LSCA:=0.815;
+call, file="/afs/cern.ch/user/r/rtomas/lintrack/CLICr/MainBeam/BDS/v_10_10_11/newCLICx";
+beam;
+
+use, period=EFF1S;
+call, file="/afs/cern.ch/user/r/rtomas/lintrack/CLICr/MainBeam/BDS/v_10_10_11/coll_sexts_octs.madx";
+call, file="/afs/cern.ch/user/r/rtomas/lintrack/CLICr/MainBeam/BDS/v_10_10_11/values.disp085.ind92";
+select, flag=twiss, clear;
+select, flag=twiss, full;!, column=name,s,betx,bety,alfx,alfy,dx,mux,muy,l,k1l,k2l,keyword, angle, k3l, k4l, k5l, k6l;
+
+twiss,BETX=64.99988501,BETY=17.99971417,deltap=0.0,file="twiss",save;
+
+
+!###PTC
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10;
+ptc_normal,icase=6,no=6,deltap=0.00;
+ptc_end;
