@@ -189,17 +189,20 @@ class Map2(polmap, dct):
     '''
     chi2 = 0
     if v == None:
-      v = XYZD
+      v = XYZD[:-2]
     for f in v:
-      if len(self[f].items()) < len(m[f].items()) and\
-         self[f].order == self[f].order and\
-         self[f].vars == m[f].vars:
-        print "For '", f, "'. Self map has fewer elements than map2 or the dimentions are different!"
-        print "This gives a wrong result"
-      for k, v in self[f].iteritems():
-        #TODO: Why k[4]?
-        if k[4] == 0:
-          chi2 += (v - m[f].get(k, 0)) ** 2
+      p1 = self[f]
+      p2 = m[f]
+      if len(p1.keys()[0]) == len(p2.keys()[0]) and\
+         p1.order == p2.order and\
+         p1.vars == p2.vars:
+        for k, v in p1.iteritems():
+          #TODO: Why k[4]?
+          if k[4] == 0:
+            chi2 += (v - p2.get(k, 0)) ** 2
+      else:
+        print "These maps are not comparable."
+        return -1
     return chi2
 
   def compc(self, m, v=None):
@@ -216,15 +219,18 @@ class Map2(polmap, dct):
     '''
     chi2 = 0
     if v == None:
-      v = XYZD
+      v = XYZD[-2]
     for f in v:
-      if len(self[f].items()) < len(m[f].items()) and\
-         self[f].order == self[f].order and\
-         self[f].vars == m[f].vars:
-        print "For '", f, "'. Self map has fewer elements than map2 or the dimentions are different!"
-        print "This gives a wrong result"
-      for k, v in self[f].iteritems():
-        chi2 += (v - m[f].get(k, 0)) ** 2
+      p1 = self[f]
+      p2 = m[f]
+      if len(p1.keys()[0]) == len(p2.keys()[0]) and\
+         p1.order == p2.order and\
+         p1.vars == p2.vars:
+        for k, v in p1.iteritems():
+          chi2 += (v - p2.get(k, 0)) ** 2
+      else:
+        print "These maps are not comparable."
+        return -1
     return chi2
 
   #Correlation from mapclass.py originally
