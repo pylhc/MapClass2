@@ -122,10 +122,12 @@ class twiss2(dct):
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
     # DRIFT and recalculate transport matrix
     e = dct(self.elems[nE])
-    e['L'] = s
+    e.K1L = (e.K1L / e.L) * s
+    e.ANGLE = (e.ANGLE / e.L) * s
+    e.L = s
     eTransport = matrixForElement(e, 6)  # NOTE: Takes order 6
     if eTransport == None:
-      e['KEYWORD']="DRIFT"
+      e.KEYWORD ="DRIFT"
       eTransport = matrixForElement(e, 6)
     eTransport = eTransport(d=0)
 
@@ -188,10 +190,12 @@ class twiss2(dct):
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
     # DRIFT and recalculate transport matrix
     e = dct(self.elems[nE])
-    e['L'] = s
+    e.K1L = (e.K1L / e.L) * s
+    e.ANGLE = (e.ANGLE / e.L) * s
+    e.L = s
     m = matrixForElement(e, 6)   # NOTE: Take order 6
     if m == None:
-      e['KEYWORD']="DRIFT"
+      e.KEYWORD = "DRIFT"
       m = matrixForElement(e, 6)
     m = m(d=0)
 
@@ -231,10 +235,12 @@ class twiss2(dct):
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
     # DRIFT and recalculate transport matrix
     e = dct(self.elems[nE])
-    e['L'] = s
+    e.K1L = (e.K1L / e.L) * s
+    e.ANGLE = (e.ANGLE / e.L) * s
+    e.L = s
     m = matrixForElement(e, 6)  # NOTE: Takes order 6
     if m == None:
-      e['KEYWORD']="DRIFT"
+      e.KEYWORD = "DRIFT"
       m = matrixForElement(e, 6)
     m = m(d=0)
 
@@ -420,7 +426,7 @@ class twiss2(dct):
         para = self.getBeta(nE,ss)
         disp = self.getDisp(nE,ss)
         alpha = math.atan(-para.ALFX - para.BETX * disp.DPX / disp.DX)
-        Phi = endPhase - self.getPhase(nE,ss).MUX + alpha
+        Phi = (endPhase - self.getPhase(nE,ss).MUX) * 2 * math.pi + alpha
         cosPhi = (math.cos(Phi) ** 2).real
         H = self.getH(nE, ss)
         P = abs(e.L / e.ANGLE)
