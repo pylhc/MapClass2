@@ -5,7 +5,7 @@ from definitions import dct
 from transport import *
 import mapclass
 from pytpsa import polmap
-import math
+import math, re
 from integration import simpson
 
 
@@ -16,7 +16,7 @@ class twiss2(dct):
 
   def __init__(self, filename='twiss'):
     self.elems = []
-    # Markers
+    # Markers (only takes 1st and last)
     self.markers = []
 
     f = open(filename, 'r')
@@ -389,17 +389,24 @@ class twiss2(dct):
     return dct([('HX', HX),
                 ('HY', HY)])
 
-  def sigmaBends(self, gamma, s=None, s0=0, n=100):
+  def sigmaBends(self, E, s=None, s0=0, n=100):
     """
     Returns delta(sigma^2) due to bends (dipoles)
 
     :param float s: location of interest along beamline
-    :param float gamma: energy
+    :param float E: energy
     :param string fun: name of the function given to the integral for the calculations
     :param float s0: start location along beamline (optional)
     :param int n: number of intervals for integrations (optional)
     """
-    if s is None: s = self.markers[1].S
+    if s is None:
+      s = self.markers[1].S
+      endPhase = self.markers[1].MUX
+    else:
+      nE = self.findElem(s)
+      e = self.elems[nE]
+      ss = s - (e.S - e.L)
+      endPhase = self.getPhase(nE, ss)
 
     # Calculates H/P^3 cos(phi)^2 at location s along the beamline
     def f(s):
@@ -412,9 +419,9 @@ class twiss2(dct):
         ss = s - (e.S - e.L)
         para = self.getBeta(nE,ss)
         disp = self.getDisp(nE,ss)
-        alpha = math.atan(-para.ALFX + para.BETX * disp.DPX / disp.DX)
-        phi = self.getPhase(nE,ss).MUX + alpha
-        cosPhi = (math.cos(phi) ** 2).real + para.ALFX
+        alpha = math.atan(-para.ALFX - para.BETX * disp.DPX / disp.DX)
+        Phi = endPhase - self.getPhase(nE,ss).MUX + alpha
+        cosPhi = (math.cos(Phi) ** 2).real
         H = self.getH(nE, ss)
         P = abs(e.L / e.ANGLE)
         return H.HX * cosPhi / P**3
@@ -422,8 +429,16 @@ class twiss2(dct):
         return 0
 
     c2 = 4.13e-11  # m^2(GeV)^-5
-    coeff = c2 * gamma**5 * self.markers[1].BETX  # Check this! x or y?
+    coeff = c2 * E**5 * self.markers[1].BETX
     return coeff * simpson(f, s0, s, n)
+
+  def stripLine(self):
+    """
+    Returns a new twiss object with the monitors and markers removed
+    """
+    t = deepcopy(self)
+    t.elems = [e for e in t.elems if e.KEYWORD not in ["MARKER", "MONITOR"]]
+    return t
 
   def alterElem(self, nE, dL=0, dPos=0):
     """
@@ -431,9 +446,9 @@ class twiss2(dct):
     of an element.
 
     Changes the twiss parameters (BETX, BETY, ALFX, ALFY), the dispersion
-    (DX, DPX, DY, DPY) and the phase (MUX, MUY) accordingly. Other parameters
-    will maintain the values from the original twiss object and, therefore,
-    may be incorrect.
+    (DX, DPX, DY, DPY) the phase (MUX, MUY) and the strength parameters KnL
+    accordingly. Other parameters will maintain the values from the original
+    twiss object and, therefore, may be incorrect.
 
     :param int nE: number of element whose properties are to be altered
     :param float dL: change in length (e.g. dL = 2 adds 1 unit to each end of the element)
@@ -448,9 +463,10 @@ class twiss2(dct):
     # Tests that element is surrounded by drifts
     prev = self.elems[nE-1]
     nxt = self.elems[nE+1]
-    if all("DRIFT" != k.KEYWORD for k in [prev, nxt]):
-      print "Element not surrounded by drifts"
-      return
+    for k in [prev, nxt]:
+      if k.KEYWORD != "DRIFT":
+        print "Element not surrounded by drifts"
+        return
 
     # Tests that dL not longer than surrounding drift space
     if dL > (prev.L + nxt.L):
@@ -476,6 +492,9 @@ class twiss2(dct):
     # Modifies L and S of twiss copy according to length change, dL
     # Length is added/subtracted symmetrically from each side of the element
     prev.L = prev.L - dL / 2
+    for k,knl in curr.iteritems():
+      if re.match("K\d+L", k) and knl != 0:
+        curr[k] = (knl / curr.L) * (dL + curr.L)
     curr.L = curr.L + dL
     nxt.L = nxt.L - dL / 2
 
