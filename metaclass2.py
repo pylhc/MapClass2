@@ -122,8 +122,9 @@ class twiss2(dct):
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
     # DRIFT and recalculate transport matrix
     e = dct(self.elems[nE])
-    e.K1L = (e.K1L / e.L) * s
-    e.ANGLE = (e.ANGLE / e.L) * s
+    if e.L != 0:
+      e.K1L = (e.K1L / e.L) * s
+      e.ANGLE = (e.ANGLE / e.L) * s
     e.L = s
     eTransport = matrixForElement(e, 6)  # NOTE: Takes order 6
     if eTransport == None:
@@ -190,8 +191,9 @@ class twiss2(dct):
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
     # DRIFT and recalculate transport matrix
     e = dct(self.elems[nE])
-    e.K1L = (e.K1L / e.L) * s
-    e.ANGLE = (e.ANGLE / e.L) * s
+    if e.L != 0:
+      e.K1L = (e.K1L / e.L) * s
+      e.ANGLE = (e.ANGLE / e.L) * s
     e.L = s
     m = matrixForElement(e, 6)   # NOTE: Take order 6
     if m == None:
@@ -235,8 +237,9 @@ class twiss2(dct):
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
     # DRIFT and recalculate transport matrix
     e = dct(self.elems[nE])
-    e.K1L = (e.K1L / e.L) * s
-    e.ANGLE = (e.ANGLE / e.L) * s
+    if e.L != 0:
+      e.K1L = (e.K1L / e.L) * s
+      e.ANGLE = (e.ANGLE / e.L) * s
     e.L = s
     m = matrixForElement(e, 6)  # NOTE: Takes order 6
     if m == None:
@@ -405,6 +408,7 @@ class twiss2(dct):
     :param float s0: start location along beamline (optional)
     :param int n: number of intervals for integrations (optional)
     """
+
     if s is None:
       s = self.markers[1].S
       endPhase = self.markers[1].MUX
@@ -442,26 +446,39 @@ class twiss2(dct):
     """
     Returns a new twiss object with the monitors and markers removed
     """
+
     t = deepcopy(self)
     t.elems = [e for e in t.elems if e.KEYWORD not in ["MARKER", "MONITOR"]]
     return t
 
   def mergeElems(self):
+    """
+    Returns a new twiss object with adjacent elements combined if they have the
+    same KEYWORD, L and KnL.
+    """
+
     t = deepcopy(self)
-    i=0
-    while i < len(t.elems)-1:
+    i = 0
+    while i < len(t.elems) - 1:
       curr = t.elems[i]
       nxt = t.elems[i+1]
+      # Make subdictionaries of KEYWORD, L and all of the strength
+      # parameters KnL for quick comparison
       currSub = dict((k, v) for k, v in curr.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD", "L"])
       nxtSub =  dict((k, v) for k, v in nxt.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD", "L"])
+      # If subdictionaries are equal change KnL, ANGLE and L of the
+      # second element and delete the first one. 
       if currSub == nxtSub:
-        for k,knl in nxt.iteritems():
-          if re.match("K\d+L", k) and knl != 0:
-            nxt[k] = (knl / nxt.L) * (curr.L + nxt.L)
-        nxt.ANGLE = (nxt.ANGLE / nxt.L) * (curr.L + nxt.L)
-        nxt.L = nxt.L + curr.L
+        if nxt.L != 0:
+          for k,knl in nxt.iteritems():
+            if re.match("K\d+L", k) and knl != 0:
+              nxt[k] = (knl / nxt.L) * (curr.L + nxt.L)
+          nxt.ANGLE = (nxt.ANGLE / nxt.L) * (curr.L + nxt.L)
+          nxt.L = nxt.L + curr.L
         del t.elems[i]
-      else: i = i+1
+      # i only increments when subdictionaries not equal because upon
+      # deletion of an element len(t.elems) decreases by 1 for the loop
+      else: i = i + 1
     return t
 
   def alterElem(self, nE, dL=0, dPos=0):
