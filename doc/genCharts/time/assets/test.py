@@ -20,6 +20,11 @@ startTime = time.time()
 if sys.argv[2] == "-t":
   t = twiss2()
   m = Map2(t,order=o)
+if sys.argv[2] == "-m":
+  t = twiss2()
+  t = t.stripLine()
+  t = t.mergeElems()
+  m = Map2(t,order=o)
 else:
   m = Map2(order=o)
 

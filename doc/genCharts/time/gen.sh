@@ -49,8 +49,9 @@ for O in $(seq 1 6); do
   echo -n "."
   TIMETWISS=`echo $($PYFILE $PYDIR -t $O | tail -n 1) + $TIMEMAD | bc`
   echo -n "."
+  TIMETWISSMERGE=`echo $($PYFILE $PYDIR -m $O | tail -n 1) + $TIMEMAD | bc`
 
-  echo $O $TIMETWISS $TIMEFORT >> "time.$DATEXT"
+  echo $O $TIMETWISS $TIMEFORT $TIMETWISSMERGE >> "time.$DATEXT"
   echo ""
 done
 
@@ -61,5 +62,6 @@ gnuplot <<EOF
   set ylabel "Time (s)"
   set xlabel "Order"
   p "$TMPDIR/time.$DATEXT" using 1:2 title 'Time twiss' with linespoints,\
-    "$TMPDIR/time.$DATEXT" using 1:3 title 'Time fort' with linespoints
+    "$TMPDIR/time.$DATEXT" using 1:3 title 'Time fort' with linespoints,\
+    "$TMPDIR/time.$DATEXT" using 1:4 title 'Time twiss+strip+merge' with linespoints
 EOF
