@@ -446,6 +446,24 @@ class twiss2(dct):
     t.elems = [e for e in t.elems if e.KEYWORD not in ["MARKER", "MONITOR"]]
     return t
 
+  def mergeElems(self):
+    t = deepcopy(self)
+    i=0
+    while i < len(t.elems)-1:
+      curr = t.elems[i]
+      nxt = t.elems[i+1]
+      currSub = dict((k, v) for k, v in curr.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD", "L"])
+      nxtSub =  dict((k, v) for k, v in nxt.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD", "L"])
+      if currSub == nxtSub:
+        for k,knl in nxt.iteritems():
+          if re.match("K\d+L", k) and knl != 0:
+            nxt[k] = (knl / nxt.L) * (curr.L + nxt.L)
+        nxt.ANGLE = (nxt.ANGLE / nxt.L) * (curr.L + nxt.L)
+        nxt.L = nxt.L + curr.L
+        del t.elems[i]
+      else: i = i+1
+    return t
+
   def alterElem(self, nE, dL=0, dPos=0):
     """
     Returns a new twiss object having altered the length or position (or both)
