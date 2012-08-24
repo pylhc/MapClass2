@@ -15,6 +15,9 @@ select, flag=twiss, full;!, column=name,s,betx,bety,alfx,alfy,dx,mux,muy,l,k1l,k
 
 twiss,BETX=64.99988501,BETY=17.99971417,deltap=0.0,file="ffs.twiss",save;
 
+! Misalignments file creation
+SELECT,FLAG=ERROR,FULL;
+ESAVE,FILE=err.file;
 
 !###PTC
 ptc_create_universe;

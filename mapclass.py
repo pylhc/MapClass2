@@ -42,6 +42,7 @@ class Map2(polmap, dct):
   :param int order: calculate map up to this order
   :param string filename: input filename
   :param twiss2 t: the twiss2 object
+  :param twiss2 terr: the twiss object that contains the errors assigned to elements from MADX (e.g. misaligments).
 
   Either filename is used or twiss object to construct a Map2
   '''
@@ -53,7 +54,7 @@ class Map2(polmap, dct):
       self.fromFort(*args, **kwargs)
 
   ## Twiss
-  def fromTwiss(self, t, align=None, order=6):
+  def fromTwiss(self, t, terr=None, order=6):
     R = generateDefaultMap(order=order)
     U = generateDefaultMatrix(order=order)
     for i in xrange(len(t.elems)):
@@ -67,10 +68,10 @@ class Map2(polmap, dct):
           mp = metaclass2.matrixToMap(M, XYZD)
 
         # Apply misalignments here if any
-        if align is not None:
-          if isinstance(align, metaclass2.twiss2):
-            dx = align.elems[i].DX
-            dy = align.elems[i].DY
+        if terr is not None:
+          if isinstance(terr, metaclass2.twiss2):
+            dx = terr.elems[i].DX
+            dy = terr.elems[i].DY
             if dx != 0:
               mp = mp(x=X+dx)
             if dy != 0:
