@@ -612,6 +612,8 @@ def mapForElement(e, order):
         m = MUL(order=order, **e)
       else:
         m = MULTHICK(order=order, **e)
+    if e.KEYWORD == "ROUNDBB":
+      m = ROUNDBB(order=order, **e)
     return m
   except Exception as e:
     print "The Twiss object doesn't have the desired structure"
