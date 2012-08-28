@@ -342,18 +342,19 @@ class twiss2(dct):
     return dct([('ChromX', -simpson(fX, s0, s, n) / (4 * math.pi)),
                 ('ChromY', -simpson(fY, s0, s, n) / (4 * math.pi))])
 
-  def oide(self, emi, n=100):
+  def oide(self, emi=2e-8, gamma=2.9354207436399e-6, n=100):
     """
     Returns delta(sigma^2) due to Oide Effect
 
     :param float emi: emittance
+    :param float gamma: Lorentz factor = E/Eo = 1500/0.000511 for CLIC
     :param int n: number of intervals for integration (optional)
     """
 
-    gamma = 2934846.4097045588 # 1500/0.0005111 relativistic parameter
     re = 2.817940325e-15
     lame = 3.861592678e-13
-    betas = self.markers[1].BETY  # 17.92472388e-6 from mathematica
+    betas = self.markers[1].BETY # Reads 6.77249e-5 from FFS
+    # (betas = 17.92472388e-6 from mathematica nb)
     coeff = 110 * re * lame * gamma**5 / (3 * math.sqrt(6 * math.pi))
 
     # Read twiss object in reverse to find first DRIFT and QUADRUPOLE
@@ -364,7 +365,8 @@ class twiss2(dct):
         break
     for e in reversed(self.elems):
       if e.KEYWORD == 'QUADRUPOLE':
-        Lq = 2 * e.L   # Correct to multiply by two? Could be other file with just one quadrupole segment?
+        # Multiplied by 2 because final quadrupoles split in file
+        Lq = 2 * e.L
         Kq = abs(e.K1L / e.L)
         break
 
@@ -402,9 +404,8 @@ class twiss2(dct):
     """
     Returns delta(sigma^2) due to bends (dipoles)
 
-    :param float s: location of interest along beamline
     :param float E: energy
-    :param string fun: name of the function given to the integral for the calculations
+    :param float s: location of interest along beamline (optional)
     :param float s0: start location along beamline (optional)
     :param int n: number of intervals for integrations (optional)
     """
@@ -418,7 +419,7 @@ class twiss2(dct):
       ss = s - (e.S - e.L)
       endPhase = self.getPhase(nE, ss)
 
-    # Calculates H/P^3 cos(phi)^2 at location s along the beamline
+    # Calculates H*G^3 cos(phi)^2 at location s along the beamline
     def f(s):
       nE = self.findElem(s)
       e = self.elems[nE]
@@ -532,15 +533,17 @@ class twiss2(dct):
 
     # Modifies L and S of twiss copy according to length change, dL
     # Length is added/subtracted symmetrically from each side of the element
-    prev.L = prev.L - dL / 2
-    for k,knl in curr.iteritems():
-      if re.match("K\d+L", k) and knl != 0:
-        curr[k] = (knl / curr.L) * (dL + curr.L)
+    prev.L = prev.L - dL / 2.0
+    if curr.L != 0:
+      for k,knl in curr.iteritems():
+        if re.match("K\d+L", k) and knl != 0:
+          curr[k] = (knl / curr.L) * (dL + curr.L)
+      curr.ANGLE = (curr.ANGLE / curr.L) * (dL + curr.L)
     curr.L = curr.L + dL
-    nxt.L = nxt.L - dL / 2
+    nxt.L = nxt.L - dL / 2.0
 
-    prev.S = prev.S - dL / 2
-    curr.S = curr.S + dL / 2
+    prev.S = prev.S - dL / 2.0
+    curr.S = curr.S + dL / 2.0
 
     # Modifies L and S of twiss copy according to position change, dPos
     prev.L = prev.L + dPos
