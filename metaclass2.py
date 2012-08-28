@@ -141,8 +141,9 @@ class twiss2(dct):
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
     # DRIFT and recalculate transport matrix
     e = dct(self.elems[nE])
-    e.K1L = (e.K1L / e.L) * s
-    e.ANGLE = (e.ANGLE / e.L) * s
+    if e.L != 0:
+      e.K1L = (e.K1L / e.L) * s
+      e.ANGLE = (e.ANGLE / e.L) * s
     e.L = s
     eTransport = matrixForElement(e, 6)  # NOTE: Takes order 6
     if eTransport == None:
@@ -209,8 +210,9 @@ class twiss2(dct):
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
     # DRIFT and recalculate transport matrix
     e = dct(self.elems[nE])
-    e.K1L = (e.K1L / e.L) * s
-    e.ANGLE = (e.ANGLE / e.L) * s
+    if e.L != 0:
+      e.K1L = (e.K1L / e.L) * s
+      e.ANGLE = (e.ANGLE / e.L) * s
     e.L = s
     m = matrixForElement(e, 6)   # NOTE: Take order 6
     if m == None:
@@ -254,8 +256,9 @@ class twiss2(dct):
     # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to
     # DRIFT and recalculate transport matrix
     e = dct(self.elems[nE])
-    e.K1L = (e.K1L / e.L) * s
-    e.ANGLE = (e.ANGLE / e.L) * s
+    if e.L != 0:
+      e.K1L = (e.K1L / e.L) * s
+      e.ANGLE = (e.ANGLE / e.L) * s
     e.L = s
     m = matrixForElement(e, 6)  # NOTE: Takes order 6
     if m == None:
@@ -358,18 +361,19 @@ class twiss2(dct):
     return dct([('ChromX', -simpson(fX, s0, s, n) / (4 * math.pi)),
                 ('ChromY', -simpson(fY, s0, s, n) / (4 * math.pi))])
 
-  def oide(self, emi, n=100):
+  def oide(self, emi=2e-8, gamma=2.9354207436399e-6, n=100):
     """
     Returns delta(sigma^2) due to Oide Effect
 
     :param float emi: emittance
+    :param float gamma: Lorentz factor = E/Eo = 1500/0.000511 for CLIC
     :param int n: number of intervals for integration (optional)
     """
 
-    gamma = 2934846.4097045588 # 1500/0.0005111 relativistic parameter
     re = 2.817940325e-15
     lame = 3.861592678e-13
-    betas = self.markers[1].BETY  # 17.92472388e-6 from mathematica
+    betas = self.markers[1].BETY # Reads 6.77249e-5 from FFS
+    # (betas = 17.92472388e-6 from mathematica nb)
     coeff = 110 * re * lame * gamma**5 / (3 * math.sqrt(6 * math.pi))
 
     # Read twiss object in reverse to find first DRIFT and QUADRUPOLE
@@ -380,7 +384,8 @@ class twiss2(dct):
         break
     for e in reversed(self.elems):
       if e.KEYWORD == 'QUADRUPOLE':
-        Lq = 2 * e.L   # Correct to multiply by two? Could be other file with just one quadrupole segment?
+        # Multiplied by 2 because final quadrupoles split in file
+        Lq = 2 * e.L
         Kq = abs(e.K1L / e.L)
         break
 
@@ -418,12 +423,12 @@ class twiss2(dct):
     """
     Returns delta(sigma^2) due to bends (dipoles)
 
-    :param float s: location of interest along beamline
     :param float E: energy
-    :param string fun: name of the function given to the integral for the calculations
+    :param float s: location of interest along beamline (optional)
     :param float s0: start location along beamline (optional)
     :param int n: number of intervals for integrations (optional)
     """
+
     if s is None:
       s = self.markers[1].S
       endPhase = self.markers[1].MUX
@@ -433,7 +438,7 @@ class twiss2(dct):
       ss = s - (e.S - e.L)
       endPhase = self.getPhase(nE, ss)
 
-    # Calculates H/P^3 cos(phi)^2 at location s along the beamline
+    # Calculates H*G^3 cos(phi)^2 at location s along the beamline
     def f(s):
       nE = self.findElem(s)
       e = self.elems[nE]
@@ -459,28 +464,41 @@ class twiss2(dct):
 
   def stripLine(self):
     """
-    Returns a new twiss object with the monitors and markers removed
+    Returns a new twiss object with the monitors and markers and matrices removed
     """
+
     t = deepcopy(self)
-    t.elems = [e for e in t.elems if e.KEYWORD not in ["MARKER", "MONITOR"]]
+    t.elems = [e for e in t.elems if e.KEYWORD not in ["MARKER", "MONITOR", "MATRIX"]]
     return t
 
   def mergeElems(self):
+    """
+    Returns a new twiss object with adjacent elements combined if they have the
+    same KEYWORD, L and KnL.
+    """
+
     t = deepcopy(self)
-    i=0
-    while i < len(t.elems)-1:
+    i = 0
+    while i < len(t.elems) - 1:
       curr = t.elems[i]
       nxt = t.elems[i+1]
-      currSub = dict((k, v) for k, v in curr.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD", "L"])
-      nxtSub =  dict((k, v) for k, v in nxt.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD", "L"])
+      # Make subdictionaries of KEYWORD and all of the strength
+      # parameters KnL for quick comparison
+      currSub = dict((k, v) for k, v in curr.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD"])
+      nxtSub =  dict((k, v) for k, v in nxt.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD"])
+      # If subdictionaries are equal change KnL, ANGLE and L of the
+      # second element and delete the first one.
       if currSub == nxtSub:
-        for k,knl in nxt.iteritems():
-          if re.match("K\d+L", k) and knl != 0:
-            nxt[k] = (knl / nxt.L) * (curr.L + nxt.L)
-        nxt.ANGLE = (nxt.ANGLE / nxt.L) * (curr.L + nxt.L)
-        nxt.L = nxt.L + curr.L
+        if nxt.L != 0:
+          for k,knl in nxt.iteritems():
+            if re.match("K\d+L", k) and knl != 0:
+              nxt[k] = (knl / nxt.L) * (curr.L + nxt.L)
+          nxt.ANGLE = (nxt.ANGLE / nxt.L) * (curr.L + nxt.L)
+          nxt.L = nxt.L + curr.L
         del t.elems[i]
-      else: i = i+1
+      # i only increments when subdictionaries not equal because upon
+      # deletion of an element len(t.elems) decreases by 1 for the loop
+      else: i = i + 1
     return t
 
   def alterElem(self, nE, dL=0, dPos=0):
@@ -534,15 +552,17 @@ class twiss2(dct):
 
     # Modifies L and S of twiss copy according to length change, dL
     # Length is added/subtracted symmetrically from each side of the element
-    prev.L = prev.L - dL / 2
-    for k,knl in curr.iteritems():
-      if re.match("K\d+L", k) and knl != 0:
-        curr[k] = (knl / curr.L) * (dL + curr.L)
+    prev.L = prev.L - dL / 2.0
+    if curr.L != 0:
+      for k,knl in curr.iteritems():
+        if re.match("K\d+L", k) and knl != 0:
+          curr[k] = (knl / curr.L) * (dL + curr.L)
+      curr.ANGLE = (curr.ANGLE / curr.L) * (dL + curr.L)
     curr.L = curr.L + dL
-    nxt.L = nxt.L - dL / 2
+    nxt.L = nxt.L - dL / 2.0
 
-    prev.S = prev.S - dL / 2
-    curr.S = curr.S + dL / 2
+    prev.S = prev.S - dL / 2.0
+    curr.S = curr.S + dL / 2.0
 
     # Modifies L and S of twiss copy according to position change, dPos
     prev.L = prev.L + dPos
