@@ -273,8 +273,15 @@ class twiss2(dct):
     yy = m.item((2,3)) / math.sqrt(prevE.BETY * para.BETY)
     yx = (math.sqrt(prevE.BETY) * m.item((2,2)) / math.sqrt(para.BETY)) - (prevE.ALFY * yy)
 
-    return  dct([('MUX', math.atan2(xy,xx) / (2 * math.pi) + prevE.MUX),
-                 ('MUY', math.atan2(yy,yx) / (2 * math.pi) + prevE.MUY)])
+    thetaX = math.atan2(xy,xx)
+    thetaY = math.atan2(yy, yx)
+    if thetaX < 0:
+      thetaX =+ 2 * math.pi
+    if thetaY < 0:
+      thetaY =+ 2 * math.pi
+
+    return  dct([('MUX', thetaX / (2 * math.pi) + prevE.MUX),
+                 ('MUY', thetaY / (2 * math.pi) + prevE.MUY)])
 
   def findElem(self, s):
     """
@@ -461,6 +468,65 @@ class twiss2(dct):
     c2 = 4.13e-11  # m^2(GeV)^-5
     coeff = c2 * E**5 * self.markers[1].BETX
     return coeff * simpson(f, s0, s, n)
+
+  def sigmaBends2(self, E, s=None, s0=0, n=100):
+    """
+    Returns delta(sigma^2) due to bends (dipoles)
+
+    :param float E: energy
+    :param float s: location of interest along beamline (optional)
+    :param float s0: start location along beamline (optional)
+    :param int n: number of intervals for integrations (optional)
+    """
+
+    if s is None:
+      s = self.markers[1].S
+      nELast = len(self.elems)-1
+      endPhase = self.markers[1].MUX
+      ss = self.elems[-1].L
+    else:
+      nELast = self.findElem(s)
+      last = self.elems[nELast]
+      ss = s - (last.S - last.L)
+      endPhase = self.getPhase(nELast, ss).MUX
+
+    if s0 != 0:
+      nEFirst = self.findElem(s0)
+      first = self.elems[nEFirst]
+      ss0 = s0 - (first.S - first.L)
+      rangeElems = xrange(nEFirst, len(self.elems))
+    else:
+      nEFirst = 0
+      rangeElems = xrange(len(self.elems))
+
+    # Calculates H*G^3 cos(phi)^2 at location s along the beamline
+    def wrap(nE):
+      def f(ss):
+        para = self.getBeta(nE,ss)
+        disp = self.getDisp(nE,ss)
+        if disp.DX == 0: return 0
+        alpha = math.atan(-para.ALFX - para.BETX * disp.DPX / disp.DX)
+        Phi = (endPhase - self.getPhase(nE,ss).MUX) * 2 * math.pi + alpha
+        cosPhi = (math.cos(Phi) ** 2).real
+        H = self.getH(nE, ss)
+        P = abs(e.L / e.ANGLE)
+        return H.HX * cosPhi / P**3
+      return f
+
+    c2 = 4.13e-11  # m^2(GeV)^-5
+    coeff = c2 * E**5 * self.markers[1].BETX
+
+    total = 0
+    for i in rangeElems:
+      e = self.elems[i]
+      if e.KEYWORD == 'SBEND':
+        if i == nEFirst:
+          total +=  coeff * simpson(wrap(i), ss0, e.L, n)
+        elif i == nELast:
+          total += coeff * simpson(wrap(i), 0, ss, n)
+        else:
+          total += coeff * simpson(wrap(i), 0, e.L, n)
+      if i == nELast: return total
 
   def stripLine(self):
     """
