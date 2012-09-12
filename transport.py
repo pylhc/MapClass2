@@ -154,6 +154,6 @@ def MULTHICK(K1L,K2L,K3L,K4L,L,order,**args):
 
 def ROUNDBB(K,SIGMAX,SIGMAY,XM,YM,order,**args):
   m = generateDefaultMap(order)
-  m[XYZD[1]] = (K/(1+D))*((X-XM)/((X-XM)**2+(Y-YM)**2))*(1-exp(-((X-XM)**2+(Y-YM)**2)/(float(SIGMAX)**2+float(SIGMAY)**2)))
-  m[XYZD[3]] = (K/(1+D))*((Y-YM)/((X-XM)**2+(Y-YM)**2))*(1-exp(-((X-XM)**2+(Y-YM)**2)/(float(SIGMAX)**2+float(SIGMAY)**2)))
+  m[XYZD[1]] = m[XYZD[1]] + (K/(1+D))*((X-XM)/((X-XM)**2+(Y-YM)**2))*(1-exp(-((X-XM)**2+(Y-YM)**2)/(float(SIGMAX)**2+float(SIGMAY)**2)))
+  m[XYZD[3]] = m[XYZD[1]] + (K/(1+D))*((Y-YM)/((X-XM)**2+(Y-YM)**2))*(1-exp(-((X-XM)**2+(Y-YM)**2)/(float(SIGMAX)**2+float(SIGMAY)**2)))
   return m
