@@ -13,6 +13,8 @@ from math import sqrt
 # compared with those of the original twiss object.
 
 # Constants
+order = 2
+
 betx = 64.99988501
 bety = 17.99971417
 gamma = 3e6
@@ -27,9 +29,9 @@ t0 = t0.stripLine()
 print "* Merging the elements."
 t0 = t0.mergeElems()
 print "* Calculating the map."
-m0 = Map2(t0, order=2)
-print "* Calculating original sigma x^2 ",
-sOrig = m0.sigma('x', sigmaFFS).real
+m0 = Map2(t0, order=order)
+print "* Calculating original sigma x ",
+sOrig = sqrt(m0.sigma('x', sigmaFFS).real)
 print sOrig
 
 # Loop through the elements in the stripped and merged beamline
@@ -59,8 +61,8 @@ for i in range(1, len(t0.elems)-1):
             sys.stdout.flush()
             t = t0.alterElem(i, dPos=lower)
             if t is None: break # Stops if alterElem finds an issue
-            m = Map2(t,order=2)
-            s = m.sigma('x', sigmaFFS).real
+            m = Map2(t,order=order)
+            s = sqrt(m.sigma('x', sigmaFFS).real)
             # If the new sigma is smaller than the previous one, make
             # them equal to compare with the next position alteration
             # and store the position change.
@@ -71,9 +73,9 @@ for i in range(1, len(t0.elems)-1):
 
         print ""
         if dPosIdeal != 0:
-            print "Original sigma x^2: ", sOrig
-            print "Optimised sigma x^2: ", s0
-            print "Sigma x^2 reduced by: ", sOrig - s0
+            print "Original sigma x: ", sOrig
+            print "Optimised sigma x: ", s0
+            print "Sigma x reduced by: ", sOrig - s0
             print "This reduction occurred at a position change of: ", dPosIdeal
         else:
             print "This sextupole could not be optimised"
