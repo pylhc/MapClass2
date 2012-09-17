@@ -313,7 +313,7 @@ class twiss2(dct):
                 ('NChromY', Fr*C*(m['y'][(0,0,1,0,1,0)]**2 * BetY0 / BetStarY +
                                  m['y'][(0,0,0,1,1,0)]**2 / (BetY0 * BetStarY)).real)])
 
-  def getChrom(self, s, s0=0, n=100):
+  def getChrom(self, s=None, s0=0, n=100):
     """
     Calculates chromaticity using -1/4pi * integral (beta*K) ds
 
@@ -323,6 +323,9 @@ class twiss2(dct):
 
     :returns: chromaticity between s0 and s
     """
+
+    if s is None: s = self.markers[1].S
+
   ## CHECK: positive/negative signs on K for focus vs. defocus...
   ## Is this natural chromaticity also because it only considers quadrupoles?
   ## What about multipole quadrupoles?
@@ -450,7 +453,7 @@ class twiss2(dct):
     coeff = c2 * E**5 * self.markers[1].BETX
     return coeff * simpson(f, s0, s, n)
 
-  def sigmaBends2(self, E, s=None, s0=0, n=100):
+  def sigmaBends2(self, E, s=None, s0=0, n=20):
     """
     Returns delta(sigma^2) due to bends (dipoles)
 
