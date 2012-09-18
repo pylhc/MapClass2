@@ -523,7 +523,7 @@ class twiss2(dct):
   def mergeElems(self):
     """
     Returns a new twiss object with adjacent elements combined if they have the
-    same KEYWORD, L and KnL.
+    same KEYWORD, bending radius and KnL.
     """
 
     t = deepcopy(self)
@@ -531,10 +531,13 @@ class twiss2(dct):
     while i < len(t.elems) - 1:
       curr = t.elems[i]
       nxt = t.elems[i+1]
-      # Make subdictionaries of KEYWORD and all of the strength
+      # Make subdictionaries of KEYWORD, bending radius and all of the strength
       # parameters KnL for quick comparison
       currSub = dict((k, v) for k, v in curr.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD"])
       nxtSub =  dict((k, v) for k, v in nxt.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD"])
+      if currSub["KEYWORD"] == "SBEND" and nxtSub["KEYWORD"] == "SBEND":
+        currSub["RHO"] = curr.ANGLE / curr.L
+        nxtSub["RHO"] = nxt.ANGLE / nxt.L
       # If subdictionaries are equal change KnL, ANGLE and L of the
       # second element and delete the first one.
       if currSub == nxtSub:
