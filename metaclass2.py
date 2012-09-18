@@ -45,7 +45,6 @@ class twiss2(dct):
 
       if "* " in line or "*\t" in line:
         labels = splt[1:]
-        print "labels ", len(labels)
 
       if "$ " in line or "$\t" in line:
         types = splt[1:]
