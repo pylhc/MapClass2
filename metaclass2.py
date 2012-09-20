@@ -582,17 +582,17 @@ class twiss2(dct):
         return
 
     # Tests that dL not longer than surrounding drift space
-    if dL > (prev.L + nxt.L):
+    if dL > 2 * min(prev.L, nxt.L):
       print "dL too long"
       return
 
     # Tests that dPos does not exceed available drift space
     if dPos < 0:
-      if abs(dPos) > prev.L:
+      if abs(dPos) > prev.L - dL / 2:
         print "dPos out of range"
         return
     if dPos > 0:
-      if dPos > nxt.L:
+      if dPos > nxt.L - dL / 2:
         print "dPos out of range"
         return
 
