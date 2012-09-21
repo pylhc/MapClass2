@@ -46,7 +46,8 @@ for E in ${ELEMS[@]}; do
   echo -n "[gen] Element $KW"
   for L in $(seq $LMIN $LINC $LMAX); do
     echo -n "."
-    sed -e "s/L=/L=$L/" $MADXFILE | sed -e "s/LINE:=/LINE:=\($E\)/" | $MADX > /dev/null
+    A=$(echo "$L * 5" | bc)
+    sed -e "s/L=/L=$L/" -e "s/ANGLE=15.0/ANGLE=$A/" -e "s/LINE:=/LINE:=\($E\)/" $MADXFILE | $MADX > /dev/null
 
     CHI2=$($PYFILE $PYDIR | tail -n 1)
     echo $L $CHI2 >> "$E.$DATEXT"
@@ -59,6 +60,7 @@ for E in ${ELEMS[@]}; do
   # a = 0; b = 2;
   # fit f(x) '$TMPDIR/$E.$DATEXT' via a,b
   set logscale y
+  set format y "10^{%T}"
   set term $IMGFORM enhanced
   set output "$IMGDIR/$E.$IMGFORM"
   set title "$KW ($E)"

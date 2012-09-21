@@ -45,7 +45,6 @@ class twiss2(dct):
 
       if "* " in line or "*\t" in line:
         labels = splt[1:]
-        print "labels ", len(labels)
 
       if "$ " in line or "$\t" in line:
         types = splt[1:]
@@ -332,7 +331,7 @@ class twiss2(dct):
                 ('NChromY', Fr*C*(m['y'][(0,0,1,0,1,0)]**2 * BetY0 / BetStarY +
                                  m['y'][(0,0,0,1,1,0)]**2 / (BetY0 * BetStarY)).real)])
 
-  def getChrom(self, s, s0=0, n=100):
+  def getChrom(self, s=None, s0=0, n=100):
     """
     Calculates chromaticity using -1/4pi * integral (beta*K) ds
 
@@ -342,6 +341,9 @@ class twiss2(dct):
 
     :returns: chromaticity between s0 and s
     """
+
+    if s is None: s = self.markers[1].S
+
   ## CHECK: positive/negative signs on K for focus vs. defocus...
   ## Is this natural chromaticity also because it only considers quadrupoles?
   ## What about multipole quadrupoles?
@@ -469,7 +471,7 @@ class twiss2(dct):
     coeff = c2 * E**5 * self.markers[1].BETX
     return coeff * simpson(f, s0, s, n)
 
-  def sigmaBends2(self, E, s=None, s0=0, n=100):
+  def sigmaBends2(self, E, s=None, s0=0, n=20):
     """
     Returns delta(sigma^2) due to bends (dipoles)
 
@@ -540,7 +542,7 @@ class twiss2(dct):
   def mergeElems(self):
     """
     Returns a new twiss object with adjacent elements combined if they have the
-    same KEYWORD, L and KnL.
+    same KEYWORD, bending radius and KnL.
     """
 
     t = deepcopy(self)
@@ -548,10 +550,13 @@ class twiss2(dct):
     while i < len(t.elems) - 1:
       curr = t.elems[i]
       nxt = t.elems[i+1]
-      # Make subdictionaries of KEYWORD and all of the strength
+      # Make subdictionaries of KEYWORD, bending radius and all of the strength
       # parameters KnL for quick comparison
       currSub = dict((k, v) for k, v in curr.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD"])
       nxtSub =  dict((k, v) for k, v in nxt.iteritems() if re.match("K\d+L", k) or k in ["KEYWORD"])
+      if currSub["KEYWORD"] == "SBEND" and nxtSub["KEYWORD"] == "SBEND":
+        currSub["RHO"] = curr.ANGLE / curr.L
+        nxtSub["RHO"] = nxt.ANGLE / nxt.L
       # If subdictionaries are equal change KnL, ANGLE and L of the
       # second element and delete the first one.
       if currSub == nxtSub:
@@ -596,17 +601,17 @@ class twiss2(dct):
         return
 
     # Tests that dL not longer than surrounding drift space
-    if dL > (prev.L + nxt.L):
+    if dL > 2 * min(prev.L, nxt.L):
       print "dL too long"
       return
 
     # Tests that dPos does not exceed available drift space
     if dPos < 0:
-      if abs(dPos) > prev.L:
+      if abs(dPos) > prev.L - dL / 2:
         print "dPos out of range"
         return
     if dPos > 0:
-      if dPos > nxt.L:
+      if dPos > nxt.L - dL / 2:
         print "dPos out of range"
         return
 
