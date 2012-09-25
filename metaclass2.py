@@ -351,7 +351,7 @@ class twiss2(dct):
     return dct([('ChromX', -simpson(fX, s0, s, n) / (4 * math.pi)),
                 ('ChromY', -simpson(fY, s0, s, n) / (4 * math.pi))])
 
-  def oide(self, emi=2e-8, gamma=2.9354207436399e-6, n=100):
+  def oide(self, emi=2e-8, gamma=2.9354207436399e-6, betas=None, n=100):
     """
     Returns delta(sigma^2) due to Oide Effect
 
@@ -362,7 +362,7 @@ class twiss2(dct):
 
     re = 2.817940325e-15
     lame = 3.861592678e-13
-    betas = self.markers[1].BETY # Reads 6.77249e-5 from FFS
+    if betas is None: betas = self.markers[1].BETY # Reads 6.77249e-5 from FFS
     # (betas = 17.92472388e-6 from mathematica nb)
     coeff = 110 * re * lame * gamma**5 / (3 * math.sqrt(6 * math.pi))
 
