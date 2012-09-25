@@ -299,17 +299,18 @@ class twiss2(dct):
     m = mapclass.Map2(newT)
 
     # For Xy, 001010 and Xy, 000110
-    Fr = 4.373354581906215  # gamma(1./2)*3 * gamma(3./2)**2
-    C = 0.4573148512298903  # 8*pow(pi,-2.5)
+    # Fr = gamma(1./2)*3 * gamma(3./2)**2
+    # C = 8*pow(pi,-2.5)
+    # Fr * C = 1
 
     if BetStarX is None: BetStarX = self.markers[1].BETX
     if BetX0 is None: BetX0 = self.markers[0].BETX
     if BetStarY is None: BetStarY = self.markers[1].BETY
     if BetY0 is None: BetY0 = self.markers[0].BETY
     #CHECK FOR X!!! JUST GUESSING
-    return dct([('NChromX', Fr*C*(m['x'][(1,0,0,0,1,0)]**2 * BetX0 / BetStarX +
+    return dct([('NChromX', (m['x'][(1,0,0,0,1,0)]**2 * BetX0 / BetStarX +
                                  m['x'][(0,1,0,0,1,0)]**2 / (BetX0 * BetStarX)).real),
-                ('NChromY', Fr*C*(m['y'][(0,0,1,0,1,0)]**2 * BetY0 / BetStarY +
+                ('NChromY', (m['y'][(0,0,1,0,1,0)]**2 * BetY0 / BetStarY +
                                  m['y'][(0,0,0,1,1,0)]**2 / (BetY0 * BetStarY)).real)])
 
   def getChrom(self, s=None, s0=0, n=100):
@@ -510,6 +511,28 @@ class twiss2(dct):
         else:
           total += coeff * simpson(wrap(i), 0, e.L, n)
       if i == nELast: return total
+
+  # Temporal definition
+  def sigmaBendsI5(self, E):
+    '''
+    Returns delta(sigma^2) due to bends (dipoles) using the I5 integral
+
+    :param float E: energy
+    '''
+    H=0
+
+    for i in range(len(self.elems)):
+      # Original calculation
+      #H=H+(self.DX[i]**2+(self.DPX[i]*self.BETX[i]+self.DX[i]*self.ALFX[i])**2)/self.BETX[i]*(abs(self.ANGLE[i]))**3/self.L[i]**2
+      para =  self.getBeta(i,0)
+      disp = self.getDisp(i,0)
+      phas = self.getPhase(i,0)
+      if self.elems[i].ANGLE != 0:
+        H = H + ( disp.DX**2 + (disp.DPX * para.BETX + disp.DX * para.ALFX)**2)/para.BETX*(abs(self.elems[i].ANGLE))**3/self.elems[i].L**2
+
+    c2 = 4.13e-11 # m^2(GeV)^-5
+    coeff = c2 * E**5 * self.markers[1].BETX
+    return H*coeff
 
   def stripLine(self):
     """
