@@ -138,10 +138,11 @@ def MULTHICK(K1L,K2L,K3L,K4L,L,order,**args):
   Li = L / 6  # Divide the original length in 6 splits
   m = generateDefaultMap(order)
   U = generateDefaultMatrix(order)
+  dr = matrixToMap(DRIFT(L=Li, order=order, **args) * U, XYZD)
 
   for ck in CiK[:-1]:
     m = MUL(K1L*ck, K2L*ck, K3L*ck, K4L*ck, order, **args) * m
-    m = matrixToMap(DRIFT(L=Li, order=order, **args) * U, XYZD) * m
+    m =  dr * m
 
   m = MUL(K1L*CiK[-1], K2L*CiK[-1], K3L*CiK[-1], K4L*CiK[-1], order, **args) * m
   return m
