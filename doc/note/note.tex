@@ -75,7 +75,7 @@ this with a file which already has specific columns defined, the line
 these. For more details see the \textsc{MAD-X PTC} manual~\cite{madx}.
 
 \subsection{Source code and Installation}
-\def \codelocation {/afs/cern.ch/eng/sl/lintrack/MAPCLASS/MapClass2.git}
+\def \codelocation {https://github.com/pylhc/MapClass2.git}
 
 The code ($\sim$ 7.7MB) is located in a public AFS~\cite{afs} area at:
 
@@ -609,7 +609,7 @@ incremented it is reasonably fast up to order 4, particularly if we consider
 the constant gain in time offered by stripping and merging the line.
 
 Further improvements can be obtained by avoiding to generate approximated map
-for each element and combine them, but rather directly generate the
+for each element and combine them, but rather directly generating the
 composition by using the map resulting from the previous step (instead of the
 defaultMap), in analogy of what a tracking code does by passing the final
 condition of the previous element as the initial conditions of the next
@@ -663,19 +663,19 @@ account.
 
 \textbf{pytpsa} takes a very simple but elegant solution to represent
 polynomials and to operate with them. In addition, by representing quantities
-as multivariate polynomials and performing trunctation at a specified order
-for each elementary operation, it return machine-precision Taylor expansions
-of the user expressions. Special function are like sqrt, sin, asin and so on
+as multivariate polynomials and performing truncation at a specified order
+for each elementary operation, it returns machine-precision Taylor expansions
+of the user expressions. Special functions like sqrt, sin, asin and so on
 are implemented by Taylor expansion, derivative composition rules, Newton
 methods, such that they return machine-precision correct results up to the
-desired order. Since the library does not support symbolic manimulation like
+desired order. Since the library does not support symbolic manipulation like
 simplifications or limits, differentiable expressions composed by non
 differentiable parts still diverge. In this context alternative formulation of
 the expressions should be used.
 
-Python alternatives to \textbf{pytsa} for what concerns the manipulation of
-polynomials exists (SymPy~\cite{sympy}, Sage~\cite{sagemath}), although the
-truncation rules and special functions needs to be programmed.
+Python alternatives to \textbf{pytpsa} for what concerns the manipulation of
+polynomials exist (SymPy~\cite{sympy}, Sage~\cite{sagemath}), although the
+truncation rules and special functions need to be programmed.
 
 Some patches have been suggested in order to speed-up the library.  After
 making a quick profiling upon the creation of the map for the FFS it is easy
