@@ -1,6 +1,6 @@
 [submodule "pytpsa"]
 	path = pytpsa
-	url = /afs/cern.ch/eng/sl/lintrack/MAPCLASS/pytpsa.git
+	url = https://github.com/pylhc/pytpsa.git
 [submodule "old"]
 	path = old
-	url = /afs/cern.ch/eng/sl/lintrack/MAPCLASS/MapClass.git
+	url = https://github.com/pylhc/MapClass.git
