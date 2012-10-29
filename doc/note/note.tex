@@ -56,8 +56,8 @@ the same version of Python. Other requirements are the argparse
 library, OrderedDict class and the unittest2 package; however, due to
 the lack of these elements in LXPLUS~\cite{lxplus} they have been
 added to the project inside the \textit{libs} folder. To generate the
-documentation \textit{Sphinx}~\cite{sphinx} is required, more about
-this in section~\ref{sec:code}. Finally, \textsc{MAPCLASS2} needs the
+documentation \textit{Sphinx}~\cite{sphinx} is required, see~\ref{sec:code}. 
+Finally, \textsc{MAPCLASS2} needs the
 pytpsa library (automatically acquired upon installation) and
 \textsc{MAD-X PTC 5.0} (for the provision of the Twiss file or map
 coefficients).
@@ -77,7 +77,7 @@ these. For more details see the \textsc{MAD-X PTC} manual~\cite{madx}.
 \subsection{Source code and Installation}
 \def \codelocation {https://github.com/pylhc/MapClass2.git}
 
-The code ($\sim$ 7.7MB) is located in a public AFS~\cite{afs} area at:
+The code ($\sim$ 7.7MB) is located in the public repository:
 
 \texttt{\codelocation}
 
@@ -204,7 +204,7 @@ defined integral and the number of integration intervals.
 \\\\
 \textbf{unittests.py}
 This file contains all the unit tests to verify that things are still
-working properly after changes. More explanations about this in
+working properly after changes. More explanations about this can be found in
 section~\ref{sec:test}.
 \\\\
 \textbf{``libs'' folder}
@@ -328,8 +328,9 @@ Gaussian distribution or a uniform one.
 \\\\
 \textbf{comp(m, v=XYZD)}
 
-Compares two maps and returns the $\chi^2$. This comparison is only
-made on the elements for which \textit{m} is 0. It takes two parameters:
+Compares two maps, the parent one to an external map \textit{m},  
+and returns the $\chi^2$. This comparison is only
+made on the geometric components for which \textit{m} is 0. It takes two parameters:
 \textbf{m} for the second map to compare it with and \textbf{v} which
 is a list of the dimensions to be compared, it defaults to the values
 in \textbf{XYZD} (see section~\ref{sec:code}, file
@@ -717,24 +718,26 @@ guidance during the development of the software.
 %
 \bibitem{python} http://www.python.org/
 %
+\bibitem{git} http://git-scm.com/
+%
 \bibitem{numpy} http://numpy.scipy.org/
 %
 \bibitem{lxplus} http://plus.web.cern.ch/plus/
 %
-\bibitem{afs}
-  http://services-old.web.cern.ch/services-old/afs/afsguide.html
+%\bibitem{afs}
+%  http://services-old.web.cern.ch/services-old/afs/afsguide.html
 %
-\bibitem{git} http://git-scm.com/
+\bibitem{geo} E.~Forest, KEK Preprint 2005-107 (2006), page 55,
+  equation 124.
 %
+
 \bibitem{sphinx} http://sphinx.pocoo.org/
 %
+
 \bibitem{oide} K. Oide, Phys. Rev. Lett. 61, 1713 - 1715 (1988).
 %
 \bibitem{sands} M. Sands, Emittance Growth From Radiation
   Fluctuations, Report SLAC/AP-47 (1985).
-%
-\bibitem{geo} E.~Forest, KEK Preprint 2005-107 (2006), page 55,
-  equation 124.
 %
 \bibitem{esave} http://mad.web.cern.ch/mad/madx.old/error/error\_save.html
 %
