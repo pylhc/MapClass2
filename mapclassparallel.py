@@ -10,9 +10,8 @@ from transport import *
 from pytpsa import pol, polmap
 
 from math import *
-from multiprocessing import Process
-from ctypes import *
-lib = cdll.LoadLibrary('./libMapBeamLine.so')
+from multiprocessing import Process, Queue
+
 
 ################
 def gammln(xx):
@@ -52,29 +51,57 @@ class Map2(polmap, dct):
   def __init__(self, *args, **kwargs):
     if len(args) == 1 and isinstance(args[0], metaclass2.twiss2):
       self.fromTwiss(args[0], **kwargs)
-    elif len(kwargs) == 3:
-      self.fromCplusplus(*args, **kwargs)
     else:
       self.fromFort(*args, **kwargs)
 
-  def fromCplusplus(self, filename, order=6, nbProc=1):
-   
-    lib.MapBeamLine_new.argtypes = [c_char_p, c_int, c_int]
-    lib.MapBeamLine_new.restype = c_char_p
-    s = lib.MapBeamLine_new(filename, order, nbProc).split("|")
-    dd = generateDefaultDict()
-    fdct = {}
-    for i in range(0, len(s) - 1, 2):
-      fdct[dd[s[i]]] = pol(s[i + 1].strip(" \t\n()[]"))
-    self.update(fdct)
-    self.reorder(XYZD)
-
   ## Twiss
-  def fromTwiss(self, t, terr=None, order=6):
+  def fromTwiss(self, t, terr=None, order=6, nbProc=1):
+    
+    jobs = []
+    procElemLen = int(len(t.elems)/nbProc)
+    q = Queue()
+    for i in range(nbProc - 1):
+      # divide the list of elements to processes and start the processes
+      if terr is not None:
+        p = Process(target=self.processElements, args=(t.elems[i * procElemLen : (i + 1) * procElemLen], terr.elems[i * procElemLen : (i + 1) * procElemLen], q, i, order))
+      else:
+        p = Process(target=self.processElements, args=(t.elems[i * procElemLen : (i + 1) * procElemLen], None, q, i, order))
+      jobs.append(p)
+      p.start()
+    i = nbProc - 1
+    if terr is not None:
+      p = Process(target=self.processElements, args=(t.elems[i * procElemLen : ], terr.elems[i * procElemLen : ], q, i, order))
+    else:
+      p = Process(target=self.processElements, args=(t.elems[i * procElemLen : ], None, q, i, order))
+    jobs.append(p)
+    p.start()
+    
+    #combine the results from all the processes 
+    R = generateDefaultMap(order=order)
+    results = {}
+    for i in range(nbProc):
+      val = q.get()
+      results[val[0]] = val[1]
+    for job in jobs:
+      job.join() 
+    for i in range(nbProc):
+      R = results[i] * R
+   
+    for k in XYZD:
+      self[k] = R[k]
+
+    # Reorder the variables so that they are always in the same order
+    # This is important for comparision operations but also for all
+    # the other methods
+    self.reorder(XYZD)
+  #  for k in XYZD:
+  #    print self[k] 
+
+  def processElements(self, elems, elemserr, q, index, order=6):
     R = generateDefaultMap(order=order)
     U = generateDefaultMatrix(order=order)
-    for i in xrange(len(t.elems)):
-      e = t.elems[i]
+    for i in xrange(len(elems)):
+      e = elems[i]
       try:
         mtr = metaclass2.matrixForElement(e, order)
         if mtr == None:
@@ -84,10 +111,10 @@ class Map2(polmap, dct):
           mp = metaclass2.matrixToMap(M, XYZD)
 
         # Apply misalignments here if any
-        if terr is not None:
-          if isinstance(terr, metaclass2.twiss2):
-            dx = terr.elems[i].DX
-            dy = terr.elems[i].DY
+        if elemserr is not None:
+          if isinstance(elemserr, metaclass2.twiss2):
+            dx = elemserr.elems[i].DX
+            dy = elemserr.elems[i].DY
             if dx != 0:
               mp = mp(x=X+dx)
             if dy != 0:
@@ -98,18 +125,10 @@ class Map2(polmap, dct):
         # Combine the map with everything else
         R = mp * R
       except Exception:
-        print "No implementation for element: ", e.NAME, e.KEYWORD
-
-    for k in XYZD:
-      self[k] = R[k]
-
-    # Reorder the variables so that they are always in the same order
-    # This is important for comparision operations but also for all
-    # the other methods
-    self.reorder(XYZD)
-    
-   # for k in XYZD:
-   #   print self[k] 
+        print "No implementation for element: ", e.NAME, e.KEYWORD 	
+    q.put((index, R))
+    #q.cancel_join_thread()
+    print "Finished in ", index
 
   ## fort.18
   def fromFort(self, order=6, filename='fort.18', nbProc=1):

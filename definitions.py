@@ -7,7 +7,6 @@ XYZD = ['x', 'px', 'y', 'py', 'd', 's']
 ## Polynomes declaration
 X, PX, Y, PY, D, S = mkpol(str(XYZD).translate(None, "'[] "))
 
-
 def generateDefaultMatrix(order):
   """
   A default matrix is a single column matrix with a
@@ -21,6 +20,16 @@ def generateDefaultMatrix(order):
                  [D],
                  [S]])
 
+
+def generateDefaultDict():
+  dd = {}
+  dd["x"] = XYZD[0] 
+  dd["px"] = XYZD[1]
+  dd["y"] = XYZD[2]
+  dd["py"] = XYZD[3]
+  dd["d"] = XYZD[4]
+  dd["s"] = XYZD[5]
+  return dd
 
 def generateDefaultMap(order):
   """

@@ -1,0 +1,2 @@
+g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x -fopenmp 
+g++ -shared -o libMapBeamLine.so MapBeamLine.o -fopenmp
