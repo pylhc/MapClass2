@@ -20,17 +20,6 @@ def generateDefaultMatrix(order):
                  [D],
                  [S]])
 
-
-def generateDefaultDict():
-  dd = {}
-  dd["x"] = XYZD[0] 
-  dd["px"] = XYZD[1]
-  dd["y"] = XYZD[2]
-  dd["py"] = XYZD[3]
-  dd["d"] = XYZD[4]
-  dd["s"] = XYZD[5]
-  return dd
-
 def generateDefaultMap(order):
   """
   A default map is a map where all the polynomials are simple;

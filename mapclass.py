@@ -12,6 +12,7 @@ from pytpsa import pol, polmap
 from math import *
 from multiprocessing import Process
 from ctypes import *
+from ctypes.util import *
 lib = cdll.LoadLibrary('./libMapBeamLine.so')
 
 ################
@@ -58,16 +59,18 @@ class Map2(polmap, dct):
       self.fromFort(*args, **kwargs)
 
   def fromCplusplus(self, filename, order=6, nbProc=1):
-   
-    lib.MapBeamLine_new.argtypes = [c_char_p, c_int, c_int]
-    lib.MapBeamLine_new.restype = c_char_p
-    s = lib.MapBeamLine_new(filename, order, nbProc).split("|")
-    dd = generateDefaultDict()
+    lib.MapBeamLine_new.argtypes = [ c_char_p,  c_int, c_int]
+    lib.MapBeamLine_new.restype =   c_char_p
+    _s = lib.MapBeamLine_new(filename, order, nbProc)
+    s =  _s.split("|")
     fdct = {}
     for i in range(0, len(s) - 1, 2):
-      fdct[dd[s[i]]] = pol(s[i + 1].strip(" \t\n()[]"))
+      fdct[str(s[i])] = pol(s[i + 1].strip(" \t\n()[]"), order=order)
     self.update(fdct)
     self.reorder(XYZD)
+    
+  def fromTwissObject(self, t, terr=None, order=6):
+    pass
 
   ## Twiss
   def fromTwiss(self, t, terr=None, order=6):
@@ -107,9 +110,6 @@ class Map2(polmap, dct):
     # This is important for comparision operations but also for all
     # the other methods
     self.reorder(XYZD)
-    
-   # for k in XYZD:
-   #   print self[k] 
 
   ## fort.18
   def fromFort(self, order=6, filename='fort.18', nbProc=1):

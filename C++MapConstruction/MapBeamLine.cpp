@@ -103,7 +103,7 @@ extern "C" {
 		return mp.polmap.c_str();
  
 	}
-    void MapBeamLine_fromTwiss(MapBeamLine* mb, Twiss t, Twiss err, int order, int nbthreads){ 
+    void MapBeamLine_fromTwiss(Twiss t, Twiss err, int order, int nbthreads){ 
 		mb->fromTwiss(t, err, order, nbthreads); 
 	}
 }

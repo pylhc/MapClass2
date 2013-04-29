@@ -36,7 +36,6 @@ t = twiss2('assets/ffs.twiss')
 
 m = Map2(filename='assets/ffs.twiss',order=args.order, nbProc=args.nbProc)
 #m = Map2(t,order=args.order)
-print m
 
 mm = Map2(filename='assets/fort.18',order=args.order)
 #mm = Map2(filename='assets/fort.18',order=args.order)
@@ -47,6 +46,7 @@ v = ['x','px','y','py']
 
 print ''
 print "!!!!! Maps of order %i" % args.order,
+
 if args.gaussian:
     print "and with Gaussian Delta"
 print ''
