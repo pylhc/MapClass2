@@ -1,2 +1,4 @@
-g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x -fopenmp 
+sudo apt-get install libboost-all-devs
+
+g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x -fopenmp -I boost_1_53_0/include/ 
 g++ -shared -o libMapBeamLine.so MapBeamLine.o -fopenmp
