@@ -1,4 +1,6 @@
 import sys
+import cProfile
+import pstats
 
 sys.path.append('../../libs')
 
@@ -10,6 +12,8 @@ sys.path.append('../../')
 
 from metaclass2 import twiss2
 from mapclass import Map2
+#from mapclassparallel import Map2
+#from mapclasspool import Map2
 
 ### Argument reading
 
@@ -18,6 +22,9 @@ parser.add_argument('-o', help="Order at which run the test. Default is 3 (for f
                     type=int, default=3, dest='order')
 parser.add_argument('-g', help="Run with Gaussian Delta or not. By default it doesn't",
                     action='store_true', dest='gaussian')
+parser.add_argument('-n', help="How many cores to run on. By default it is 1",
+                    type=int, default=1, dest='nbProc')                    
+                    
 
 args = parser.parse_args()
 
@@ -27,9 +34,11 @@ startTime = time.time()
 
 t = twiss2('assets/ffs.twiss')
 
-m = Map2(t,order=args.order)
+m = Map2(filename='assets/ffs.twiss',order=args.order, nbProc=args.nbProc)
+#m = Map2(t,order=args.order)
 
 mm = Map2(filename='assets/fort.18',order=args.order)
+#mm = Map2(filename='assets/fort.18',order=args.order)
 
 v = ['x','px','y','py']
 
@@ -37,6 +46,7 @@ v = ['x','px','y','py']
 
 print ''
 print "!!!!! Maps of order %i" % args.order,
+
 if args.gaussian:
     print "and with Gaussian Delta"
 print ''
@@ -77,4 +87,4 @@ for i in v:
 
 
 print ''
-print 'It took', time.time() - startTime, 'seconds to run.'
+print 'It took', time.time() - startTime, 'seconds to run.'   

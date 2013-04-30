@@ -20,7 +20,7 @@ class twiss2(dct):
     self.markers = []
 
     f = open(filename, 'r')
-
+   
     for line in f:
       # if ("@ " in line and "%le" in line) :    # FIX to take DPP %s
       if "@ " not in line and "@" in line:
@@ -59,6 +59,9 @@ class twiss2(dct):
           if "s" in types[j]:
             vals.append(splt[j].strip('"'))
         e = dct(zip(labels, vals))
+        e.update(self)
+        del e['markers']
+        del e['elems']
         if "$" in line:
           self.markers.append(e)
         else:
