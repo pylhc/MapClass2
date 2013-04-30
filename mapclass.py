@@ -10,7 +10,10 @@ from transport import *
 from pytpsa import pol, polmap
 
 from math import *
-
+from multiprocessing import Process
+from ctypes import *
+from ctypes.util import *
+lib = cdll.LoadLibrary('./libMapBeamLine.so')
 
 ################
 def gammln(xx):
@@ -50,8 +53,24 @@ class Map2(polmap, dct):
   def __init__(self, *args, **kwargs):
     if len(args) == 1 and isinstance(args[0], metaclass2.twiss2):
       self.fromTwiss(args[0], **kwargs)
+    elif len(kwargs) == 3:
+      self.fromCplusplus(*args, **kwargs)
     else:
       self.fromFort(*args, **kwargs)
+
+  def fromCplusplus(self, filename, order=6, nbProc=1):
+    lib.MapBeamLine_new.argtypes = [ c_char_p,  c_int, c_int]
+    lib.MapBeamLine_new.restype =   c_char_p
+    _s = lib.MapBeamLine_new(filename, order, nbProc)
+    s =  _s.split("|")
+    fdct = {}
+    for i in range(0, len(s) - 1, 2):
+      fdct[str(s[i])] = pol(s[i + 1].strip(" \t\n()[]"), order=order)
+    self.update(fdct)
+    self.reorder(XYZD)
+    
+  def fromTwissObject(self, t, terr=None, order=6):
+    pass
 
   ## Twiss
   def fromTwiss(self, t, terr=None, order=6):
@@ -93,7 +112,7 @@ class Map2(polmap, dct):
     self.reorder(XYZD)
 
   ## fort.18
-  def fromFort(self, order=6, filename='fort.18'):
+  def fromFort(self, order=6, filename='fort.18', nbProc=1):
     ietall = -1
 
     dct = {}
@@ -197,7 +216,6 @@ class Map2(polmap, dct):
          p1.order == p2.order and\
          p1.vars == p2.vars:
         for k, v in p1.iteritems():
-          #TODO: Why k[4]?
           if k[4] == 0:
             chi2 += (v - p2.get(k, 0)) ** 2
       else:
