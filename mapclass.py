@@ -12,8 +12,9 @@ from pytpsa import pol, polmap
 from math import *
 from multiprocessing import Process
 from ctypes import *
-from ctypes.util import *
-lib = cdll.LoadLibrary('./libMapBeamLine.so')
+import mapbeamline_wrapper
+#from ctypes.util import *
+#lib = cdll.LoadLibrary('./libMapBeamLine.so')
 
 ################
 def gammln(xx):
@@ -53,15 +54,16 @@ class Map2(polmap, dct):
   def __init__(self, *args, **kwargs):
     if len(args) == 1 and isinstance(args[0], metaclass2.twiss2):
       self.fromTwiss(args[0], **kwargs)
-    elif len(kwargs) == 3:
+    elif len(kwargs) == 4:
       self.fromCplusplus(*args, **kwargs)
     else:
       self.fromFort(*args, **kwargs)
 
-  def fromCplusplus(self, filename, order=6, nbProc=1):
-    lib.MapBeamLine_new.argtypes = [ c_char_p,  c_int, c_int]
-    lib.MapBeamLine_new.restype =   c_char_p
-    _s = lib.MapBeamLine_new(filename, order, nbProc)
+  def fromCplusplus(self, filename, filenameerr=None, order=6, nbProc=1): 
+    if filenameerr is None:
+      _s = mapbeamline_wrapper.constructMapFromTwissFile(filename, order, nbProc)
+    else:
+      _s = mapbeamline_wrapper.constructMapFromTwissFileWithErr(filename, filenameerr, order, nbProc) 
     s =  _s.split("|")
     fdct = {}
     for i in range(0, len(s) - 1, 2):

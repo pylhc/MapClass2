@@ -37,6 +37,7 @@ class Polmap {
 		Polmap operator +(Polmap other);
 		Polmap operator -(Polmap other);
 		Polmap operator *(Polmap other);
+		Polmap eval(string var, Polynom<T> other);
 		Polmap parallelmult(Polmap other);
 		Polmap operator ^(int n);
 		Polynom<T> operator [](string s);
@@ -92,6 +93,14 @@ template <class T> Polmap<T> Polmap<T>::operator-(Polmap<T> other) {
 		result_pols[i->first] = this[i->first] - i->second;
 	}
 	return Polmap<T>(result_pols);
+}
+
+template <class T> Polmap<T> Polmap<T>::eval(string var, Polynom<T> other) {
+	
+	for (typename unordered_map<string, Polynom<T>>::const_iterator i = pols.begin(); i != pols.end(); ++i) {
+		pols[i->first] = pols[i->first].eval(var, other);
+	}
+	return *this;
 }
 
 /*template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
