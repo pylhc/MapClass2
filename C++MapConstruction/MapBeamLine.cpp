@@ -89,9 +89,9 @@ MapBeamLine::MapBeamLine(string filename, int order, int nbthreads) {
 	delete [] Res; 
 }
 
-MapBeamLine::MapBeamLine(string filename, string filenamerr, int order, int nbthreads) {
+MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbthreads) {
 	Twiss t = Twiss(filename);
-	Twiss terr = Twiss(filenamerr);
+	Twiss terr = Twiss(filenameerr);
 	omp_set_num_threads(nbthreads);
 	timespec time1, time2; 
 	vector<vector<Polynom<double>>> v = separateComplexList(EQ(4, order));
@@ -142,12 +142,12 @@ timespec diff(timespec start, timespec end)
 }
 
 
-extern "C" {
+/*extern "C" {
     const char* MapBeamLine_new(char* filename, int order, int nbthreads){ 
 		MapBeamLine mp = MapBeamLine(filename, order, nbthreads);
 		return mp.polmap.c_str();
  
 	}
-}
+}*/
 
 
