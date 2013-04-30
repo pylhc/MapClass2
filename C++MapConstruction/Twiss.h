@@ -21,6 +21,7 @@ class Twiss {
 		vector<unordered_map<string, any>> markers;
 	public:
 		Twiss(std::string s);
+		Twiss(unordered_map<string, any> p, vector<unordered_map<string, any>> e, vector<unordered_map<string, any>> m);
 		void printtwiss();
 };
 
@@ -28,8 +29,8 @@ Twiss::Twiss(std::string filename) {
 	string line;
   	ifstream file (filename);
   	vector<string> labels;
-     vector<string> types;
-     unordered_map<string, any> e;
+    vector<string> types;
+    unordered_map<string, any> e;
   	if (file.is_open())
   	{
     		while (!file.eof())
@@ -92,6 +93,12 @@ Twiss::Twiss(std::string filename) {
     		file.close();
   	}
   	else cout << "Unable to open file"; 
+}
+
+Twiss::Twiss(unordered_map<string, any> p, vector<unordered_map<string, any>> e, vector<unordered_map<string, any>> m){
+	parameters = move(p);
+	elems = move(e);
+	markers = move(m);
 }
 
 void Twiss:: printtwiss() {
