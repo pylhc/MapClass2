@@ -1,4 +1,28 @@
+Local machine
+
 sudo apt-get install libboost-all-devs
 
-g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x -fopenmp -I boost_1_53_0/include/ 
-g++ -shared -o libMapBeamLine.so MapBeamLine.o -fopenmp
+or if you didn't install libboost, you can download it from
+http://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.zip/download
+unzip the archive
+and then use
+
+
+
+g++ -O2 -fPIC -c Twiss.cpp --std=c++0x  -I /path/to/the/directory/boost_1_53_0/include/ 
+g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x -fopenmp -I /path/to/the/directory/boost_1_53_0/include/ 
+g++ -O2 -fPIC -c MapBeamLine_wrapper.cpp --std=c++0x  -lboost_python -I /usr/include/python2.7 -fopenmp
+g++ -shared -o mapbeamline_wrapper.so Twiss.o MapBeamLine.o MapBeamLine_wrapper.o -lboost_python -lgomp
+
+where for the -I parameter you provide the path to where you downloaded boost 
+
+For LXPLUS
+use first
+
+source /afs/cern.ch/sw/lcg/contrib/gcc/4.4/x86_64-slc5/setup.sh
+
+g++ -O2 -fPIC -c Twiss.cpp --std=c++0x  -fopenmp 
+g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x  -fopenmp 
+g++ -O2 -fPIC -c MapBeamLine_wrapper.cpp --std=c++0x  -lboost_python -I /usr/include/python2.7 -fopenmp
+g++ -shared -o mapbeamline_wrapper.so Twiss.o MapBeamLine.o MapBeamLine_wrapper.o -lboost_python -lgomp
+
