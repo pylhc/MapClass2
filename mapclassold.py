@@ -11,8 +11,7 @@ from pytpsa import pol, polmap
 
 from math import *
 from multiprocessing import Process
-from ctypes import *
-import mapbeamline_wrapper
+import time
 
 ################
 def gammln(xx):
@@ -52,40 +51,27 @@ class Map2(polmap, dct):
   def __init__(self, *args, **kwargs):
     if len(args) == 1 and isinstance(args[0], metaclass2.twiss2):
       self.fromTwiss(args[0], **kwargs)
-    elif len(kwargs) == 4:
-      self.fromCplusplus(*args, **kwargs)
     else:
       self.fromFort(*args, **kwargs)
 
-  def fromCplusplus(self, filename, filenameerr=None, order=6, nbProc=1): 
-    if filenameerr is None:
-      _s = mapbeamline_wrapper.constructMapFromTwissFile(filename, order, nbProc)
-    else:
-      _s = mapbeamline_wrapper.constructMapFromTwissFileWithErr(filename, filenameerr, order, nbProc) 
-    s =  _s.split("|")
-    fdct = {}
-    for i in range(0, len(s) - 1, 2):
-      fdct[str(s[i])] = pol(s[i + 1].strip(" \t\n()[]"), order=order)
-    self.update(fdct)
-    self.reorder(XYZD)
-    
-  def fromTwissObject(self, t, terr=None, order=6):
-    pass
-
   ## Twiss
   def fromTwiss(self, t, terr=None, order=6):
+    EQnL = computeEQ(4, order, X , Y)
+    EQnLR, EQnLI = separateComplexList(EQnL)
     R = generateDefaultMap(order=order)
     U = generateDefaultMatrix(order=order)
     for i in xrange(len(t.elems)):
       e = t.elems[i]
       try:
+        start = time.time()
         mtr = metaclass2.matrixForElement(e, order)
         if mtr == None:
-          mp = metaclass2.mapForElement(e, order)
+          mp = metaclass2.mapForElement(e, order, EQnLR, EQnLI)
         else:
           M = mtr * U
           mp = metaclass2.matrixToMap(M, XYZD)
-
+        end = time.time() - start
+        print e.KEYWORD, "Generating map", end
         # Apply misalignments here if any
         if terr is not None:
           if isinstance(terr, metaclass2.twiss2):
@@ -97,12 +83,16 @@ class Map2(polmap, dct):
               mp = mp(y=Y+dy)
           else:
             raise TypeError("The 'align' attribute has to be of the type 'twiss2'.")
-
         # Combine the map with everything else
+        tstart = time.time()
         R = mp * R
+        tend = time.time() - tstart 	
+	print e.KEYWORD, "Composition" , tend
+	
+     #  print "R", "%.20f" % time()
       except Exception:
-        print "No implementation for element: ", e.NAME, e.KEYWORD
-
+        #print "No implementation for element: ", e.NAME, e.KEYWORD
+	pass
     for k in XYZD:
       self[k] = R[k]
 
@@ -110,9 +100,12 @@ class Map2(polmap, dct):
     # This is important for comparision operations but also for all
     # the other methods
     self.reorder(XYZD)
+    
+    for k in XYZD:
+      print k, "=", self[k] 
 
   ## fort.18
-  def fromFort(self, order=6, filename='fort.18', nbProc=1):
+  def fromFort(self, order=6, filename='fort.18'):
     ietall = -1
 
     dct = {}
