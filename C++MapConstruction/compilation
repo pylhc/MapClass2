@@ -1,0 +1,16 @@
+'''
+  def fromCplusplus(self, filename, order=6, nbProc=1):
+    lib.MapBeamLine_new.argtypes = [ c_char_p,  c_int, c_int]
+    lib.MapBeamLine_new.restype =   c_char_p
+    _s = lib.MapBeamLine_new(filename, order, nbProc)
+    s =  _s.split("|")
+    fdct = {}
+    for i in range(0, len(s) - 1, 2):
+      fdct[str(s[i])] = pol(s[i + 1].strip(" \t\n()[]"), order=order)
+    self.update(fdct)
+    self.reorder(XYZD)
+'''
+g++ -O2 -fPIC -c Twiss.cpp --std=c++0x  -lboost_python -I /usr/include/python2.7 -fopenmp
+g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x  -lboost_python -I /usr/include/python2.7 -fopenmp
+g++ -O2 -fPIC -c MapBeamLine_wrapper.cpp --std=c++0x  -lboost_python -I /usr/include/python2.7 -fopenmp
+g++ -shared -o mapbeamline_wrapper.so Twiss.o MapBeamLine.o MapBeamLine_wrapper.o -lboost_python -lgomp

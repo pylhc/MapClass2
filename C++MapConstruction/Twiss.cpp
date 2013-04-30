@@ -16,8 +16,8 @@ Twiss::Twiss(std::string filename) {
 	string line;
   	ifstream file (filename);
   	vector<string> labels;
-    vector<string> types;
-    unordered_map<string, any> e;
+     vector<string> types;
+     unordered_map<string, any> e;
   	if (file.is_open())
   	{
     		while (!file.eof())
