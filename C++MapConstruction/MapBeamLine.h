@@ -17,7 +17,8 @@ class MapBeamLine : public Polmap<double> {
 	public:
 		MapBeamLine(string filename, int order, int nbthreads);
 		MapBeamLine(string filename, string filenamerr, int order, int nbthreads);
-		void fromTwiss(Twiss t, Twiss terr, int order, int nbthreads);
+		MapBeamLine(Twiss t, int order, int nbthreads);
+		MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads);
 };
 
 
