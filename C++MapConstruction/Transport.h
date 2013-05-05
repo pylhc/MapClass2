@@ -5,7 +5,6 @@
 #include <string>
 #include <cmath>
 #include <complex>
-#include <boost/any.hpp>
 #include "Polmap.h"
 #include "Funset.h"
 
@@ -288,16 +287,16 @@ template <class T> Polmap<T> MULTHICK(double K1L,double K2L,double K3L,double K4
   	return m;
 } 
 
-template <class T> Polmap<T> mapForElement(unordered_map<string, any> e, int order, vector<vector<Polynom<T>>> v,
+template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, int order, vector<vector<Polynom<T>>> v,
 		Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
-	string keyword = any_cast<string>(e["KEYWORD"]);
-	//cout << keyword << endl;
-	double l = any_cast<double>(e["L"]);
-	double k1l = any_cast<double>(e["K1L"]);
-	double k2l = any_cast<double>(e["K2L"]);
-	double k3l = any_cast<double>(e["K3L"]);
-	double k4l = any_cast<double>(e["K4L"]);
-	double angle = any_cast<double>(e["ANGLE"]);
+	string keyword = e["KEYWORD"];
+//	cout << keyword << endl;
+	double l = atof(e["L"].c_str());
+	double k1l = atof(e["K1L"].c_str());
+	double k2l = atof(e["K2L"].c_str());
+	double k3l = atof(e["K3L"].c_str());
+	double k4l = atof(e["K4L"].c_str());
+	double angle = atof(e["ANGLE"].c_str());
 	string drift = "DRIFT";
 	string quadrupole = "QUADRUPOLE";
 	string sbend = "SBEND";
