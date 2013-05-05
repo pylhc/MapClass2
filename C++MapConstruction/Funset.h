@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include <boost/functional/hash.hpp>
 #include <complex>
 #include "Pol.h"
 
