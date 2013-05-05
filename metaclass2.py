@@ -18,7 +18,7 @@ class twiss2(dct):
     self.elems = []
     # Markers (only takes 1st and last)
     self.markers = []
-
+    self.types_parameters = dct()
     f = open(filename, 'r')
    
     for line in f:
@@ -31,37 +31,44 @@ class twiss2(dct):
         label = splt[1]
         try:
             self[label] = float(splt[3])
+            self.types_parameters[label] = "%le"
         except:
             print "Problem parsing:", line
             print "Going to be parsed as string"
             try:
               self[label] = splt[3].strip('"')
+              self.types_parameters[label] = "%s"
             except:
               print "Problem persits, let's ignore it!"
 
       elif "@ " in line and "s" in splt[2]:
         label = splt[1].strip(":")
         self[label] = splt[3].strip('"')
+        self.types_parameters[label] = "%s"
 
       if "* " in line or "*\t" in line:
         labels = splt[1:]
 
       if "$ " in line or "$\t" in line:
         types = splt[1:]
-
+        self.types_parameters.update(dct(zip(labels, types)))
+        
       if "@" not in line and "*" not in line and "%" not in line:
         vals = []
         for j in range(0, len(labels)):
-          if "%hd" in types[j]:
+          if "%d" in types[j]:
             vals.append(int(splt[j]))
           if "%le" in types[j]:
             vals.append(float(splt[j]))
           if "s" in types[j]:
-            vals.append(splt[j].strip('"'))
+            vals.append(splt[j].strip('"'))	  
+        #for j in range(0, len(labels)):
+        #  print j, labels[j], types[j], vals[j]
         e = dct(zip(labels, vals))
         e.update(self)
         del e['markers']
         del e['elems']
+        del e['types_parameters']  
         if "$" in line:
           self.markers.append(e)
         else:

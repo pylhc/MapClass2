@@ -37,7 +37,6 @@ MapBeamLine::MapBeamLine(Twiss t, int order, int nbthreads) {
 	Polmap<double>* Res = new Polmap<double>[nbthreads];
 	for (int i = 0; i < nbthreads; i ++)
 		Res[i] = generateDefaultMap(order, x, px, y, py, d, s); 
-	
 	int size = t.elems.size();	
 	#pragma omp parallel for shared(Res) schedule(static)
 	for (int i = 0; i < size; i ++) {
@@ -48,6 +47,7 @@ MapBeamLine::MapBeamLine(Twiss t, int order, int nbthreads) {
 	}
 	for (int i = 0; i < nbthreads; i ++)
 		R = Res[i] * R;
+	polmap = R.getMap();
 	for (unordered_map<string, Polynom<double>>:: iterator it = R.pols.begin(); it != R.pols.end(); it ++) 
 		pols[it->first] = it->second; 
 	delete [] Res;
@@ -83,6 +83,7 @@ MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads) {
 	}
 	for (int i = 0; i < nbthreads; i ++)
 		R = Res[i] * R;
+	polmap = R.getMap();
 	for (unordered_map<string, Polynom<double>>:: iterator it = R.pols.begin(); it != R.pols.end(); it ++) 
 		pols[it->first] = it->second; 
 	delete [] Res;
@@ -171,5 +172,11 @@ timespec diff(timespec start, timespec end)
 		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
 	}
 	return temp;
+}
+
+int main() {
+	Twiss t = Twiss("/home/diana/Thesis/GIT/MapClass2/doc/FFSexample/assets/ffs.twiss");
+	MapBeamLine mp = MapBeamLine(t, 3, 1);
+	mp.printpolmap();
 }
 

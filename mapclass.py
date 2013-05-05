@@ -54,7 +54,7 @@ class Map2(polmap, dct):
     #  self.fromTwiss(args[0], **kwargs)
     if len(kwargs) == 3 and isinstance(args[0], metaclass2.twiss2):
       self.fromTwissObject(args[0], **kwargs)
-    elif len(kwargs) == 3:
+    elif len(kwargs) == 4:
       self.fromTwissFile(*args, **kwargs)
     else:
       self.fromFort(*args, **kwargs)
@@ -73,9 +73,9 @@ class Map2(polmap, dct):
     
   def fromTwissObject(self, t, terr=None, order=6, nbProc=1):
     if terr is None:
-      _s = mapbeamline_wrapper.constructMapFromTwissObject(t, t.elems, t.markers, order, nbProc)
+      _s = mapbeamline_wrapper.constructMapFromTwissObject(t, order, nbProc)
     else:
-      _s = mapbeamline_wrapper.constructMapFromTwissObjectWithErr(t, t.elems, t.markers, terr, terr.elems, terr.markers, order, nbProc) 
+      _s = mapbeamline_wrapper.constructMapFromTwissObjectWithErr(t, terr, order, nbProc) 
     s =  _s.split("|")
     fdct = {}
     for i in range(0, len(s) - 1, 2):

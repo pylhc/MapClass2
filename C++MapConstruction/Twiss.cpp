@@ -16,8 +16,8 @@ Twiss::Twiss(std::string filename) {
 	string line;
   	ifstream file (filename);
   	vector<string> labels;
-     vector<string> types;
-     unordered_map<string, any> e;
+    vector<string> types;
+    unordered_map<string, string> e;
   	if (file.is_open())
   	{
     		while (!file.eof())
@@ -35,7 +35,8 @@ Twiss::Twiss(std::string filename) {
     			} while (iss);
 
       		if (line.find("@ ") != string::npos && line.find("%") != string::npos && line.find("s") == string::npos) {
-      			parameters[splt[1]] = atof(splt[3].c_str()); 
+      			types_parameters[splt[1]] = "%le";
+      			parameters[splt[1]] = splt[3]; 
       		}
       		else if (line.find("@ ") != string::npos && line.find("%") != string::npos && line.find("s") != string::npos) {
       			trim_if(splt[1],is_any_of(":"));		
@@ -46,6 +47,7 @@ Twiss::Twiss(std::string filename) {
       					s += " " + splt[i];
       				trim_if(s,is_any_of("\""));
       			}
+      			types_parameters[splt[1]] = "%s";
       			parameters[splt[1]] = s;
       		}
       		if (line.find("* ") != string::npos || line.find("*\t") != string::npos) {
@@ -55,21 +57,27 @@ Twiss::Twiss(std::string filename) {
       		if (line.find("$ ") != string::npos || line.find("$\t") != string::npos) {
       			types = splt;
       			types.erase(types.begin());
+      			for (int i = 0; i < labels.size(); i ++)
+      				types_parameters[labels[i]] = types[i];
       		}
       		if (line.find("@") == string::npos && line.find("%") == string::npos && line.find("*") == string::npos) {
-        			e.clear();
         			
         			for (int j = 0; j < labels.size(); j ++)  {
-          			if (types[j].compare("%hd") == 0)
+          		/*	if (types[j].compare("%d") == 0)
           				e[labels[j]] = atoi(splt[j].c_str());
           			else if (types[j].compare("%le") == 0) {
           					e[labels[j]] = atof(splt[j].c_str());
           				}
             				else if (types[j].compare("%s") == 0) {
-          						trim_if(splt[j], is_any_of(" "));
-          						trim_if(splt[j], is_any_of("\""));
+          						trim_if(splt[j], is_string_of(" "));
+          						trim_if(splt[j], is_string_of("\""));
           						e[labels[j]] = splt[j];
           					} 
+          			*/
+
+          			trim_if(splt[j], is_any_of("\" "));
+          			e[labels[j]] = splt[j];
+          			
           		}
           		if (line.find("$") != string::npos) 
           			markers.push_back(e);
@@ -82,44 +90,22 @@ Twiss::Twiss(std::string filename) {
   	else cout << "Unable to open file"; 
 }
 
-Twiss::Twiss(unordered_map<string, any> p, vector<unordered_map<string, any>> e, vector<unordered_map<string, any>> m){
+Twiss::Twiss(unordered_map<string, string> p, vector<unordered_map<string, string>> e, vector<unordered_map<string, string>> m, unordered_map<string, string> types){
 	parameters = move(p);
 	elems = move(e);
 	markers = move(m);
+	types_parameters = move(types);
 }
 
 void Twiss:: printtwiss() {
-	for (unordered_map<string, any>::iterator i = parameters.begin(); i != parameters.end(); ++i) {
-		cout <<i->first << " ";
-		try
-    		{
-        		cout << any_cast<double>(i->second)<<endl;
-        	}
-    		catch(const boost::bad_any_cast &)
-   	 	{
-        		cout << any_cast<string>(i->second)<<endl;
-    		}	
+	for (unordered_map<string, string>::iterator i = parameters.begin(); i != parameters.end(); ++i) {
+		cout <<i->first << " " << i->second << endl;
 	}
 	cout << markers.size();
-	for (vector<unordered_map<string, any>>:: iterator i = elems.begin(); i != elems.end(); ++i) {
-		unordered_map<string, any> e = *i;
-		for (unordered_map<string, any>::iterator j = e.begin(); j != e.end(); ++j) {
-			cout <<j->first << " ";
-			try
-    			{
-        			cout << any_cast<double>(j->second)<<endl;
-        		}
-    			catch(const boost::bad_any_cast &)
-   	 		{
-        			try
-    				{
-        				cout << any_cast<string>(j->second)<<endl;
-        			}
-        			catch(const boost::bad_any_cast &)
-   	 			{
-        				cout << any_cast<int>(j->second)<<endl;
-    				}
-    			}	
+	for (vector<unordered_map<string, string>>:: iterator i = elems.begin(); i != elems.end(); ++i) {
+		unordered_map<string, string> e = *i;
+		for (unordered_map<string, string>::iterator j = e.begin(); j != e.end(); ++j) {
+			cout <<j->first << " "<<j->second << endl;
 		}
 	
 	}
