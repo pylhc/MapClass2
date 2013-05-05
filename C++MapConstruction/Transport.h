@@ -5,7 +5,6 @@
 #include <string>
 #include <cmath>
 #include <complex>
-#include <boost/any.hpp>
 #include "Polmap.h"
 #include "Funset.h"
 
