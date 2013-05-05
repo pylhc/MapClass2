@@ -12,6 +12,7 @@ from pytpsa import pol, polmap
 from math import *
 from multiprocessing import Process
 from ctypes import *
+cdll.LoadLibrary("../../libs/libboost_python.so.1.53.0")
 import mapbeamline_wrapper
 
 ################

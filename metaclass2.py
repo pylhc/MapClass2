@@ -62,8 +62,6 @@ class twiss2(dct):
             vals.append(float(splt[j]))
           if "s" in types[j]:
             vals.append(splt[j].strip('"'))	  
-        #for j in range(0, len(labels)):
-        #  print j, labels[j], types[j], vals[j]
         e = dct(zip(labels, vals))
         e.update(self)
         del e['markers']
