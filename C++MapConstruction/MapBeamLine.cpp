@@ -74,8 +74,8 @@ MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads) {
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
 		Polmap<double> mp = mapForElement(t.elems[i], order, v, x, px, y, py, d, s);	
-		double dx = any_cast<double>(terr.elems[i][DX]);
-          double dy = any_cast<double>(terr.elems[i][DY]);
+		double dx = atof(terr.elems[i][DX].c_str());
+          	double dy = atof(terr.elems[i][DY].c_str());
 		mp = mp.eval("x", Polynom<double>(order, 1E-18, "x", 1) + dx); 
 		mp = mp.eval("y", Polynom<double>(order, 1E-18, "y", 1) + dy);
 		if (mp.pols.size() != 0)
@@ -145,8 +145,8 @@ MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbt
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
 		Polmap<double> mp = mapForElement(t.elems[i], order, v, x, px, y, py, d, s);	
-		double dx = any_cast<double>(terr.elems[i][DX]);
-          double dy = any_cast<double>(terr.elems[i][DY]);
+		double dx = atof(terr.elems[i][DX].c_str());
+          	double dy = atof(terr.elems[i][DY].c_str());
 		mp = mp.eval("x", Polynom<double>(order, 1E-18, "x", 1) + dx); 
 		mp = mp.eval("y", Polynom<double>(order, 1E-18, "y", 1) + dy);
 		if (mp.pols.size() != 0)
