@@ -13,7 +13,7 @@ from math import *
 from multiprocessing import Process
 from ctypes import *
 cdll.LoadLibrary("../../libs/boost_1_53_0/libboost_python.so.1.53.0")
-import mapbeamline_wrapper
+import mapbeamline
 
 ################
 def gammln(xx):
@@ -62,9 +62,9 @@ class Map2(polmap, dct):
 
   def fromTwissFile(self, filename, filenameerr=None, order=6, nbProc=1): 
     if filenameerr is None:
-      _s = mapbeamline_wrapper.constructMapFromTwissFile(filename, order, nbProc)
+      _s = mapbeamline.constructMapFromTwissFile(filename, order, nbProc)
     else:
-      _s = mapbeamline_wrapper.constructMapFromTwissFileWithErr(filename, filenameerr, order, nbProc) 
+      _s = mapbeamline.constructMapFromTwissFileWithErr(filename, filenameerr, order, nbProc) 
     s =  _s.split("|")
     fdct = {}
     for i in range(0, len(s) - 1, 2):
@@ -74,9 +74,9 @@ class Map2(polmap, dct):
     
   def fromTwissObject(self, t, terr=None, order=6, nbProc=1):
     if terr is None:
-      _s = mapbeamline_wrapper.constructMapFromTwissObject(t, order, nbProc)
+      _s = mapbeamline.constructMapFromTwissObject(t, order, nbProc)
     else:
-      _s = mapbeamline_wrapper.constructMapFromTwissObjectWithErr(t, terr, order, nbProc) 
+      _s = mapbeamline.constructMapFromTwissObjectWithErr(t, terr, order, nbProc) 
     s =  _s.split("|")
     fdct = {}
     for i in range(0, len(s) - 1, 2):
