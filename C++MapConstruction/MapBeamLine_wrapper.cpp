@@ -216,7 +216,7 @@ str _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthre
         return mp.polmap.c_str();
 }
 
-BOOST_PYTHON_MODULE(mapbeamline_wrapper)
+BOOST_PYTHON_MODULE(mapbeamline)
 {
      def("constructMapFromTwissFile", _TwissFile_wrapper);
      def("constructMapFromTwissFileWithErr", _TwissFileErr_wrapper);
