@@ -51,11 +51,11 @@ class Map2(polmap, dct):
   '''
 
   def __init__(self, *args, **kwargs):
-    #if len(args) == 1 and isinstance(args[0], metaclass2.twiss2):
-    #  self.fromTwiss(args[0], **kwargs)
-    if len(kwargs) == 3 and isinstance(args[0], metaclass2.twiss2):
+    if len(args) == 2 and isinstance(args[0], metaclass2.twiss2):
+      self.fromTwiss(args[0], **kwargs)
+    elif len(args) == 1 and isinstance(args[0], metaclass2.twiss2):
       self.fromTwissObject(args[0], **kwargs)
-    elif len(kwargs) == 4:
+    elif len(args) == 1 and isinstance(args[0], str):
       self.fromTwissFile(*args, **kwargs)
     else:
       self.fromFort(*args, **kwargs)

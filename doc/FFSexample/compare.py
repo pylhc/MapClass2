@@ -34,13 +34,11 @@ startTime = time.time()
 
 t = twiss2('assets/ffs.twiss')
 
-m = Map2(filename='assets/ffs.twiss',filenameerr=None, order=args.order, nbProc=args.nbProc)
-#m = Map2(t,order=args.order)
+m = Map2('assets/ffs.twiss',filenameerr=None, order=args.order, nbProc=args.nbProc)
+#m = Map2(t, "old", order=args.order)  #old mapclass call
 #m = Map2(t, terr=None, order=args.order, nbProc=args.nbProc)
-#print m
 
-mm = Map2(filename='assets/fort.18',order=args.order)
-#mm = Map2(filename='assets/fort.18',order=args.order)
+mm = Map2(filename='assets/fort.18',order=args.order) #from fort call
 
 v = ['x','px','y','py']
 

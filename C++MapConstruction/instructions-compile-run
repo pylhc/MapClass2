@@ -10,6 +10,7 @@ cp mapbeamline.so ../doc/FFSexample
 
 Local machine -Python 2.7 or 3
 
+for installing boost on ubuntu
 sudo apt-get install libboost-all-devs
 
 g++ -O2 -fPIC -c Twiss.cpp --std=c++0x
