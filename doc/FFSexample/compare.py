@@ -1,6 +1,8 @@
 import sys
 import cProfile
 import pstats
+from ctypes import *
+cdll.LoadLibrary("../../libs/boost_1_53_0/libboost_python.so.1.53.0")
 
 sys.path.append('../../libs')
 
@@ -14,6 +16,7 @@ from metaclass2 import twiss2
 from mapclass import Map2
 #from mapclassparallel import Map2
 #from mapclasspool import Map2
+
 
 ### Argument reading
 
