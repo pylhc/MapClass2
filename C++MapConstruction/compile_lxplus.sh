@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-source /afs/cern.ch/sw/lcg/contrib/gcc/4.4.3/x86_64-slc5/setup.sh
+
 export CPLUS_INCLUDE_PATH=../libs/boost_1_53_0/include/
 g++ -O2 -fPIC -c Twiss.cpp --std=c++0x  -fopenmp 
 g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x  -fopenmp
