@@ -81,6 +81,9 @@ class twiss2(dct):
       print "Leaving Metaclass"
       exit()
 
+  def setDelta(self, nE, delta):
+    self.elems[nE].DELTAP = delta
+    
   def getBeta(self, nE, s):
     """
     Calculates beta, alpha, gamma at location s in element nE.

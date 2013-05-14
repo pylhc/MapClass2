@@ -60,6 +60,8 @@ class Polynom {
 		static Polynom phorner (vector<T> lst, Polynom p);
 		void setOrder(int o);
 		string getPol();
+		template <class U> friend Polynom<U> operator*(U val, Polynom<U> other);
+		template <class U> friend Polynom<U> operator+(U val, Polynom<U> other);
 };
 
 template <class T> Polynom<T>::Polynom (int o, double e, vector<string> v, unordered_map<vector<int>, T, container_hash<vector<int>>> t) {
@@ -200,7 +202,6 @@ template <class T> Polynom<T> Polynom<T>::operator*(Polynom<T> other) {
 	Polynom<T> res = Polynom<T>(neworder, eps, newvars, result_terms);
 	return move(res);
 }
-
 
 template <class T> Polynom<T> Polynom<T>::operator/(Polynom<T> other) {
 	return move(*this * other.pinv());
@@ -466,6 +467,29 @@ template <class T> Polynom<T> Polynom<T>::operator*(T val) {
 	Polynom<T> res = Polynom<T>(order, eps, vars, result_terms);
 	return move(res);
 }
+
+template <class T> Polynom<T> operator+(T val, Polynom<T> other) {
+	vector<int> zero (other.vars.size(), 0);
+	unordered_map<vector<int>, T, container_hash<vector<int>>> result_terms;
+	result_terms = other.terms;
+	result_terms[zero] += other.val;
+	Polynom<T> res = Polynom<T>(other.order, other.eps, other.vars, result_terms);
+	return move(res);
+}
+
+template <class T> Polynom<T> operator*(T val, Polynom<T> other) {
+	vector<int> zero (other.vars.size());
+	for (int i = 0; i < other.vars.size(); i ++)
+		zero.push_back(0);
+	unordered_map<vector<int>, T, container_hash<vector<int>>> result_terms;
+	result_terms = other.terms;
+	for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::iterator i = other.terms.begin(); i != other.terms.end(); ++i) {
+		result_terms[i->first] = i->second * val;
+	}
+	Polynom<T> res = Polynom<T>(other.order, other.eps, other.vars, result_terms);
+	return move(res);
+}
+
 
 template <class T> Polynom<T> Polynom<T>::operator/(T val) {
 	return move(*this * (1/val));

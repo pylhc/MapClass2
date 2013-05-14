@@ -55,44 +55,45 @@ template <class T> Polmap<T> DRIFTMap(double length, int order, Polynom<T> x, Po
   	return Polmap<T>(mp);
 }
 
-template <class T> Polynom<T>  Q11(double L, double K1L, int order, Polynom<T> d) {
+template <class T> Polynom<T>  Q11p(double L, double K1L, int order, Polynom<T> d) {
 	Polynom<T> K = (d + 1).pinv() * abs(K1L/L); 
 	return cosp(sqrtp(K) * L);
 } 
 
-template <class T> Polynom<T> Q12(double L,double K1L, int order, Polynom<T> d) {
+template <class T> Polynom<T> Q12p(double L,double K1L, int order, Polynom<T> d) {
 	Polynom<T> K =  (d + 1).pinv() * abs(K1L/L);
  	return (sqrtp(K).pinv() * sinp(sqrtp(K) * L))/(d + 1);
 }
 
-template <class T> Polynom<T> Q21(double L,double K1L, int order, Polynom<T> d) {
+template <class T> Polynom<T> Q21p(double L,double K1L, int order, Polynom<T> d) {
 	Polynom<T> K =  (d + 1).pinv() * abs(K1L/L);
  	return sqrtp(K) * sinp(sqrtp(K) * L) * (d + 1) * (-1);
 }
 
-template <class T> Polynom<T> Q33(double L,double K1L, int order, Polynom<T> d) {
+template <class T> Polynom<T> Q33p(double L,double K1L, int order, Polynom<T> d) {
 	Polynom<T> K =  (d + 1).pinv() * abs(K1L/L);
  	return coshp(sqrtp(K) * L);
 }
 
-template <class T> Polynom<T> Q34(double L,double K1L, int order, Polynom<T> d) {
+template <class T> Polynom<T> Q34p(double L,double K1L, int order, Polynom<T> d) {
 	Polynom<T> K =  (d + 1).pinv() * abs(K1L/L);
  	return sqrtp(K).pinv() * sinhp(sqrtp(K) * L)/(d + 1);
 }
 
-template <class T> Polynom<T> Q43(double L,double K1L, int order, Polynom<T> d) {
+template <class T> Polynom<T> Q43p(double L,double K1L, int order, Polynom<T> d) {
 	Polynom<T> K =  (d + 1).pinv() * abs(K1L/L);
  	return sqrtp(K)*sinhp(sqrtp(K) * L) * (d + 1);
+ 	
 }
 
-template <class T> Polmap<T> QFMap(double L,double K1L, int order, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
+template <class T> Polmap<T> QFMapp(double L,double K1L, int order, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
     unordered_map<string, Polynom<T>> mp;
-  	Polynom<T> q11 = Q11(L, K1L, order, d);
-  	Polynom<T> q12 = Q12(L, K1L, order, d);
-  	Polynom<T> q21 = Q21(L, K1L, order, d);
-  	Polynom<T> q33 = Q33(L, K1L, order, d);
-  	Polynom<T> q34 = Q34(L, K1L, order, d);
-  	Polynom<T> q43 = Q43(L, K1L, order, d);
+  	Polynom<T> q11 = Q11p(L, K1L, order, d);
+  	Polynom<T> q12 = Q12p(L, K1L, order, d);
+  	Polynom<T> q21 = Q21p(L, K1L, order, d);
+  	Polynom<T> q33 = Q33p(L, K1L, order, d);
+  	Polynom<T> q34 = Q34p(L, K1L, order, d);
+  	Polynom<T> q43 = Q43p(L, K1L, order, d);
   	mp[xstring] = q11 * x + q12 * px;
   	mp[pxstring] = q21 * x  + q11 * px;
   	mp[ystring] = q33 * y + q34 * py;
@@ -102,14 +103,14 @@ template <class T> Polmap<T> QFMap(double L,double K1L, int order, Polynom<T> x,
   	return Polmap<T>(mp);
 }
 
-template <class T> Polmap<T> QDMap(double L,double K1L, int order, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
+template <class T> Polmap<T> QDMapp(double L,double K1L, int order, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
   	unordered_map<string, Polynom<T>> mp;
-  	Polynom<T> q11 = Q11(L, K1L, order, d);
-  	Polynom<T> q12 = Q12(L, K1L, order, d);
-  	Polynom<T> q21 = Q21(L, K1L, order, d);
-  	Polynom<T> q33 = Q33(L, K1L, order, d);
-  	Polynom<T> q34 = Q34(L, K1L, order, d);
-  	Polynom<T> q43 = Q43(L, K1L, order, d);
+  	Polynom<T> q11 = Q11p(L, K1L, order, d);
+  	Polynom<T> q12 = Q12p(L, K1L, order, d);
+  	Polynom<T> q21 = Q21p(L, K1L, order, d);
+  	Polynom<T> q33 = Q33p(L, K1L, order, d);
+  	Polynom<T> q34 = Q34p(L, K1L, order, d);
+  	Polynom<T> q43 = Q43p(L, K1L, order, d);
   	mp[xstring] = q33 * x + q34 * px;
   	mp[pxstring] = q43 * x  + q33 * px;
   	mp[ystring] = q11 * y + q12 * py;
@@ -118,6 +119,71 @@ template <class T> Polmap<T> QDMap(double L,double K1L, int order, Polynom<T> x,
   	mp[sstring] = s;
   	return Polmap<T>(mp);
 }
+
+static double Q11(double L, double K1L, int order, double delta) {
+	double K = 1/(delta + 1) * abs(K1L/L);
+	return cos(sqrt(K) * L);
+} 
+
+static double Q12(double L,double K1L, int order, double delta) {
+	double K =  1/(delta + 1) * abs(K1L/L);
+ 	return (1/sqrt(K) * sin(sqrt(K) * L))/(delta + 1);
+}
+
+static double Q21(double L,double K1L, int order, double delta) {
+	double K =  1/(delta + 1) * abs(K1L/L);
+ 	return -sqrt(K) * sin(sqrt(K) * L) * (delta + 1);
+}
+
+static double Q33(double L,double K1L, int order, double delta) {
+	double K =  1/(delta + 1) * abs(K1L/L);
+ 	return cosh(sqrt(K) * L);
+}
+
+static double Q34(double L,double K1L, int order, double delta) {
+	double K =  1/(delta + 1) * abs(K1L/L);
+ 	return 1/sqrt(K) * sinh(sqrt(K) * L)/(delta + 1);
+}
+
+static double Q43(double L,double K1L, int order, double delta) {
+	double K =  1/(delta + 1) * abs(K1L/L);
+ 	return sqrt(K)*sinh(sqrt(K) * L) * (delta + 1);
+}
+
+template <class T> Polmap<T> QFMap(double L,double K1L, double delta, int order, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
+    	unordered_map<string, Polynom<T>> mp;
+  	double q11 = Q11(L, K1L, order, delta);
+  	double q12 = Q12(L, K1L, order, delta);
+  	double q21 = Q21(L, K1L, order, delta);
+  	double q33 = Q33(L, K1L, order, delta);
+  	double q34 = Q34(L, K1L, order, delta);
+  	double q43 = Q43(L, K1L, order, delta);
+  	mp[xstring] = q11 * x + q12 * px;
+  	mp[pxstring] = q21 * x  + q11 * px;
+  	mp[ystring] = q33 * y + q34 * py;
+  	mp[pystring] = q43 * y + q33 * py;
+  	mp[dstring] = d;
+  	mp[sstring] = s;
+  	return Polmap<T>(mp);
+}
+
+template <class T> Polmap<T> QDMap(double L,double K1L, double delta, int order, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
+  	unordered_map<string, Polynom<T>> mp;
+  	double q11 = Q11(L, K1L, order, delta);
+  	double q12 = Q12(L, K1L, order, delta);
+  	double q21 = Q21(L, K1L, order, delta);
+  	double q33 = Q33(L, K1L, order, delta);
+  	double q34 = Q34(L, K1L, order, delta);
+  	double q43 = Q43(L, K1L, order, delta);
+  	mp[xstring] = q33 * x + q34 * px;
+  	mp[pxstring] = q43 * x  + q33 * px;
+  	mp[ystring] = q11 * y + q12 * py;
+  	mp[pystring] = q21 * y + q11 * py;
+  	mp[dstring] = d;
+  	mp[sstring] = s;
+  	return Polmap<T>(mp);
+}
+
 
 template <class T> Polynom<T>  D11(double L, double ANGLE, int order, Polynom<T> d) {
 	Polynom<T> THETA = sqrtp(d + 1).pinv() * ANGLE; 
@@ -297,6 +363,7 @@ template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, int 
 	double k3l = atof(e["K3L"].c_str());
 	double k4l = atof(e["K4L"].c_str());
 	double angle = atof(e["ANGLE"].c_str());
+	double delta = atof(e["DELTAP"].c_str());
 	string drift = "DRIFT";
 	string quadrupole = "QUADRUPOLE";
 	string sbend = "SBEND";
@@ -307,12 +374,21 @@ template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, int 
     	
     	if (keyword.compare(drift) == 0) 
 		return DRIFTMap(l, order, x, px, y, py, d, s);
+    	/*
     	if (keyword.compare(quadrupole) == 0)
 		if (l != 0) { 
         		if (k1l > 0)
-          		return QFMap(l, k1l, order, x, px, y, py, d, s);
+          		return QFMapp(l, k1l, order, x, px, y, py, d, s);
         		else
-          		return QDMap(l, k1l, order, x, px, y, py, d, s);
+          		return QDMapp(l, k1l, order, x, px, y, py, d, s);
+          } */
+          
+     if (keyword.compare(quadrupole) == 0)
+		if (l != 0) { 
+        		if (k1l > 0)
+          		return QFMap(l, k1l, delta, order, x, px, y, py, d, s);
+        		else
+          		return QDMap(l, k1l, delta, order, x, px, y, py, d, s);
           }
     	if (keyword.compare(sbend) == 0) 
      	return DIMap(l, angle, order, x, px, y, py, d, s);        
