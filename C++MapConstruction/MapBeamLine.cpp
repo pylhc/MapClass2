@@ -32,16 +32,16 @@ MapBeamLine::MapBeamLine(Twiss t, int order, int nbthreads) {
 	Polynom<double> py = PY<double>(order);
 	Polynom<double> d = D<double>(order);
 	Polynom<double> s = S<double>(order);
-	Polmap<double> R = generateDefaultMap(order, x, px, y, py, d, s);
+	Polmap<double> R = generateDefaultMap(x, px, y, py, d, s);
 	
 	Polmap<double>* Res = new Polmap<double>[nbthreads];
 	for (int i = 0; i < nbthreads; i ++)
-		Res[i] = generateDefaultMap(order, x, px, y, py, d, s); 
+		Res[i] = generateDefaultMap(x, px, y, py, d, s); 
 	int size = t.elems.size();	
 	#pragma omp parallel for shared(Res) schedule(static)
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
-		Polmap<double> mp = mapForElement(t.elems[i], order, v, x, px, y, py, d, s);	
+		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
 		if (mp.pols.size() != 0)
 			Res[index] = mp * Res[index];		
 	}
@@ -63,17 +63,17 @@ MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads) {
 	Polynom<double> py = PY<double>(order);
 	Polynom<double> d = D<double>(order);
 	Polynom<double> s = S<double>(order);
-	Polmap<double> R = generateDefaultMap(order, x, px, y, py, d, s);
+	Polmap<double> R = generateDefaultMap(x, px, y, py, d, s);
 	
 	Polmap<double>* Res = new Polmap<double>[nbthreads];
 	for (int i = 0; i < nbthreads; i ++)
-		Res[i] = generateDefaultMap(order, x, px, y, py, d, s); 
+		Res[i] = generateDefaultMap(x, px, y, py, d, s); 
 	
 	int size = t.elems.size();	
 	#pragma omp parallel for shared(Res) schedule(static)
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
-		Polmap<double> mp = mapForElement(t.elems[i], order, v, x, px, y, py, d, s);	
+		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
 		double dx = atof(terr.elems[i][DX].c_str());
           	double dy = atof(terr.elems[i][DY].c_str());
 		mp = mp.eval("x", Polynom<double>(order, 1E-18, "x", 1) + dx); 
@@ -100,17 +100,17 @@ MapBeamLine::MapBeamLine(string filename, int order, int nbthreads) {
 	Polynom<double> py = PY<double>(order);
 	Polynom<double> d = D<double>(order);
 	Polynom<double> s = S<double>(order);
-	Polmap<double> R = generateDefaultMap(order, x, px, y, py, d, s);
+	Polmap<double> R = generateDefaultMap( x, px, y, py, d, s);
 	
 	Polmap<double>* Res = new Polmap<double>[nbthreads];
 	for (int i = 0; i < nbthreads; i ++)
-		Res[i] = generateDefaultMap(order, x, px, y, py, d, s); 
+		Res[i] = generateDefaultMap(x, px, y, py, d, s); 
 	
 	int size = t.elems.size();	
 	#pragma omp parallel for shared(Res) schedule(static)
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
-		Polmap<double> mp = mapForElement(t.elems[i], order, v, x, px, y, py, d, s);	
+		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
 		if (mp.pols.size() != 0)
 				Res[index] = mp * Res[index];		
 	}
@@ -134,17 +134,17 @@ MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbt
 	Polynom<double> py = PY<double>(order);
 	Polynom<double> d = D<double>(order);
 	Polynom<double> s = S<double>(order);
-	Polmap<double> R = generateDefaultMap(order, x, px, y, py, d, s);
+	Polmap<double> R = generateDefaultMap(x, px, y, py, d, s);
 	
 	Polmap<double>* Res = new Polmap<double>[nbthreads];
 	for (int i = 0; i < nbthreads; i ++)
-		Res[i] = generateDefaultMap(order, x, px, y, py, d, s); 
+		Res[i] = generateDefaultMap(x, px, y, py, d, s); 
 	
 	int size = t.elems.size();	
 	#pragma omp parallel for shared(Res) schedule(static)
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
-		Polmap<double> mp = mapForElement(t.elems[i], order, v, x, px, y, py, d, s);	
+		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
 		double dx = atof(terr.elems[i][DX].c_str());
           	double dy = atof(terr.elems[i][DY].c_str());
 		mp = mp.eval("x", Polynom<double>(order, 1E-18, "x", 1) + dx); 
