@@ -374,22 +374,22 @@ template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, vect
     	
     	if (keyword.compare(drift) == 0) 
 		return DRIFTMap(l, x, px, y, py, d, s);
-    	/*
+    	
     	if (keyword.compare(quadrupole) == 0)
 		if (l != 0) { 
         		if (k1l > 0)
           		return QFMapp(l, k1l, x, px, y, py, d, s);
         		else
           		return QDMapp(l, k1l, x, px, y, py, d, s);
-          } */
+          } 
           
-     if (keyword.compare(quadrupole) == 0)
+   /*  if (keyword.compare(quadrupole) == 0)
 		if (l != 0) { 
         		if (k1l > 0)
           		return QFMap(l, k1l, delta, x, px, y, py, d, s);
         		else
           		return QDMap(l, k1l, delta,  x, px, y, py, d, s);
-          }
+          } */
     	if (keyword.compare(sbend) == 0) 
      	return DIMap(l, angle, x, px, y, py, d, s);        
     	if (keyword.compare(quadrupole) == 0)
