@@ -120,26 +120,6 @@ template <class T> Polmap<T> QDMap(Polynom<T> L,Polynom<T> K1L, Polynom<T> x, Po
   	return Polmap<T>(mp);
 }
 
-static Polynom<T> Q11(Polynom<T> L, Polynom<T> K1L, Polynom<T> delta) {
-	Polynom<T> K = 1/(delta + 1) * abs(K1L/L);
-	return cos(sqrt(K) * L);
-} 
-
-static Polynom<T> Q12(Polynom<T> L,Polynom<T> K1L, Polynom<T> delta) {
-	Polynom<T> K =  1/(delta + 1) * abs(K1L/L);
- 	return (1/sqrt(K) * sin(sqrt(K) * L))/(delta + 1);
-}
-
-static Polynom<T> Q21(Polynom<T> L,Polynom<T> K1L, Polynom<T> delta) {
-	Polynom<T> K =  1/(delta + 1) * abs(K1L/L);
- 	return -sqrt(K) * sin(sqrt(K) * L) * (delta + 1);
-}
-
-static Polynom<T> Q33(Polynom<T> L,Polynom<T> K1L, Polynom<T> delta) {
-	Polynom<T> K =  1/(delta + 1) * abs(K1L/L);
- 	return cosh(sqrt(K) * L);
-}
-
 template <class T> Polynom<T>  D11(Polynom<T> L, Polynom<T> ANGLE, Polynom<T> d) {
 	Polynom<T> THETA = sqrtp(d + 1).pinv() * ANGLE; 
 	return cosp(THETA);
@@ -203,18 +183,18 @@ template <class T> Polmap<T> generateDefaultMap(Polynom<T> x, Polynom<T> px, Pol
   	return Polmap<T>(mp);
 }
 
-static vector<Polynom<Polynom<T>>> separateComplex(Polynom<complex<Polynom<T>>> p) {
-	unordered_map<vector<int>, Polynom<T>, container_hash<vector<int>>> real_terms;
-	unordered_map<vector<int>, Polynom<T>, container_hash<vector<int>>> imag_terms;
-	for (unordered_map<vector<int>, complex<Polynom<T>>, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {
+static vector<Polynom<double>> separateComplex(Polynom<complex<double>> p) {
+	unordered_map<vector<int>, double, container_hash<vector<int>>> real_terms;
+	unordered_map<vector<int>, double, container_hash<vector<int>>> imag_terms;
+	for (unordered_map<vector<int>, complex<double>, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {
 		if (i->second.real() != 0)
 			real_terms[i->first] = i->second.real();
 		if (i->second.imag() != 0)
 			imag_terms[i->first] = i->second.imag();	
 	}
-	vector<Polynom<Polynom<T>>> v;
-	v.push_back(Polynom<Polynom<T>>(p.order, p.eps, p.vars, real_terms));
-	v.push_back(Polynom<Polynom<T>>(p.order, p.eps, p.vars, imag_terms));
+	vector<Polynom<double>> v;
+	v.push_back(Polynom<double>(p.order, p.eps, p.vars, real_terms));
+	v.push_back(Polynom<double>(p.order, p.eps, p.vars, imag_terms));
 	return v;
 }
 
@@ -222,12 +202,12 @@ static int factorial(int n){
   return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
 }
 
-static vector<Polynom<complex<Polynom<T>>>> EQ(int n, int order) {
-	Polynom<complex<Polynom<T>>> x = X<complex<Polynom<T>>>(order);
-	Polynom<complex<Polynom<T>>> y = Y<complex<Polynom<T>>>(order);
-	vector<Polynom<complex<Polynom<T>>>> lst;
-	complex<Polynom<T>> j (0, 1);
-	Polynom<complex<Polynom<T>>> init = x + y * j;
+static vector<Polynom<complex<double>>> EQ(int n, int order) {
+	Polynom<complex<double>> x = X<complex<double>>(order);
+	Polynom<complex<double>> y = Y<complex<double>>(order);
+	vector<Polynom<complex<double>>> lst;
+	complex<double> j (0, 1);
+	Polynom<complex<double>> init = x + y * j;
 	
 	lst.push_back(init);
 	for (int i = 2; i <= n; i ++) {
@@ -236,12 +216,12 @@ static vector<Polynom<complex<Polynom<T>>>> EQ(int n, int order) {
 	return lst;
 }
 
-static vector<vector<Polynom<Polynom<T>>>> separateComplexList(vector<Polynom<complex<Polynom<T>>>> lst) {
-	vector<vector<Polynom<Polynom<T>>>> res;
-	vector<Polynom<Polynom<T>>> real;
-	vector<Polynom<Polynom<T>>> imag;
-	for (vector<Polynom<complex<Polynom<T>>>>::iterator it = lst.begin(); it != lst.end(); it ++)  {
-		vector<Polynom<Polynom<T>>> r = separateComplex(*it);
+static vector<vector<Polynom<double>>> separateComplexList(vector<Polynom<complex<double>>> lst) {
+	vector<vector<Polynom<double>>> res;
+	vector<Polynom<double>> real;
+	vector<Polynom<double>> imag;
+	for (vector<Polynom<complex<double>>>::iterator it = lst.begin(); it != lst.end(); it ++)  {
+		vector<Polynom<double>> r = separateComplex(*it);
 		real.push_back(r[0]);
 		imag.push_back(r[1]);
 	}
@@ -249,9 +229,8 @@ static vector<vector<Polynom<Polynom<T>>>> separateComplexList(vector<Polynom<co
 	res.push_back(imag);
 	return res;
 }
-
 template <class T> Polynom<T> Bx(Polynom<T> r, Polynom<T> KnL) {  
-  	return r * (-KnL);
+  	return r * KnL * (-1);
 }
 template <class T> Polynom<T> By(Polynom<T> i, Polynom<T> KnL) { 
   	return i * KnL;
@@ -293,10 +272,10 @@ template <class T> Polmap<T> MUL(Polynom<T> K1L, Polynom<T> K2L, Polynom<T> K3L,
 	return mp;
 }
 
-static Polynom<T> CiK[7] = {0.04880952380952381, 0.2571428571428571, 0.03214285714285714, 0.3238095238095238, 0.03214285714285714, 0.2571428571428571, 0.04880952380952381};
+static double CiK[7] = {0.04880952380952381, 0.2571428571428571, 0.03214285714285714, 0.3238095238095238, 0.03214285714285714, 0.2571428571428571, 0.04880952380952381};
 
 template <class T> Polmap<T> MULTHICK(Polynom<T> K1L,Polynom<T> K2L,Polynom<T> K3L,Polynom<T> K4L,Polynom<T> L, vector<vector<Polynom<T>>> v, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
-	Polynom<T> Li = L / 6;
+	Polynom<T> Li = L * (1/6);
   	Polmap<T> m = generateDefaultMap(x, px, y, py, d, s);
   	Polmap<T> dr = DRIFTMap(Li, x, px, y, py, d, s);
 	
@@ -308,19 +287,19 @@ template <class T> Polmap<T> MULTHICK(Polynom<T> K1L,Polynom<T> K2L,Polynom<T> K
   	return m;
 } 
 
-template <class T> Polmap<T> mapForElement(int index, unordered_map<string, string> e, vector<vector<Polynom<T>>> v,
+template <class T> Polmap<T> mapForElementWithIndex(int index, unordered_map<string, string> e, vector<vector<Polynom<T>>> v,
 		Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
 	string keyword = e["KEYWORD"];
 //	cout << keyword << endl;
 	int order = x.order;
 	double eps = x.eps;
 	Polynom<T> l = Polynom<T>(order, eps, "l", atof(e["L"].c_str()));
-	Polynom<T> k1l = Polynom<T>(order, eps, "k1l", atof(e["K1L"].c_str());
-	Polynom<T> k2l = Polynom<T>(order, eps, "k2l", atof(e["K2L"].c_str());
-	Polynom<T> k3l = Polynom<T>(order, eps, "k3l", atof(e["K3L"].c_str());
-	Polynom<T> k4l = Polynom<T>(order, eps, "k4l", atof(e["K4L"].c_str());
-	Polynom<T> angle = Polynom<T>(order, eps, "angle", atof(e["ANGLE"].c_str());
-	Polynom<T> delta = Polynom<T>(order, eps, "deltap", atof(e["DELTAP"].c_str());
+	Polynom<T> k1l = Polynom<T>(order, eps, "k1l", atof(e["K1L"].c_str()));
+	Polynom<T> k2l = Polynom<T>(order, eps, "k2l", atof(e["K2L"].c_str()));
+	Polynom<T> k3l = Polynom<T>(order, eps, "k3l", atof(e["K3L"].c_str()));
+	Polynom<T> k4l = Polynom<T>(order, eps, "k4l", atof(e["K4L"].c_str()));
+	Polynom<T> angle = Polynom<T>(order, eps, "angle", atof(e["ANGLE"].c_str()));
+	Polynom<T> delta = Polynom<T>(order, eps, "deltap", atof(e["DELTAP"].c_str()));
 	string drift = "DRIFT";
 	string quadrupole = "QUADRUPOLE";
 	string sbend = "SBEND";
