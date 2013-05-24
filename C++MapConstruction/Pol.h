@@ -221,10 +221,10 @@ template <class T> Polynom<T> Polynom<T>::operator+(Polynom<T> other) {
 		for (int k = 0; k < vars.size(); k ++)
 			expi[vars[k]] = i->first[k];
 		for (int k = 0; k < newvars.size(); k ++) {
-			newexp[k] = 0;
 			unordered_map<string, int>::iterator it1 = expi.find(newvars[k]);
 			if (it1 != expi.end())
-				newexp[k] += it1->second;
+				newexp[k] = it1->second;
+			else newexp[k] = 0;
 		}
 		if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder)
 			result_terms[newexp] += i->second;
@@ -235,10 +235,10 @@ template <class T> Polynom<T> Polynom<T>::operator+(Polynom<T> other) {
 		for (int k = 0; k < other.vars.size(); k ++)
 			expj[other.vars[k]] = j->first[k];
 		for (int k = 0; k < newvars.size(); k ++) {
-			newexp[k] = 0;
 			unordered_map<string, int>::iterator it1 = expj.find(newvars[k]);
 			if (it1 != expj.end())
-				newexp[k] += it1->second;
+				newexp[k] = it1->second;
+			else newexp[k] = 0;
 		}
 		if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder)
 			result_terms[newexp] += j->second;
@@ -260,10 +260,10 @@ template <class T> Polynom<T> Polynom<T>::operator-(Polynom<T> other) {
 		for (int k = 0; k < vars.size(); k ++)
 			expi[vars[k]] = i->first[k];
 		for (int k = 0; k < newvars.size(); k ++) {
-			newexp[k] = 0;
 			unordered_map<string, int>::iterator it1 = expi.find(newvars[k]);
 			if (it1 != expi.end())
-				newexp[k] += it1->second;
+				newexp[k] = it1->second;
+			else newexp[k] = 0;
 		}
 		if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder)
 			result_terms[newexp] += i->second;
@@ -274,13 +274,14 @@ template <class T> Polynom<T> Polynom<T>::operator-(Polynom<T> other) {
 		for (int k = 0; k < other.vars.size(); k ++)
 			expj[other.vars[k]] = j->first[k];
 		for (int k = 0; k < newvars.size(); k ++) {
-			newexp[k] = 0;
 			unordered_map<string, int>::iterator it1 = expj.find(newvars[k]);
 			if (it1 != expj.end())
-				newexp[k] -= it1->second;
+				newexp[k] = it1->second;
+			else newexp[k] = 0;
+
 		}
 		if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder)
-			result_terms[newexp] += j->second;
+			result_terms[newexp] -= j->second;
 	}
 	Polynom<T> res = Polynom<T>(neworder, eps, newvars, result_terms);
 	return move(res);
