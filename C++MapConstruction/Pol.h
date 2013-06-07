@@ -336,7 +336,7 @@ template <class T> string Polynom<T>::getPol() {
 				temp << " - ";
 			else if(!first)
 				temp <<" + ";
-			temp << setprecision(14) << val;
+			temp << setprecision(15) << val;
 			for (int k = 0; k < i->first.size(); k ++) {
 				if (i->first[k] >= 2)
 					temp << "*" << vars[k] << "**" << i->first[k];
