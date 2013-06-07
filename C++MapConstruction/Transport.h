@@ -288,6 +288,16 @@ template <class T> Polmap<T> MULTHICK(double K1L,double K2L,double K3L,double K4
   	return m;
 } 
 
+
+template <class T> Polmap<T> MULTHICK2(double K1L,double K2L,double K3L,double K4L,double L, vector<vector<Polynom<T>>> v, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
+	double Li = L / 2;
+  	Polmap<T> m = DRIFTMap(Li, x, px, y, py, d, s);
+	Polmap<T> dr = m;
+    	m = MUL(K1L, K2L, K3L, K4L, v, x, px, y, py, d, s) * m;
+    	m =  dr * m;
+  	return m;
+} 
+
 template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, vector<vector<Polynom<T>>> v,
 		Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
 	string keyword = e["KEYWORD"];
@@ -334,6 +344,7 @@ template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, vect
         	}
       	else {
         		return MULTHICK(k1l,  k2l, k3l, k4l, l, v, x, px, y, py, d, s);
+        		//return MULTHICK2(k1l,  k2l, k3l, k4l, l, v, x, px, y, py, d, s);
         	}
 	}
 	return Polmap<T>();
