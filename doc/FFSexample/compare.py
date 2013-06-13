@@ -37,9 +37,14 @@ startTime = time.time()
 
 t = twiss2('assets/ffs.twiss')
 
-m = Map2('assets/ffs.twiss',filenameerr=None, order=args.order, nbProc=args.nbProc)
-#m = Map2(t, "old", order=args.order)  #old mapclass call
-#m = Map2(t, terr=None, order=args.order, nbProc=args.nbProc)
+# The following is a call to construct the Map using the C++ Map construction from a twiss file
+#m = Map2('assets/ffs.twiss',filenameerr=None, order=args.order, nbProc=args.nbProc) 
+
+# The following is call to the old mapclass which uses Python map construction
+#m = Map2(t, "old", order=args.order) 
+
+# The following is a call to construct the Map from a Twiss Python object
+m = Map2(t, terr=None, order=args.order, nbProc=args.nbProc)
 
 mm = Map2(filename='assets/fort.18',order=args.order) #from fort call
 

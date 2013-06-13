@@ -29,7 +29,8 @@ t0 = t0.stripLine()
 print "* Merging the elements."
 t0 = t0.mergeElems()
 print "* Calculating the map."
-m0 = Map2(t0, order=order)
+#m0 = Map2(t0, "old", order=order)
+m0 = Map2(t0, terr=None, order=order, nbProc=2)
 print "* Calculating original sigma x ",
 sOrig = sqrt(m0.sigma('x', sigmaFFS).real)
 print sOrig
@@ -61,7 +62,8 @@ for i in range(1, len(t0.elems)-1):
             sys.stdout.flush()
             t = t0.alterElem(i, dPos=lower)
             if t is None: break # Stops if alterElem finds an issue
-            m = Map2(t,order=order)
+            #m = Map2(t,"old", order=order)
+            m = Map2(t, terr=None, order=order, nbProc=2)
             s = sqrt(m.sigma('x', sigmaFFS).real)
             # If the new sigma is smaller than the previous one, make
             # them equal to compare with the next position alteration
