@@ -311,7 +311,7 @@ template <class T> void Polynom<T>::printpol() {
 				cout << " - ";
 			else if(!first)
 				cout <<" + ";
-			cout << setprecision(14) << val;
+			cout << setprecision(16) << val;
 			for (int k = 0; k < i->first.size(); k ++) {
 				if (i->first[k] >= 2)
 					cout << "*" << vars[k] << "**" << i->first[k];
@@ -336,7 +336,7 @@ template <class T> string Polynom<T>::getPol() {
 				temp << " - ";
 			else if(!first)
 				temp <<" + ";
-			temp << setprecision(15) << val;
+			temp << setprecision(16) << val;
 			for (int k = 0; k < i->first.size(); k ++) {
 				if (i->first[k] >= 2)
 					temp << "*" << vars[k] << "**" << i->first[k];
