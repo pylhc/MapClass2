@@ -26,10 +26,6 @@ str _TwissObject_wrapper(dict tobject, int order, int nbthreads) {
         boost::python::list markers = extract<boost::python::list>(tobject["markers"]);
         boost::python::dict types = extract<boost::python::dict>(tobject["types_parameters"]);
 
-        tobject["elems"].del();
-        tobject["markers"].del();
-        tobject["types_parameters"].del();
-
         boost::python::list keys = types.keys();
         int len_keys = extract<int>(keys.attr("__len__")());
         unordered_map<string, string> tps;
@@ -43,10 +39,12 @@ str _TwissObject_wrapper(dict tobject, int order, int nbthreads) {
         unordered_map<string, string> parameters;
         for (int j = 0; j < len_keys; ++j) {
                 std::string key = extract<std::string> (keys[j]);
-                if (tps[key].compare("%s") == 0)
-                       parameters[key] = extract<std::string>(tobject[key]);
-                else
-                        parameters[key] = boost::lexical_cast<std::string>(extract<double>(tobject[key]));
+                if (key.compare("elems") != 0 && key.compare("markers") != 0 && key.compare("types_parameters") != 0) {
+			if (tps[key].compare("%s") == 0)
+                       		parameters[key] = extract<std::string>(tobject[key]);
+                	else
+                        	parameters[key] = boost::lexical_cast<std::string>(extract<double>(tobject[key]));
+		}
 
         }
 
@@ -93,14 +91,10 @@ str _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthre
         boost::python::list markers = extract<boost::python::list>(tobject["markers"]);
         boost::python::dict types = extract<boost::python::dict>(tobject["types_parameters"]);
 
-        tobject["elems"].del();
-        tobject["markers"].del();
-        tobject["types_parameters"].del();
-
         boost::python::list keys = types.keys();
         int len_keys = extract<int>(keys.attr("__len__")());
         unordered_map<string, string> tps;
-       for (int j = 0; j < len_keys; ++j) {
+       	for (int j = 0; j < len_keys; ++j) {
                 std::string key = extract<std::string> (keys[j]);
                 tps[key] = extract<std::string>(types[key]);
         }
@@ -110,10 +104,12 @@ str _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthre
         unordered_map<string, string> parameters;
         for (int j = 0; j < len_keys; ++j) {
                 std::string key = extract<std::string> (keys[j]);
-                if (tps[key].compare("%s") == 0)
-                        parameters[key] = extract<std::string>(tobject[key]);
-                else
-                        parameters[key] = boost::lexical_cast<std::string>(extract<double>(tobject[key]));
+                 if (key.compare("elems") != 0 && key.compare("markers") != 0 && key.compare("types_parameters") != 0) {
+			if (tps[key].compare("%s") == 0)
+                        	parameters[key] = extract<std::string>(tobject[key]);
+                	else
+                        	parameters[key] = boost::lexical_cast<std::string>(extract<double>(tobject[key]));
+		}
 
         }
 

@@ -1,5 +1,7 @@
 import sys
 
+from ctypes import *
+cdll.LoadLibrary("../../libs/boost_1_53_0/libboost_python.so.1.53.0")
 sys.path.append('../../')
 
 from metaclass2 import twiss2
@@ -34,7 +36,6 @@ m0 = Map2(t0, terr=None, order=order, nbProc=2)
 print "* Calculating original sigma x ",
 sOrig = sqrt(m0.sigma('x', sigmaFFS).real)
 print sOrig
-
 # Loop through the elements in the stripped and merged beamline
 print "* Starting main loop"
 for i in range(1, len(t0.elems)-1):
