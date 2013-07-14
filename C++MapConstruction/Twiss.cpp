@@ -42,7 +42,7 @@ Twiss::Twiss(std::string filename) {
       			trim_if(splt[3],is_any_of("\""));
       			string s = splt[3];
       			if (splt.size() > 3) {
-      				for (int i = 4; i < splt.size(); i ++)
+      				for (unsigned int i = 4; i < splt.size(); i ++)
       					s += " " + splt[i];
       				trim_if(s,is_any_of("\""));
       			}
@@ -56,12 +56,12 @@ Twiss::Twiss(std::string filename) {
       		if (line.find("$ ") != string::npos || line.find("$\t") != string::npos) {
       			types = splt;
       			types.erase(types.begin());
-      			for (int i = 0; i < labels.size(); i ++)
+      			for (unsigned int i = 0; i < labels.size(); i ++)
       				types_parameters[labels[i]] = types[i];
       		}
       		if (line.find("@") == string::npos && line.find("%") == string::npos && line.find("*") == string::npos) {
         			
-        			for (int j = 0; j < labels.size(); j ++)  {
+        			for (unsigned int j = 0; j < labels.size(); j ++)  {
           		/*	if (types[j].compare("%d") == 0)
           				e[labels[j]] = atoi(splt[j].c_str());
           			else if (types[j].compare("%le") == 0) {

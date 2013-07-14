@@ -95,7 +95,7 @@ template <class T> Polynom<T>::Polynom (int o, double e, vector<string> vs, stri
         vars = vs;
         sort(vars.begin(), vars.end());
         vector<int> v(vars.size(), 0);
-        int index = 0;
+        unsigned int index = 0;
         for (index = 0; index < vars.size(); ++index)
                 if (var.compare(vars[index]) == 0)
                         break;
@@ -115,9 +115,9 @@ template <class T> Polynom<T>::Polynom (int o, double e, string var, int exp) {
 
 template <class T> Polynom<T>::Polynom(const Polynom &other) {
 	order = other.order;
-     eps = other.eps;
-     vars = other.vars;
-     terms = other.terms;
+     	eps = other.eps;
+     	vars = other.vars;
+     	terms = other.terms;
 }
 
 template <class T> Polynom<T>::Polynom () {
@@ -139,7 +139,7 @@ template <class T> Polynom<T>& Polynom<T>::operator=(Polynom other ) {
 
 template <class T> Polynom<T>:: Polynom(Polynom&& other) {
 	order = other.order;
-     eps = other.eps;
+     	eps = other.eps;
 	vars = move(other.vars);
 	terms = move(other.terms);
    
@@ -171,7 +171,7 @@ template <class T> Polynom<T> Polynom<T>::operator*(Polynom<T> other) {
 		vector<int> newexp (newvars.size(), 0);
 		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator i = terms.begin(); i != terms.end(); ++i) 
 			for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator j = other.terms.begin(); j != other.terms.end(); ++j) {
-				for (int k = 0; k < i->first.size(); ++k)  
+				for (unsigned int k = 0; k < i->first.size(); ++k)  
 					newexp[k] = i->first[k] + j->first[k];
 				if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder && fabs(i->second * j->second) >= eps)
 					result_terms[newexp] += i->second * j->second;  
@@ -186,12 +186,12 @@ template <class T> Polynom<T> Polynom<T>::operator*(Polynom<T> other) {
 		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator i = terms.begin(); i != terms.end(); ++i) {
 			for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator j = other.terms.begin(); j != other.terms.end(); ++j) {
 				
-				for (int k = 0; k < vars.size(); ++k)
+				for (unsigned int k = 0; k < vars.size(); ++k)
 					expi[vars[k]] = i->first[k];
-				for (int k = 0; k < other.vars.size(); ++k)
+				for (unsigned int k = 0; k < other.vars.size(); ++k)
 					expj[other.vars[k]] = j->first[k];
 							
-				for (int k = 0; k < newvars.size(); ++k) {
+				for (unsigned int k = 0; k < newvars.size(); ++k) {
 					unordered_map<string,int>::iterator it1 = expi.find(newvars[k]);
 					unordered_map<string,int>::iterator it2 = expj.find(newvars[k]);
 					newexp[k] = 0;
@@ -255,9 +255,9 @@ template <class T> Polynom<T> Polynom<T>::operator+(Polynom<T> other) {
 		unordered_map<string, int> expi, expj;
 		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator i = terms.begin(); i != terms.end(); ++i) 
 		{
-			for (int k = 0; k < vars.size(); ++k)
+			for (unsigned int k = 0; k < vars.size(); ++k)
 				expi[vars[k]] = i->first[k];
-			for (int k = 0; k < newvars.size(); ++k) {
+			for (unsigned int k = 0; k < newvars.size(); ++k) {
 				unordered_map<string, int>::iterator it1 = expi.find(newvars[k]);
 				if (it1 != expi.end())
 					newexp[k] = it1->second;
@@ -269,9 +269,9 @@ template <class T> Polynom<T> Polynom<T>::operator+(Polynom<T> other) {
 		}
 		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator j = other.terms.begin(); j != other.terms.end(); ++j) 
 		{		
-			for (int k = 0; k < other.vars.size(); ++k)
+			for (unsigned int k = 0; k < other.vars.size(); ++k)
 				expj[other.vars[k]] = j->first[k];
-			for (int k = 0; k < newvars.size(); ++k) {
+			for (unsigned int k = 0; k < newvars.size(); ++k) {
 				unordered_map<string, int>::iterator it1 = expj.find(newvars[k]);
 				if (it1 != expj.end())
 					newexp[k] = it1->second;
@@ -295,9 +295,9 @@ template <class T> Polynom<T> Polynom<T>::operator-(Polynom<T> other) {
 	unordered_map<string, int> expi, expj;
 	for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator i = terms.begin(); i != terms.end(); ++i) 
 	{
-		for (int k = 0; k < vars.size(); ++k)
+		for (unsigned int k = 0; k < vars.size(); ++k)
 			expi[vars[k]] = i->first[k];
-		for (int k = 0; k < newvars.size(); ++k) {
+		for (unsigned int k = 0; k < newvars.size(); ++k) {
 			unordered_map<string, int>::iterator it1 = expi.find(newvars[k]);
 			if (it1 != expi.end())
 				newexp[k] = it1->second;
@@ -309,9 +309,9 @@ template <class T> Polynom<T> Polynom<T>::operator-(Polynom<T> other) {
 	}
 	for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator j = other.terms.begin(); j != other.terms.end(); ++j) 
 	{		
-		for (int k = 0; k < other.vars.size(); ++k)
+		for (unsigned int k = 0; k < other.vars.size(); ++k)
 			expj[other.vars[k]] = j->first[k];
-		for (int k = 0; k < newvars.size(); ++k) {
+		for (unsigned int k = 0; k < newvars.size(); ++k) {
 			unordered_map<string, int>::iterator it1 = expj.find(newvars[k]);
 			if (it1 != expj.end())
 				newexp[k] = it1->second;
@@ -350,7 +350,7 @@ template <class T> void Polynom<T>::printpol() {
 			else if(!first)
 				cout <<" + ";
 			cout << setprecision(16) << val;
-			for (int k = 0; k < i->first.size(); ++k) {
+			for (unsigned int k = 0; k < i->first.size(); ++k) {
 				if (i->first[k] >= 2)
 					cout << "*" << vars[k] << "**" << i->first[k];
 				else if (i->first[k] == 1)
@@ -375,7 +375,7 @@ template <class T> string Polynom<T>::getPol() {
 			else if(!first)
 				temp <<" + ";
 			temp << setprecision(16) << val;
-			for (int k = 0; k < i->first.size(); ++k) {
+			for (unsigned int k = 0; k < i->first.size(); ++k) {
 				if (i->first[k] >= 2)
 					temp << "*" << vars[k] << "**" << i->first[k];
 				else if (i->first[k] == 1)
@@ -406,7 +406,7 @@ template <class T> Polynom<T> Polynom<T>:: eval(string var, Polynom<T> other) {
 	vector<int> newexp (newvars.size(), 0);
 	unordered_map<string, int> expi;
 	for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::iterator i = terms.begin(); i != terms.end(); ++i) {
-		for (int k = 0; k < vars.size(); ++k)
+		for (unsigned int k = 0; k < vars.size(); ++k)
 			expi[vars[k]] = i->first[k];
 		if (i->first[index] != 0) {		
 			Polynom resexp = other ^ i->first[index];
@@ -419,7 +419,7 @@ template <class T> Polynom<T> Polynom<T>:: eval(string var, Polynom<T> other) {
 			result_terms.insert (current_term.terms.begin(), current_term.terms.end()); 
 		}
 		else {
-			for (int k = 0; k < newvars.size(); ++k) {
+			for (unsigned int k = 0; k < newvars.size(); ++k) {
 				unordered_map<string,int>::iterator it1 = expi.find(newvars[k]);	
 				newexp[k] = 0;
 				if (it1 != expi.end())

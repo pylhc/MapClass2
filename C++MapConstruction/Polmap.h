@@ -113,7 +113,7 @@ template <class T> Polmap<T> Polmap<T>::eval(string var, Polynom<T> other) {
 			//construct pol for each var
 			Polynom<T> res = Polynom<T>(p.order, p.eps, p.vars[0], i->first[0]);
 			res = res.eval(p.vars[0], other.pols[p.vars[0]]); 
-			for (int k = 1; k < p.vars.size(); k ++) {
+			for (unsigned int k = 1; k < p.vars.size(); k ++) {
 				Polynom<T> subterm = Polynom<T>(p.order, p.eps, p.vars[k], i->first[k]); 
 				subterm = subterm.eval(p.vars[k], other.pols[p.vars[k]]);
 				res = res * subterm;
@@ -140,7 +140,7 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
 		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {
 			m.clear();
 			Polynom<T> coef = Polynom<T>(p.order, p.eps, p.vars, i->second);
-			for (int k = 0; k < p.vars.size(); k ++) {
+			for (unsigned int k = 0; k < p.vars.size(); k ++) {
 				typename unordered_map<string, Polynom<T>>::const_iterator found = other.pols.find (p.vars[k]);
 				if (found == other.pols.end())
 					coef = coef * Polynom<T> (p.order, p.eps, p.vars[k], i->first[k]);  
@@ -245,7 +245,7 @@ template <class T> Polmap<T> Polmap<T>::parallelmult(Polmap<T> other) {
 		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {
 			m.clear();
 			Polynom<T> coef = Polynom<T>(p.order, p.eps, p.vars, i->second);
-			for (int k = 0; k < p.vars.size(); k ++) {
+			for (unsigned int k = 0; k < p.vars.size(); k ++) {
 				typename unordered_map<string, Polynom<T>>::const_iterator found = other.pols.find (p.vars[k]);
 				if (found == other.pols.end())
 					coef = coef * Polynom<T> (p.order, p.eps, p.vars[k], i->first[k]);  
@@ -356,7 +356,7 @@ template <class T> Polmap<T> Polmap<T>::compositionWithoutHash(Polmap<T> other){
 		for (typename unordered_map<vector<int>, double, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {  
 			m.clear();
 			Polynom<T> result = Polynom<T>(p.order, p.eps, p.vars, i->second);
-			for (int k = 0; k < p.vars.size(); ++k) {
+			for (unsigned int k = 0; k < p.vars.size(); ++k) {
 				typename unordered_map<string, Polynom<T>>::const_iterator found = other.pols.find (p.vars[k]);
 				if (found == other.pols.end()) 
 					result = result * Polynom<T> (p.order, p.eps, p.vars[k], i->first[k]);
