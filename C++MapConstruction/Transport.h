@@ -299,7 +299,8 @@ template <class T> Polmap<T> MULTHICK2(double K1L,double K2L,double K3L,double K
 } 
 
 template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, vector<vector<Polynom<T>>> v,
-		Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
+		Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s,
+		int fmultipole) {
 	string keyword = e["KEYWORD"];
 //	cout << keyword << endl;
 	double l = atof(e["L"].c_str());
@@ -343,8 +344,9 @@ template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, vect
         		return MUL(k1l,  k2l, k3l, k4l, v, x, px, y, py, d, s);
         	}
       	else {
-        		return MULTHICK(k1l,  k2l, k3l, k4l, l, v, x, px, y, py, d, s);
-        		//return MULTHICK2(k1l,  k2l, k3l, k4l, l, v, x, px, y, py, d, s);
+			if (fmultipole == 0)
+        			return MULTHICK(k1l,  k2l, k3l, k4l, l, v, x, px, y, py, d, s);
+        		else return MULTHICK2(k1l,  k2l, k3l, k4l, l, v, x, px, y, py, d, s);
         	}
 	}
 	return Polmap<T>();

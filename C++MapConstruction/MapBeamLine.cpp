@@ -10,7 +10,6 @@
 using namespace std;
 using namespace boost;
 
-timespec diff(timespec start, timespec end);
 static string drift = "DRIFT";
 static string quadrupole = "QUADRUPOLE";
 static string sbend = "SBEND";
@@ -22,9 +21,8 @@ static string DX = "DX";
 static string DY = "DY";
 
 
-MapBeamLine::MapBeamLine(Twiss t, int order, int nbthreads) {
-	omp_set_num_threads(nbthreads);
-	timespec time1, time2; 
+MapBeamLine::MapBeamLine(Twiss t, int order, int nbthreads, int fmultipole) {
+	omp_set_num_threads(nbthreads); 
 	vector<vector<Polynom<double>>> v = separateComplexList(EQ(4, order));
 	Polynom<double> x = X<double>(order);
 	Polynom<double> px = PX<double>(order);
@@ -41,7 +39,7 @@ MapBeamLine::MapBeamLine(Twiss t, int order, int nbthreads) {
 	#pragma omp parallel for shared(Res) schedule(static)
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
-		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
+		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s, fmultipole);	
 		Res[index] = mp * Res[index];		
 	}
 	for (int i = 0; i < nbthreads; i ++)
@@ -52,9 +50,8 @@ MapBeamLine::MapBeamLine(Twiss t, int order, int nbthreads) {
 	delete [] Res;
 }
 
-MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads) {
+MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads, int fmultipole) {
 	omp_set_num_threads(nbthreads);
-	timespec time1, time2; 
 	vector<vector<Polynom<double>>> v = separateComplexList(EQ(4, order));
 	Polynom<double> x = X<double>(order);
 	Polynom<double> px = PX<double>(order);
@@ -72,7 +69,7 @@ MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads) {
 	#pragma omp parallel for shared(Res) schedule(static)
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
-		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
+		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s, fmultipole);	
 		double dx = atof(terr.elems[i][DX].c_str());
           	double dy = atof(terr.elems[i][DY].c_str());
 		mp = mp.eval("x", Polynom<double>(order, 1E-18, "x", 1) + dx); 
@@ -87,11 +84,10 @@ MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads) {
 	delete [] Res;
 }
 
-MapBeamLine::MapBeamLine(string filename, int order, int nbthreads) {
+MapBeamLine::MapBeamLine(string filename, int order, int nbthreads, int fmultipole) {
 	Twiss t = Twiss(filename);
 	t.stripLine();
 	omp_set_num_threads(nbthreads);
-	timespec time1, time2; 
 	vector<vector<Polynom<double>>> v = separateComplexList(EQ(4, order));
 	Polynom<double> x = X<double>(order);
 	Polynom<double> px = PX<double>(order);
@@ -109,7 +105,7 @@ MapBeamLine::MapBeamLine(string filename, int order, int nbthreads) {
 	#pragma omp parallel for shared(Res) schedule(static)
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
-		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
+		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s, fmultipole);	
 		Res[index] = mp * Res[index];		
 	}
 	for (int i = 0; i < nbthreads; i ++)
@@ -120,13 +116,12 @@ MapBeamLine::MapBeamLine(string filename, int order, int nbthreads) {
 	delete [] Res; 
 }
 
-MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbthreads) {
+MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbthreads, int fmultipole) {
 	Twiss t = Twiss(filename);
 	t.stripLine();
 	Twiss terr = Twiss(filenameerr);
 	terr.stripLine();
 	omp_set_num_threads(nbthreads);
-	timespec time1, time2; 
 	vector<vector<Polynom<double>>> v = separateComplexList(EQ(4, order));
 	Polynom<double> x = X<double>(order);
 	Polynom<double> px = PX<double>(order);
@@ -144,7 +139,7 @@ MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbt
 	#pragma omp parallel for shared(Res) schedule(static)
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
-		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
+		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s, fmultipole);	
 		double dx = atof(terr.elems[i][DX].c_str());
           	double dy = atof(terr.elems[i][DY].c_str());
 		mp = mp.eval("x", Polynom<double>(order, 1E-18, "x", 1) + dx); 
@@ -160,15 +155,4 @@ MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbt
 }
 
 
-timespec diff(timespec start, timespec end)
-{
-	timespec temp;
-	if ((end.tv_nsec-start.tv_nsec)<0) {
-		temp.tv_sec = end.tv_sec-start.tv_sec-1;
-		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
-	} else {
-		temp.tv_sec = end.tv_sec-start.tv_sec;
-		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
-	}
-	return temp;
-}
+

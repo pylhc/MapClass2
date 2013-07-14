@@ -27,6 +27,8 @@ parser.add_argument('-g', help="Run with Gaussian Delta or not. By default it do
                     action='store_true', dest='gaussian')
 parser.add_argument('-n', help="How many cores to run on. By default it is 1",
                     type=int, default=1, dest='nbProc')                    
+parser.add_argument('-m', help="Which formula to use for multipoles",
+                    type=int, default=0, dest='fmultipole')
                     
 
 args = parser.parse_args()
@@ -44,7 +46,7 @@ t = t.stripLine();
 #m = Map2(t, "old", order=args.order) 
 
 # The following is a call to construct the Map from a Twiss Python object
-m = Map2(t, terr=None, order=args.order, nbProc=args.nbProc)
+m = Map2(t, terr=None, order=args.order, nbProc=args.nbProc, fmultipole=args.fmultipole)
 
 mm = Map2(filename='assets/fort.18',order=args.order) #from fort call
 

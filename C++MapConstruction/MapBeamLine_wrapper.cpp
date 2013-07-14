@@ -7,20 +7,20 @@
 using namespace std;
 using namespace boost::python;
 
-str _TwissFile_wrapper(str filename, int order, int nbthreads) {
+str _TwissFile_wrapper(str filename, int order, int nbthreads, int fmultipole) {
 	string file = extract<std::string>(filename);
-	MapBeamLine mp = MapBeamLine(file, order, nbthreads);
+	MapBeamLine mp = MapBeamLine(file, order, nbthreads, fmultipole);
 	return mp.polmap.c_str();
 }
 
-str _TwissFileErr_wrapper(str filename, str filenameerr, int order, int nbthreads) {
+str _TwissFileErr_wrapper(str filename, str filenameerr, int order, int nbthreads, int fmultipole) {
 	string file = extract<std::string>(filename);
 	string fileerr = extract<std::string>(filenameerr);
-	MapBeamLine mp = MapBeamLine(file, fileerr, order, nbthreads);
+	MapBeamLine mp = MapBeamLine(file, fileerr, order, nbthreads, fmultipole);
 	return mp.polmap.c_str();
 }
 
-str _TwissObject_wrapper(dict tobject, int order, int nbthreads) {
+str _TwissObject_wrapper(dict tobject, int order, int nbthreads, int fmultipole) {
 
         boost::python::list elements = extract<boost::python::list>(tobject["elems"]);
         boost::python::list markers = extract<boost::python::list>(tobject["markers"]);
@@ -82,11 +82,11 @@ str _TwissObject_wrapper(dict tobject, int order, int nbthreads) {
         }
 
         Twiss t = Twiss(parameters, elems, mks, tps);
-        MapBeamLine mp = MapBeamLine(t, order, nbthreads);
+        MapBeamLine mp = MapBeamLine(t, order, nbthreads, fmultipole);
         return mp.polmap.c_str();
 }
 
-str _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthreads) {
+str _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthreads, int fmultipole) {
         boost::python::list elements = extract<boost::python::list>(tobject["elems"]);
         boost::python::list markers = extract<boost::python::list>(tobject["markers"]);
         boost::python::dict types = extract<boost::python::dict>(tobject["types_parameters"]);
@@ -208,7 +208,7 @@ str _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthre
         }
 
         Twiss terr = Twiss(parameterserr, elemserr, mkserr, tpserr);
-        MapBeamLine mp = MapBeamLine(t, terr, order, nbthreads);
+        MapBeamLine mp = MapBeamLine(t, terr, order, nbthreads, fmultipole);
         return mp.polmap.c_str();
 }
 
