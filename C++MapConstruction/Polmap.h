@@ -47,6 +47,7 @@ class Polmap {
 		double getEps();
 		void printpolmap();
 		string getMap();
+		Polmap compositionWithoutHash(Polmap other);
 };
 
 template <class T> Polmap<T>::Polmap(unordered_map<string, Polynom<T>> ps) {
@@ -135,6 +136,7 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
 	for (typename unordered_map<string, Polynom<T>>::const_iterator itmap = pols.begin(); itmap != pols.end(); ++itmap) {
 		Polynom<T> p = itmap->second;
 		Polynom<T> newpol = Polynom<T>(p.order, p.eps, p.vars, 0);
+		vector<int> zero(p.vars.size(), 0);
 		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {
 			m.clear();
 			Polynom<T> coef = Polynom<T>(p.order, p.eps, p.vars, i->second);
@@ -172,6 +174,8 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
 				newpol = newpol + coef;
 			 
 		} 
+		if (fabs(newpol.terms[zero]) < p.eps)
+                	newpol.terms.erase(zero);
 		result_pols[itmap->first] = newpol;
 	}
 	return Polmap<T>(result_pols);
@@ -189,7 +193,7 @@ template <class T> Polmap<T> Polmap<T>::parallelmult(Polmap<T> other) {
 		vpols.push_back(make_pair(itmap->first, itmap->second));
 	list<string> m;
 	string t;
-//	#pragma omp parallel for firstprivate(lm, tempvalues, temp, m, t) shared(result_pols) schedule(static)
+	#pragma omp parallel for firstprivate(lm, tempvalues, temp, m, t) shared(result_pols) schedule(static)
 	for (int itmap = 0; itmap < vpols.size(); itmap ++) {
 		Polynom<T> p = get<1>(vpols[itmap]);
 		Polynom<T> newpol = Polynom<T>(p.order, p.eps, p.vars, 0);
@@ -291,3 +295,36 @@ template <class T> string Polmap<T>::getMap() {
 	}
 	return resultMap;
 }
+
+template <class T> Polmap<T> Polmap<T>::compositionWithoutHash(Polmap<T> other){
+        unordered_map<string, Polynom<T>> result_pols;
+        vector<string> m;
+        for (typename unordered_map<string, Polynom<T>>::const_iterator itmap = pols.begin(); itmap != pols.end(); ++itmap) {
+                Polynom<T> p = itmap->second;
+                //do not use s and d in composition, as they do not change
+                if (itmap->first.compare("s") == 0 || itmap->first.compare("d") == 0){
+                	result_pols[itmap->first] = p;
+                        continue;
+                }
+                Polynom<T> newpol = Polynom<T>(p.order, p.eps, p.vars, 0);
+		vector<int> zero(p.vars.size(), 0);
+		for (typename unordered_map<vector<int>, double, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {  
+			m.clear();
+			Polynom<T> result = Polynom<T>(p.order, p.eps, p.vars, i->second);
+			for (int k = 0; k < p.vars.size(); ++k) {
+				typename unordered_map<string, Polynom<T>>::const_iterator found = other.pols.find (p.vars[k]);
+				if (found == other.pols.end()) 
+					result = result * Polynom<T> (p.order, p.eps, p.vars[k], i->first[k]);
+				else	for (int a = 0; a < i->first[k]; a ++)
+						m.push_back(p.vars[k]);
+			}
+			for (vector<string>::iterator k = m.begin(); k != m.end(); k ++)
+				result = result * other.pols[*k];
+			newpol = newpol + result;
+		}
+		if (fabs(newpol.terms[zero]) < p.eps)
+	          	newpol.terms.erase(zero);
+		result_pols[itmap->first] = newpol;
+	}
+	return Polmap<T>(result_pols);
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

@@ -17,25 +17,25 @@ static string ystring = "y";
 static string pystring = "py";
 static string dstring = "d";
 static string sstring = "s";
-
+static std::vector<string> vars = {xstring, pxstring, ystring, pystring, dstring, sstring};
 
 template <class T> Polynom<T> X (int order) {
-	return Polynom<T>(order, 1E-18, xstring, 1);	
+	return Polynom<T>(order, 1E-18, vars, xstring, 1);	
 }
 template <class T> Polynom<T> PX (int order) {
-	return Polynom<T>(order, 1E-18, pxstring, 1);	
+	return Polynom<T>(order, 1E-18, vars, pxstring, 1);	
 }
 template <class T> Polynom<T> Y (int order) {
-	return Polynom<T>(order, 1E-18, ystring, 1);	
+	return Polynom<T>(order, 1E-18, vars, ystring, 1);	
 }
 template <class T> Polynom<T> PY (int order) {
-	return Polynom<T>(order, 1E-18, pystring, 1);	
+	return Polynom<T>(order, 1E-18, vars, pystring, 1);	
 }
 template <class T> Polynom<T> D (int order) {
-	return Polynom<T>(order, 1E-18, dstring, 1);	
+	return Polynom<T>(order, 1E-18, vars, dstring, 1);	
 }
 template <class T> Polynom<T> S (int order) {
-	return Polynom<T>(order, 1E-18, sstring, 1);	
+	return Polynom<T>(order, 1E-18, vars, sstring, 1);	
 }
 
 template <class T> Polynom<T> L(double length, Polynom<T> d) {
@@ -210,7 +210,7 @@ static vector<Polynom<complex<double>>> EQ(int n, int order) {
 	Polynom<complex<double>> init = x + y * j;
 	
 	lst.push_back(init);
-	for (int i = 2; i <= n; i ++) {
+	for (int i = 2; i <= n; ++i) {
 		lst.push_back((lst[i - 2] * init) * (1./factorial(i)));
 	}
 	return lst;
@@ -220,7 +220,7 @@ static vector<vector<Polynom<double>>> separateComplexList(vector<Polynom<comple
 	vector<vector<Polynom<double>>> res;
 	vector<Polynom<double>> real;
 	vector<Polynom<double>> imag;
-	for (vector<Polynom<complex<double>>>::iterator it = lst.begin(); it != lst.end(); it ++)  {
+	for (vector<Polynom<complex<double>>>::iterator it = lst.begin(); it != lst.end(); ++it)  {
 		vector<Polynom<double>> r = separateComplex(*it);
 		real.push_back(r[0]);
 		imag.push_back(r[1]);
@@ -280,7 +280,7 @@ template <class T> Polmap<T> MULTHICK(double K1L,double K2L,double K3L,double K4
   	Polmap<T> m = generateDefaultMap(x, px, y, py, d, s);
   	Polmap<T> dr = DRIFTMap(Li, x, px, y, py, d, s);
 	
-  	for (int i = 0; i < 6; i ++) {
+  	for (int i = 0; i < 6; ++i) {
     		m = MUL(K1L*CiK[i], K2L*CiK[i], K3L*CiK[i], K4L*CiK[i], v, x, px, y, py, d, s) * m;
     		m =  dr * m;
 	}

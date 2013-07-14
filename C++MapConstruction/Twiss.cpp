@@ -15,8 +15,8 @@ Twiss::Twiss(std::string filename) {
 	string line;
   	ifstream file (filename);
   	vector<string> labels;
-    vector<string> types;
-    unordered_map<string, string> e;
+    	vector<string> types;
+    	unordered_map<string, string> e;
   	if (file.is_open())
   	{
     		while (!file.eof())
@@ -80,7 +80,15 @@ Twiss::Twiss(std::string filename) {
           		}
           		if (line.find("$") != string::npos) 
           			markers.push_back(e);
-          		else elems.push_back(e);	
+          		else {
+				
+				//string keyword = e["KEYWORD"];
+                                //strip the line
+				//if (keyword.compare("MARKER") != 0 && keyword.compare("MONITOR") != 0 
+			//		&& keyword.compare("MATRIX") != 0)
+
+					elems.push_back(e);
+			}	
       		}
       		
     		}
@@ -107,6 +115,17 @@ void Twiss:: printtwiss() {
 			cout <<j->first << " "<<j->second << endl;
 		}
 	
+	}
+}
+
+void Twiss:: stripLine() {
+	vector<unordered_map<string, string>>:: iterator i = elems.begin();
+	while (i != elems.end()) {
+		unordered_map<string, string> e = *i;
+		string keyword = e["KEYWORD"];
+		if (keyword.compare("MARKER") == 0 || keyword.compare("MONITOR") == 0 || keyword.compare("MATRIX") == 0)
+                	i = elems.erase(i);
+		else ++i;
 	}
 }
 

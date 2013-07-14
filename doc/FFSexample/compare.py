@@ -36,7 +36,7 @@ args = parser.parse_args()
 startTime = time.time()
 
 t = twiss2('assets/ffs.twiss')
-
+t = t.stripLine();
 # The following is a call to construct the Map using the C++ Map construction from a twiss file
 #m = Map2('assets/ffs.twiss',filenameerr=None, order=args.order, nbProc=args.nbProc) 
 

@@ -42,8 +42,7 @@ MapBeamLine::MapBeamLine(Twiss t, int order, int nbthreads) {
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
 		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
-		if (mp.pols.size() != 0)
-			Res[index] = mp * Res[index];		
+		Res[index] = mp * Res[index];		
 	}
 	for (int i = 0; i < nbthreads; i ++)
 		R = Res[i] * R;
@@ -78,8 +77,7 @@ MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads) {
           	double dy = atof(terr.elems[i][DY].c_str());
 		mp = mp.eval("x", Polynom<double>(order, 1E-18, "x", 1) + dx); 
 		mp = mp.eval("y", Polynom<double>(order, 1E-18, "y", 1) + dy);
-		if (mp.pols.size() != 0)
-			Res[index] = mp * Res[index];		
+		Res[index] = mp * Res[index];		
 	}
 	for (int i = 0; i < nbthreads; i ++)
 		R = Res[i] * R;
@@ -91,6 +89,7 @@ MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads) {
 
 MapBeamLine::MapBeamLine(string filename, int order, int nbthreads) {
 	Twiss t = Twiss(filename);
+	t.stripLine();
 	omp_set_num_threads(nbthreads);
 	timespec time1, time2; 
 	vector<vector<Polynom<double>>> v = separateComplexList(EQ(4, order));
@@ -111,8 +110,7 @@ MapBeamLine::MapBeamLine(string filename, int order, int nbthreads) {
 	for (int i = 0; i < size; i ++) {
 		int index = omp_get_thread_num();
 		Polmap<double> mp = mapForElement(t.elems[i], v, x, px, y, py, d, s);	
-		if (mp.pols.size() != 0)
-				Res[index] = mp * Res[index];		
+		Res[index] = mp * Res[index];		
 	}
 	for (int i = 0; i < nbthreads; i ++)
 		R = Res[i] * R;
@@ -124,7 +122,9 @@ MapBeamLine::MapBeamLine(string filename, int order, int nbthreads) {
 
 MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbthreads) {
 	Twiss t = Twiss(filename);
+	t.stripLine();
 	Twiss terr = Twiss(filenameerr);
+	terr.stripLine();
 	omp_set_num_threads(nbthreads);
 	timespec time1, time2; 
 	vector<vector<Polynom<double>>> v = separateComplexList(EQ(4, order));
@@ -149,8 +149,7 @@ MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbt
           	double dy = atof(terr.elems[i][DY].c_str());
 		mp = mp.eval("x", Polynom<double>(order, 1E-18, "x", 1) + dx); 
 		mp = mp.eval("y", Polynom<double>(order, 1E-18, "y", 1) + dy);
-		if (mp.pols.size() != 0)
-			Res[index] = mp * Res[index];		
+		Res[index] = mp * Res[index];		
 	}
 	for (int i = 0; i < nbthreads; i ++)
 		R = Res[i] * R;
@@ -173,10 +172,3 @@ timespec diff(timespec start, timespec end)
 	}
 	return temp;
 }
-
-int main() {
-	Twiss t = Twiss("/home/diana/Thesis/GIT/MapClass2/doc/FFSexample/assets/ffs.twiss");
-	MapBeamLine mp = MapBeamLine(t, 3, 1);
-	mp.printpolmap();
-}
-
