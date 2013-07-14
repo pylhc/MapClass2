@@ -181,6 +181,51 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
 	return Polmap<T>(result_pols);
 }
 
+/*template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
+        unordered_map<string, Polynom<T>> result_pols;
+        unordered_map<string, Polynom<T>> temp;
+        temp = other.pols;      
+        list<string> m;
+         for (typename unordered_map<string, Polynom<T>>::const_iterator itmap = pols.begin(); itmap != pols.end(); ++itmap) {
+                Polynom<T> p = itmap->second;                           
+                Polynom<T> newpol = Polynom<T>(p.order, p.eps, p.vars, 0);
+                for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {
+                        m.clear();
+                        Polynom<T> coef = Polynom<T>(p.order, p.eps, p.vars, i->second);
+                        for (int k = 0; k < p.vars.size(); k ++) {
+                                typename unordered_map<string, Polynom<T>>::const_iterator found = other.pols.find (p.vars[k]);
+                                if (found == other.pols.end())
+                                        coef = coef * Polynom<T> (p.order, p.eps, p.vars[k], i->first[k]);  
+                                else
+                                        for (int a = 0; a < i->first[k]; a ++)
+                                                m.push_back(p.vars[k]);
+                        }
+                        if (m.size() > 0) {
+                                while (m.size() > 1) {
+                                        string first = m.back();
+                                        m.pop_back();
+                                        string second = m.back();
+                                        m.pop_back();
+                                        string pp = first + " " + second;       
+                                        typename unordered_map<string, Polynom<T>>::const_iterator found = temp.find (pp);
+                                        if (found == temp.end()) {
+                                                Polynom<T> newv = temp[first] * temp[second]; 
+                                                temp.insert(make_pair(pp, newv));
+                                        }       
+                                        m.push_back(pp);
+ 								}
+                                newpol = newpol + coef * temp[m.front()];
+                
+                        }
+                        else 
+                                newpol = newpol + coef;
+                         
+                } 
+                result_pols[itmap->first] = newpol;
+        }
+        return Polmap<T>(result_pols);
+}*/
+
 
 template <class T> Polmap<T> Polmap<T>::parallelmult(Polmap<T> other) {
 	unordered_map<string, Polynom<T>> result_pols;

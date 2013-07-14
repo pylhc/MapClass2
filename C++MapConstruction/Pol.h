@@ -218,37 +218,68 @@ template <class T> Polynom<T> Polynom<T>::operator/(Polynom<T> other) {
 template <class T> Polynom<T> Polynom<T>::operator+(Polynom<T> other) {
 	unordered_map<vector<int>, T, container_hash<vector<int>>> result_terms;
 	int neworder = min(order, other.order);
-	vector<string> newvars (vars.size() + other.vars.size());
-	vector<string> :: iterator it = set_union (vars.begin(), vars.end(), other.vars.begin(), other.vars.end(), newvars.begin());
-	newvars.resize(it - newvars.begin());
-	vector<int> newexp (newvars.size(), 0);
-	unordered_map<string, int> expi, expj;
-	for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator i = terms.begin(); i != terms.end(); ++i) 
-	{
-		for (int k = 0; k < vars.size(); ++k)
-			expi[vars[k]] = i->first[k];
-		for (int k = 0; k < newvars.size(); ++k) {
-			unordered_map<string, int>::iterator it1 = expi.find(newvars[k]);
-			if (it1 != expi.end())
-				newexp[k] = it1->second;
-			else newexp[k] = 0;
+	vector<string> newvars;
+	if (vars == other.vars) {
+                newvars = vars;
+                vector<int> newexp (newvars.size(), 0);
+		if (order == other.order) {
+			result_terms.insert(terms.begin(), terms.end());
+			for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator j = other.terms.begin(); j != other.terms.end(); ++j) {
+                                newexp = j->first;
+                                T sum = result_terms[newexp] + j->second;
+                                if (fabs(sum) >= eps)
+                                        result_terms[newexp] = sum;
+                        }		
+	
 		}
-		if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder)
-			result_terms[newexp] += i->second;
+		else {
+                	for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator i = terms.begin(); i != terms.end(); ++i) {
+				newexp = i->first;
+				if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder)
+                                	result_terms[newexp] += i->second;		
+			}
+               		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator j = other.terms.begin(); j != other.terms.end(); ++j) {
+                        	newexp = j->first; 
+				T sum = result_terms[newexp] + j->second;
+				if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder && fabs(sum) >= eps)
+                         		result_terms[newexp] = sum;
+               		}
+		}
+        }
+	else {
+
+		newvars.resize (vars.size() + other.vars.size());
+		vector<string> :: iterator it = set_union (vars.begin(), vars.end(), other.vars.begin(), other.vars.end(), newvars.begin());
+		newvars.resize(it - newvars.begin());
+		vector<int> newexp (newvars.size(), 0);
+		unordered_map<string, int> expi, expj;
+		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator i = terms.begin(); i != terms.end(); ++i) 
+		{
+			for (int k = 0; k < vars.size(); ++k)
+				expi[vars[k]] = i->first[k];
+			for (int k = 0; k < newvars.size(); ++k) {
+				unordered_map<string, int>::iterator it1 = expi.find(newvars[k]);
+				if (it1 != expi.end())
+					newexp[k] = it1->second;
+				else newexp[k] = 0;
+			}
+			if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder)
+				result_terms[newexp] += i->second;
 		
-	}
-	for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator j = other.terms.begin(); j != other.terms.end(); ++j) 
-	{		
-		for (int k = 0; k < other.vars.size(); ++k)
-			expj[other.vars[k]] = j->first[k];
-		for (int k = 0; k < newvars.size(); ++k) {
-			unordered_map<string, int>::iterator it1 = expj.find(newvars[k]);
-			if (it1 != expj.end())
-				newexp[k] = it1->second;
-			else newexp[k] = 0;
 		}
-		if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder)
-			result_terms[newexp] += j->second;
+		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::const_iterator j = other.terms.begin(); j != other.terms.end(); ++j) 
+		{		
+			for (int k = 0; k < other.vars.size(); ++k)
+				expj[other.vars[k]] = j->first[k];
+			for (int k = 0; k < newvars.size(); ++k) {
+				unordered_map<string, int>::iterator it1 = expj.find(newvars[k]);
+				if (it1 != expj.end())
+					newexp[k] = it1->second;
+				else newexp[k] = 0;
+			}
+			if (accumulate(newexp.begin(), newexp.end(), 0) <= neworder)
+				result_terms[newexp] += j->second;
+		}
 	}
 	Polynom<T> res = Polynom<T>(neworder, eps, newvars, result_terms);
 	return move(res);
