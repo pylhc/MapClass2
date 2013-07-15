@@ -1,4 +1,4 @@
-export PLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:../libs/boost_1_53_0/include/
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:../libs/boost_1_53_0/include/
 
 all: map
 
