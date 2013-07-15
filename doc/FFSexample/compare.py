@@ -29,7 +29,7 @@ parser.add_argument('-n', help="How many cores to run on. By default it is 1",
                     type=int, default=1, dest='nbProc')                    
 parser.add_argument('-m', help="Which formula to use for multipoles",
                     type=int, default=0, dest='fmultipole')
-parser.add_argument('-ns', help="Strip the line of unused elements (MATRIX, MONITOR): default true",
+parser.add_argument('-ns', help="Do not strip the line of unused elements (MATRIX, MONITOR, MARKER): default true",
                     action='store_false', default=True, dest='strpl')
                     
 
