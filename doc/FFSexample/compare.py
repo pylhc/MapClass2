@@ -21,7 +21,7 @@ from mapclass import Map2
 ### Argument reading
 
 parser = argparse.ArgumentParser(description="FFS test for MapClass2")
-parser.add_argument('-o', help="Order at which run the test. Default is 3 (for fast results), 6 would be in the order of 3 minutes.",
+parser.add_argument('-o', help="Order at which run the test. Default is 3",
                     type=int, default=3, dest='order')
 parser.add_argument('-g', help="Run with Gaussian Delta or not. By default it doesn't",
                     action='store_true', dest='gaussian')
@@ -29,6 +29,8 @@ parser.add_argument('-n', help="How many cores to run on. By default it is 1",
                     type=int, default=1, dest='nbProc')                    
 parser.add_argument('-m', help="Which formula to use for multipoles",
                     type=int, default=0, dest='fmultipole')
+parser.add_argument('-ns', help="Strip the line of unused elements (MATRIX, MONITOR): default true",
+                    action='store_false', default=True, dest='strpl')
                     
 
 args = parser.parse_args()
@@ -38,15 +40,15 @@ args = parser.parse_args()
 startTime = time.time()
 
 t = twiss2('assets/ffs.twiss')
-t = t.stripLine();
+#t = t.stripLine(); already done in c++ by default
 # The following is a call to construct the Map using the C++ Map construction from a twiss file
-#m = Map2('assets/ffs.twiss',filenameerr=None, order=args.order, nbProc=args.nbProc) 
+#m = Map2('assets/ffs.twiss',filenameerr=None, order=args.order, nbProc=args.nbProc, strpl=args.strpl) 
 
 # The following is call to the old mapclass which uses Python map construction
 #m = Map2(t, "old", order=args.order) 
 
 # The following is a call to construct the Map from a Twiss Python object
-m = Map2(t, terr=None, order=args.order, nbProc=args.nbProc, fmultipole=args.fmultipole)
+m = Map2(t, terr=None, order=args.order, nbProc=args.nbProc, fmultipole=args.fmultipole, strpl=args.strpl)
 
 mm = Map2(filename='assets/fort.18',order=args.order) #from fort call
 
