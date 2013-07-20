@@ -7,55 +7,20 @@
 using namespace std;
 using namespace boost::python;
 
-dict _TwissFile_wrapper(str filename, int order, int nbthreads, int fmultipole, bool strpl) {
+str _TwissFile_wrapper(str filename, int order, int nbthreads, int fmultipole, bool strpl) {
 	string file = extract<std::string>(filename);
 	MapBeamLine mp = MapBeamLine(file, order, nbthreads, fmultipole, strpl);
-	boost::python::dict mappols;
-	vector<int> expsv;
-	boost::python::tuple exps;
-	for (unordered_map<string, Polynom<double>>:: iterator it = mp.pols.begin(); it != mp.pols.end(); it ++) {
-                boost::python::dict poldict;
-		Polynom<double> p = it->second;
-		for (unordered_map<vector<int>, double, container_hash<vector<int>>>::iterator j = p.terms.begin(); 
-			j != p.terms.end(); ++j){
-			expsv = j->first;
-			if (expsv.size() == 6)
-				exps = boost::python::make_tuple(expsv[4], expsv[1], expsv[5], expsv[2], expsv[0], expsv[3]);
-			else if (expsv.size() == 5)
-				exps = boost::python::make_tuple(expsv[4], expsv[1], expsv[5], expsv[2], expsv[0]);
-			poldict[exps] = j->second;
-		}	
-		mappols[it->first] = poldict;	
-	}
-	return mappols; 
+	return mp.polmap.c_str();
 }
 
-dict _TwissFileErr_wrapper(str filename, str filenameerr, int order, int nbthreads, int fmultipole, bool strpl) {
+str _TwissFileErr_wrapper(str filename, str filenameerr, int order, int nbthreads, int fmultipole, bool strpl) {
 	string file = extract<std::string>(filename);
 	string fileerr = extract<std::string>(filenameerr);
 	MapBeamLine mp = MapBeamLine(file, fileerr, order, nbthreads, fmultipole, strpl);
-	boost::python::dict mappols;
-        vector<int> expsv;
-        boost::python::tuple exps;
-        for (unordered_map<string, Polynom<double>>:: iterator it = mp.pols.begin(); it != mp.pols.end(); it ++) {
-                boost::python::dict poldict;
-                Polynom<double> p = it->second;
-                for (unordered_map<vector<int>, double, container_hash<vector<int>>>::iterator j = p.terms.begin();
-                        j != p.terms.end(); ++j){
-                        expsv = j->first;
-                        if (expsv.size() == 6)
-                                exps = boost::python::make_tuple(expsv[4], expsv[1], expsv[5], expsv[2], expsv[0], expsv[3]);
-                        else if (expsv.size() == 5)
-                                exps = boost::python::make_tuple(expsv[4], expsv[1], expsv[5], expsv[2], expsv[0]);
-                        poldict[exps] = j->second;
-                }
-                mappols[it->first] = poldict;
-        }
-        return mappols;
-
+	return mp.polmap.c_str();
 }
 
-dict _TwissObject_wrapper(dict tobject, int order, int nbthreads, int fmultipole, bool strpl) {
+str _TwissObject_wrapper(dict tobject, int order, int nbthreads, int fmultipole, bool strpl) {
 
         boost::python::list elements = extract<boost::python::list>(tobject["elems"]);
         boost::python::list markers = extract<boost::python::list>(tobject["markers"]);
@@ -118,28 +83,10 @@ dict _TwissObject_wrapper(dict tobject, int order, int nbthreads, int fmultipole
 
         Twiss t = Twiss(parameters, elems, mks, tps);
         MapBeamLine mp = MapBeamLine(t, order, nbthreads, fmultipole, strpl);
-        boost::python::dict mappols;
-        vector<int> expsv;
-        boost::python::tuple exps;
-        for (unordered_map<string, Polynom<double>>:: iterator it = mp.pols.begin(); it != mp.pols.end(); it ++) {
-                boost::python::dict poldict;
-                Polynom<double> p = it->second;
-                for (unordered_map<vector<int>, double, container_hash<vector<int>>>::iterator j = p.terms.begin();
-                        j != p.terms.end(); ++j){
-                        expsv = j->first;
-                        if (expsv.size() == 6)
-                                exps = boost::python::make_tuple(expsv[4], expsv[1], expsv[5], expsv[2], expsv[0], expsv[3]);
-                        else if (expsv.size() == 5)
-                                exps = boost::python::make_tuple(expsv[4], expsv[1], expsv[5], expsv[2], expsv[0]);
-                        poldict[exps] = j->second;
-                }
-                mappols[it->first] = poldict;
-        }
-        return mappols;
-
+        return mp.polmap.c_str();
 }
 
-dict _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthreads, int fmultipole, bool strpl) {
+str _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthreads, int fmultipole, bool strpl) {
         boost::python::list elements = extract<boost::python::list>(tobject["elems"]);
         boost::python::list markers = extract<boost::python::list>(tobject["markers"]);
         boost::python::dict types = extract<boost::python::dict>(tobject["types_parameters"]);
@@ -262,30 +209,13 @@ dict _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthr
 
         Twiss terr = Twiss(parameterserr, elemserr, mkserr, tpserr);
         MapBeamLine mp = MapBeamLine(t, terr, order, nbthreads, fmultipole, strpl);
-        boost::python::dict mappols;
-        vector<int> expsv;
-        boost::python::tuple exps;
-        for (unordered_map<string, Polynom<double>>:: iterator it = mp.pols.begin(); it != mp.pols.end(); it ++) {
-                boost::python::dict poldict;
-                Polynom<double> p = it->second;
-                for (unordered_map<vector<int>, double, container_hash<vector<int>>>::iterator j = p.terms.begin();
-                        j != p.terms.end(); ++j){
-                        expsv = j->first;
-                        if (expsv.size() == 6)
-                                exps = boost::python::make_tuple(expsv[4], expsv[1], expsv[5], expsv[2], expsv[0], expsv[3]);
-                        else if (expsv.size() == 5)
-                                exps = boost::python::make_tuple(expsv[4], expsv[1], expsv[5], expsv[2], expsv[0]);
-                        poldict[exps] = j->second;
-                }
-                mappols[it->first] = poldict;
-        }
-        return mappols;
+        return mp.polmap.c_str();
 }
 
 BOOST_PYTHON_MODULE(mapbeamline)
 {
-     def("constructMapFromTwissFile", _TwissFile_wrapper);
-     def("constructMapFromTwissFileWithErr", _TwissFileErr_wrapper);
-     def("constructMapFromTwissObject", _TwissObject_wrapper);
-     def("constructMapFromTwissObjectWithErr", _TwissObjectErr_wrapper);
+     def("constructMapFromTwissFile2", _TwissFile_wrapper);
+     def("constructMapFromTwissFileWithErr2", _TwissFileErr_wrapper);
+     def("constructMapFromTwissObject2", _TwissObject_wrapper);
+     def("constructMapFromTwissObjectWithErr2", _TwissObjectErr_wrapper);
 }

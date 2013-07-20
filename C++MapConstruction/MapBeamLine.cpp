@@ -36,7 +36,7 @@ MapBeamLine::MapBeamLine(Twiss t, int order, int nbthreads, int fmultipole, bool
 	
 	Polmap<double>* Res = new Polmap<double>[nbthreads];
 	for (int i = 0; i < nbthreads; i ++)
-		Res[i] = generateDefaultMap(x, px, y, py, d, s); 
+		Res[i] = R; 
 	int size = t.elems.size();	
 	if (strpl) {
 		#pragma omp parallel for shared(Res) schedule(static)
@@ -81,7 +81,7 @@ MapBeamLine::MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads, int fmul
 	
 	Polmap<double>* Res = new Polmap<double>[nbthreads];
 	for (int i = 0; i < nbthreads; i ++)
-		Res[i] = generateDefaultMap(x, px, y, py, d, s); 
+		Res[i] = R; 
 	
 	int size = t.elems.size();
 	if (strpl) {	
@@ -135,7 +135,7 @@ MapBeamLine::MapBeamLine(string filename, int order, int nbthreads, int fmultipo
 	
 	Polmap<double>* Res = new Polmap<double>[nbthreads];
 	for (int i = 0; i < nbthreads; i ++)
-		Res[i] = generateDefaultMap(x, px, y, py, d, s); 
+		Res[i] = R; 
 	
 	int size = t.elems.size();
 	if (strpl) {	
@@ -160,7 +160,7 @@ MapBeamLine::MapBeamLine(string filename, int order, int nbthreads, int fmultipo
 	for (int i = 1; i < nbthreads; i ++)
 		R = Res[i] * R;
 	polmap = R.getMap();
-	for (unordered_map<string, Polynom<double>>:: iterator it = R.pols.begin(); it != R.pols.end(); it ++) 
+	for (unordered_map<string, Polynom<double>>:: iterator it = R.pols.begin(); it != R.pols.end(); it ++)
 		pols[it->first] = it->second; 
 	delete [] Res; 
 }
@@ -184,7 +184,7 @@ MapBeamLine::MapBeamLine(string filename, string filenameerr, int order, int nbt
 	
 	Polmap<double>* Res = new Polmap<double>[nbthreads];
 	for (int i = 0; i < nbthreads; i ++)
-		Res[i] = generateDefaultMap(x, px, y, py, d, s); 
+		Res[i] = R; 
 	
 	int size = t.elems.size();
 	if (strpl) {	

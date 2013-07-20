@@ -57,12 +57,38 @@ class Map2(polmap, dct):
       self.fromTwissFile(*args, **kwargs)
     else:
       self.fromFort(*args, **kwargs)
-
-  def fromTwissFile(self, filename, filenameerr=None, order=6, nbProc=1, fmultipole=0, strpl=True): 
+  def fromTwissFile(self, filename, filenameerr=None, order=6, nbProc=1, fmultipole=0, strpl=True):
     if filenameerr is None:
-      _s = mapbeamline.constructMapFromTwissFile(filename, order, nbProc, fmultipole, strpl)
+      _d = mapbeamline.constructMapFromTwissFile(filename, order, nbProc, fmultipole, strpl)
     else:
-      _s = mapbeamline.constructMapFromTwissFileWithErr(filename, filenameerr, order, nbProc, fmultipole, strpl) 
+      _d = mapbeamline.constructMapFromTwissFileWithErr(filename, filenameerr, order, nbProc, fmultipole, strpl)
+    fdct = {}
+    for key, value in _d.iteritems():
+      p = pol(0, order=order)
+      p.fromdict(value, XYZD)
+      fdct[key] = p
+    self.update(fdct)
+    self.reorder(XYZD)
+
+  def fromTwissObject(self, t, terr=None, order=6, nbProc=1, fmultipole=0, strpl=True):
+    if terr is None:
+      _d = mapbeamline.constructMapFromTwissObject(t, order, nbProc, fmultipole, strpl)
+    else:
+      _d = mapbeamline.constructMapFromTwissObjectWithErr(t, terr, order, nbProc, fmultipole, strpl)
+    fdct = {}
+    for key, value in _d.iteritems():
+      p = pol(0, order=order)
+      p.fromdict(value, XYZD)
+      fdct[key] = p
+    self.update(fdct)
+    self.reorder(XYZD)
+
+
+  def fromTwissFile2(self, filename, filenameerr=None, order=6, nbProc=1, fmultipole=0, strpl=True): 
+    if filenameerr is None:
+      _s = mapbeamline.constructMapFromTwissFile2(filename, order, nbProc, fmultipole, strpl)
+    else:
+      _s = mapbeamline.constructMapFromTwissFileWithErr2(filename, filenameerr, order, nbProc, fmultipole, strpl) 
     s =  _s.split("|")
     fdct = {}
     for i in range(0, len(s) - 1, 2):
@@ -70,11 +96,11 @@ class Map2(polmap, dct):
     self.update(fdct)
     self.reorder(XYZD)
     
-  def fromTwissObject(self, t, terr=None, order=6, nbProc=1, fmultipole=0, strpl=True):
+  def fromTwissObject2(self, t, terr=None, order=6, nbProc=1, fmultipole=0, strpl=True):
     if terr is None:
-      _s = mapbeamline.constructMapFromTwissObject(t, order, nbProc, fmultipole, strpl)
+      _s = mapbeamline.constructMapFromTwissObject2(t, order, nbProc, fmultipole, strpl)
     else:
-      _s = mapbeamline.constructMapFromTwissObjectWithErr(t, terr, order, nbProc, fmultipole, strpl) 
+      _s = mapbeamline.constructMapFromTwissObjectWithErr2(t, terr, order, nbProc, fmultipole, strpl) 
     s =  _s.split("|")
     fdct = {}
     for i in range(0, len(s) - 1, 2):

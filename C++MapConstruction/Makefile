@@ -13,7 +13,7 @@ MapBeamLine.o: MapBeamLine.cpp
 	g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x  -fopenmp -Wall
 	
 MapBeamLine_wrapper.o: MapBeamLine_wrapper.cpp
-	g++ -O2 -fPIC -c MapBeamLine_wrapper.cpp --std=c++0x -fopenmp -I/usr/include/python2.6 -Wall
+	g++ -O2 -fPIC -c MapBeamLine_wrapper.cpp --std=c++0x -fopenmp -I/usr/include/python2.6 -I/usr/include/python2.7 -Wall
 	
 clean:
 	rm -rf *o mapbeamline.so

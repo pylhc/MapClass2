@@ -267,9 +267,6 @@ template <class T> Polmap<T> MUL(double K1L, double K2L, double K3L, double K4L,
     		mp[pxstring] = mp[pxstring] + Bx(v[0][3], K4L);
     		mp[pystring] = mp[pystring] + By(v[1][3], K4L);	
   	}
-  	
-  	//m[pxstring] = m[pxstring] + Bx(1,K1L,order) + Bx(2,K2L,order) + Bx(3,K3L,order) + Bx(4,K4L,order)
-  	//m[pystring] = m[pystring] + By(1,K1L,order) + By(2,K2L,order) + By(3,K3L,order) + By(4,K4L,order)
 	return mp;
 }
 
@@ -302,7 +299,7 @@ template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, vect
 		Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s,
 		int fmultipole) {
 	string keyword = e["KEYWORD"];
-//	cout << keyword << endl;
+	//cout << keyword << endl;
 	double l = atof(e["L"].c_str());
 	double k1l = atof(e["K1L"].c_str());
 	double k2l = atof(e["K2L"].c_str());
@@ -320,30 +317,29 @@ template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, vect
     	
     	if (keyword.compare(drift) == 0) 
 		return DRIFTMap(l, x, px, y, py, d, s);
-    	
     	if (keyword.compare(quadrupole) == 0)
 		if (l != 0) { 
         		if (k1l > 0)
-          		return QFMap(l, k1l, x, px, y, py, d, s);
+          			return QFMap(l, k1l, x, px, y, py, d, s);
         		else
-          		return QDMap(l, k1l, x, px, y, py, d, s);
+          			return QDMap(l, k1l, x, px, y, py, d, s);
           } 
           
     	if (keyword.compare(sbend) == 0) 
-     	return DIMap(l, angle, x, px, y, py, d, s);        
+     		return DIMap(l, angle, x, px, y, py, d, s);        
     	if (keyword.compare(quadrupole) == 0)
-     	if (l == 0)
+     		if (l == 0)
         		return MUL(k1l, k2l, k3l, k4l, v, x, px, y, py, d, s);
     	if (keyword.compare(multipole) == 0)
-     	if (l == 0)
+     		if (l == 0)
         		return MUL(k1l, k2l, k3l, k4l, v, x, px, y, py, d, s);
     	if (keyword.compare(sextupole) == 0 || keyword.compare(octupole) == 0 || keyword.compare(decapole) == 0) {
     		
-     	if (l == 0) {
+     		if (l == 0) {
 
         		return MUL(k1l,  k2l, k3l, k4l, v, x, px, y, py, d, s);
         	}
-      	else {
+      		else {
 			if (fmultipole == 0)
         			return MULTHICK(k1l,  k2l, k3l, k4l, l, v, x, px, y, py, d, s);
         		else return MULTHICK2(k1l,  k2l, k3l, k4l, l, v, x, px, y, py, d, s);
