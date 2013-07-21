@@ -84,7 +84,7 @@ dict _TwissObject_wrapper(dict tobject, int order, int nbthreads, int fmultipole
         }
 
         int elements_length = extract<int>(elements.attr("__len__")());
-        vector<unordered_map<string, string>> elems(elements_length);
+        vector<unordered_map<string, string>> elems;
         unordered_map<string, string> map;
         for (int i = 0; i < elements_length; i++) {
                 py_dict = extract<dict>(elements[i]);
@@ -101,7 +101,7 @@ dict _TwissObject_wrapper(dict tobject, int order, int nbthreads, int fmultipole
         }
 
         int markers_length = extract<int>(markers.attr("__len__")());
-        vector<unordered_map<string, string>> mks(markers_length);
+        vector<unordered_map<string, string>> mks;
         for (int i = 0; i < markers_length; i++) {
                 py_dict = extract<dict>(markers[i]);
                 keys = py_dict.keys();
@@ -115,8 +115,7 @@ dict _TwissObject_wrapper(dict tobject, int order, int nbthreads, int fmultipole
                 }
                 mks.push_back(map);
         }
-
-        Twiss t = Twiss(parameters, elems, mks, tps);
+	Twiss t = Twiss(parameters, elems, mks, tps);
         MapBeamLine mp = MapBeamLine(t, order, nbthreads, fmultipole, strpl);
         boost::python::dict mappols;
         vector<int> expsv;
@@ -167,7 +166,7 @@ dict _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthr
         }
 
         int elements_length = extract<int>(elements.attr("__len__")());
-        vector<unordered_map<string, string>> elems(elements_length);
+        vector<unordered_map<string, string>> elems;
         unordered_map<string, string> map;
         for (int i = 0; i < elements_length; i++) {
                 py_dict = extract<dict>(elements[i]);
@@ -184,18 +183,18 @@ dict _TwissObjectErr_wrapper(dict tobject, dict terrobject, int order, int nbthr
         }
 
         int markers_length = extract<int>(markers.attr("__len__")());
-        vector<unordered_map<string, string>> mks(markers_length);
+        vector<unordered_map<string, string>> mks;
         for (int i = 0; i < markers_length; i++) {
                 py_dict = extract<dict>(markers[i]);
                 keys = py_dict.keys();
-              len_keys = extract<int>(keys.attr("__len__")());
+        	len_keys = extract<int>(keys.attr("__len__")());
                 for (int j = 0; j < len_keys; ++j) {
                         std::string key = boost::python::extract<std::string> (keys[j]);
                         if (tps[key].compare("%s") == 0)
                                 map[key] = extract<std::string>(py_dict[key]);
                         else
                                 map[key] = boost::lexical_cast<std::string>(extract<double>(py_dict[key]));
-        }
+        	}
                 mks.push_back(map);
         }
 
