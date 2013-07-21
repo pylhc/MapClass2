@@ -26,6 +26,7 @@ class Twiss {
 		Twiss(std::string s);
 		Twiss(unordered_map<string, string> p, vector<unordered_map<string, string>> e, vector<unordered_map<string, string>> m, unordered_map<string, string> t);
 		void printtwiss();
+		void stripLine();
 };
 
 

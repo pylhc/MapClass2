@@ -15,7 +15,7 @@ template <class T> Polynom<T> sqrtp(Polynom<T> c) {
 	p = p/a0;
 	vector<T> lst;
 	lst.push_back(sqrt(a0));
-	for (int i = 1; i < c.order + 1; i ++) 
+	for (int i = 1; i < c.order + 1; ++i) 
 		lst.push_back(-lst[i - 1]/2/i*(2*i - 3));
 	return Polynom<T>::phorner(lst, p);
 }
@@ -25,7 +25,7 @@ template <class T> Polynom<T> expp(Polynom<T> c) {
 	Polynom<T> p = c.getRestOfTerms();
 	vector<T> lst;
 	lst.push_back(exp(a0));
-	for (int i = 1; i < c.order + 1; i ++) 
+	for (int i = 1; i < c.order + 1; ++i) 
 		lst.push_back(-lst[i - 1]/i);
 	return Polynom<T>::phorner(lst, p);
 }
@@ -37,7 +37,7 @@ template <class T> Polynom<T> logp(Polynom<T> c) {
 	vector<T> lst;
 	lst.push_back(log(a0));
 	lst.push_back(1);
-	for (int i = 2; i < c.order + 1; i ++) 
+	for (int i = 2; i < c.order + 1; ++i) 
 		lst.push_back(-lst[i - 1]/i * (i - 1));
 	return Polynom<T>::phorner(lst, p);
 }
@@ -49,7 +49,7 @@ template <class T> Polynom<T> sinp(Polynom<T> c) {
 	vector<T> lst;
 	lst.push_back(sin(a0));
 	lst.push_back(cos(a0));
-	for (int i = 2; i < c.order + 1; i ++) 
+	for (int i = 2; i < c.order + 1; ++i) 
 		lst.push_back(-lst[i - 2]/i/(i - 1));
 	return Polynom<T>::phorner(lst, p);
 }
@@ -60,7 +60,7 @@ template <class T> Polynom<T> cosp(Polynom<T> c) {
 	vector<T> lst;
 	lst.push_back(cos(a0));
 	lst.push_back(-sin(a0));
-	for (int i = 2; i < c.order + 1; i ++) 
+	for (int i = 2; i < c.order + 1; ++i) 
 		lst.push_back(-lst[i - 2]/i/(i - 1));
 	return Polynom<T>::phorner(lst, p);
 }
@@ -75,7 +75,7 @@ template <class T> Polynom<T> sinhp(Polynom<T> c) {
 	vector<T> lst;
 	lst.push_back(sinh(a0));
 	lst.push_back(cosh(a0));
-	for (int i = 2; i < c.order + 1; i ++) 
+	for (int i = 2; i < c.order + 1; ++i) 
 		lst.push_back(-lst[i - 2]/i/(i - 1));
 	return Polynom<T>::phorner(lst, p);
 }
@@ -86,7 +86,7 @@ template <class T> Polynom<T> coshp(Polynom<T> c) {
 	vector<T> lst;
 	lst.push_back(cosh(a0));
 	lst.push_back(sinh(a0));
-	for (int i = 2; i < c.order + 1; i ++) 
+	for (int i = 2; i < c.order + 1; ++i) 
 		lst.push_back(-lst[i - 2]/i/(i - 1));
 	return Polynom<T>::phorner(lst, p);
 }

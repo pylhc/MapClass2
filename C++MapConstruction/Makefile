@@ -1,4 +1,4 @@
-export PLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:../libs/boost_1_53_0/include/
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:../libs/boost_1_53_0/include/
 
 all: map
 
@@ -7,13 +7,13 @@ map: Twiss.o MapBeamLine.o MapBeamLine_wrapper.o
 	cp mapbeamline.so ../doc/FFSexample
 	
 Twiss.o: Twiss.cpp
-	g++ -O2 -fPIC -c Twiss.cpp --std=c++0x  -fopenmp
+	g++ -O2 -fPIC -c Twiss.cpp --std=c++0x  -fopenmp -Wall
 	
 MapBeamLine.o: MapBeamLine.cpp
-	g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x  -fopenmp
+	g++ -O2 -fPIC -c MapBeamLine.cpp --std=c++0x  -fopenmp -Wall
 	
 MapBeamLine_wrapper.o: MapBeamLine_wrapper.cpp
-	g++ -O2 -fPIC -c MapBeamLine_wrapper.cpp --std=c++0x -fopenmp -I/usr/include/python2.6
+	g++ -O2 -fPIC -c MapBeamLine_wrapper.cpp --std=c++0x -fopenmp -I/usr/include/python2.6 -I/usr/include/python2.7 -Wall
 	
 clean:
 	rm -rf *o mapbeamline.so
