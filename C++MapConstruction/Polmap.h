@@ -7,6 +7,7 @@
 #include <cmath>
 #include "boost/functional/hash.hpp"
 #include "boost/lexical_cast.hpp"
+#include <boost/algorithm/string.hpp>
 #include <complex>
 #include <sstream>
 #include <omp.h>
@@ -38,7 +39,7 @@ class Polmap {
 		Polmap operator -(Polmap other);
 		Polmap operator *(Polmap other);
 		Polmap eval(string var, Polynom<T> other);
-		Polmap parallelmult(Polmap other);
+		Polmap parallel_composition(Polmap other);
 		Polmap operator ^(int n);
 		Polynom<T> operator [](string s);
 		Polmap& truncate();
@@ -133,6 +134,9 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
 	tempvalues = other.pols;
 	list<string> m;
 	string t;
+	//cout << "START" << endl; 
+	int nrfound = 0;
+	int nrmult = 0;		
 	for (typename unordered_map<string, Polynom<T>>::const_iterator itmap = pols.begin(); itmap != pols.end(); ++itmap) {
 		Polynom<T> p = itmap->second;
 		Polynom<T> newpol = Polynom<T>(p.order, p.eps, p.vars, 0);
@@ -156,8 +160,10 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
 					m.pop_back();
 					pair<string, string> pp = make_pair (first, second);	
 					unordered_map<pair<string, string>, string, pair_hash<string>>::const_iterator found = temp.find (pp);
-					if (found != temp.end())
+					if (found != temp.end()) {
 						t = found->second;
+						nrfound ++;
+					}
 					else {
 						int ilm = lexical_cast<int>(lm) + 1;
 						lm = lexical_cast<string>(ilm);
@@ -165,6 +171,7 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
 						t = lm;
 						Polynom<T> newv = tempvalues[get<0>(pp)] * tempvalues[get<1>(pp)]; 
 						tempvalues[t] = newv;
+						nrmult ++;
 					}	
 					m.push_back(t);
 				}
@@ -178,6 +185,7 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
                 	newpol.terms.erase(zero);
 		result_pols[itmap->first] = newpol;
 	}
+	//cout << nrfound << " " << nrmult << endl;
 	return Polmap<T>(result_pols);
 }
 
@@ -186,22 +194,31 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
         unordered_map<string, Polynom<T>> temp;
         temp = other.pols;      
         list<string> m;
-         for (typename unordered_map<string, Polynom<T>>::const_iterator itmap = pols.begin(); itmap != pols.end(); ++itmap) {
+	string mstring = ""; 
+        for (typename unordered_map<string, Polynom<T>>::const_iterator itmap = pols.begin(); itmap != pols.end(); ++itmap) {
                 Polynom<T> p = itmap->second;                           
                 Polynom<T> newpol = Polynom<T>(p.order, p.eps, p.vars, 0);
                 for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {
                         m.clear();
+			mstring = "";
                         Polynom<T> coef = Polynom<T>(p.order, p.eps, p.vars, i->second);
-                        for (int k = 0; k < p.vars.size(); k ++) {
+                        for (unsigned int k = 0; k < p.vars.size(); k ++) {
                                 typename unordered_map<string, Polynom<T>>::const_iterator found = other.pols.find (p.vars[k]);
                                 if (found == other.pols.end())
                                         coef = coef * Polynom<T> (p.order, p.eps, p.vars[k], i->first[k]);  
                                 else
-                                        for (int a = 0; a < i->first[k]; a ++)
+                                        for (int a = 0; a < i->first[k]; a ++) {
                                                 m.push_back(p.vars[k]);
+						mstring += p.vars[k] + " ";
+					}
                         }
                         if (m.size() > 0) {
-                                while (m.size() > 1) {
+                       		trim(mstring);
+				typename unordered_map<string, Polynom<T>>::const_iterator found = temp.find (mstring);         
+				if (found != temp.end())
+					newpol = newpol + coef * found->second;
+				else {
+				while (m.size() > 1) {
                                         string first = m.back();
                                         m.pop_back();
                                         string second = m.back();
@@ -215,7 +232,7 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
                                         m.push_back(pp);
  								}
                                 newpol = newpol + coef * temp[m.front()];
-                
+                		}
                         }
                         else 
                                 newpol = newpol + coef;
@@ -226,21 +243,24 @@ template <class T> Polmap<T> Polmap<T>::operator*(Polmap<T> other) {
         return Polmap<T>(result_pols);
 }*/
 
-
-template <class T> Polmap<T> Polmap<T>::parallelmult(Polmap<T> other) {
+template <class T> Polmap<T> Polmap<T>::parallel_composition(Polmap<T> other) {
 	unordered_map<string, Polynom<T>> result_pols;
 	unordered_map<pair<string, string>, string, pair_hash<string>> temp;
 	unordered_map<string, Polynom<T>> tempvalues;
 	vector<pair<string, Polynom<T>>> vpols;
 	string lm = "0";
 	tempvalues = other.pols;
-	for (typename unordered_map<string, Polynom<T>>::const_iterator itmap = pols.begin(); itmap != pols.end(); ++itmap) 
-		vpols.push_back(make_pair(itmap->first, itmap->second));
+	result_pols = pols; 
+	for (typename unordered_map<string, Polynom<T>>::const_iterator itmap = pols.begin(); itmap != pols.end(); ++itmap) { 
+		if (itmap->first.compare("s") != 0 && itmap->first.compare("d") != 0)
+			vpols.push_back(make_pair(itmap->first, itmap->second));
+	}
 	list<string> m;
 	string t;
-	#pragma omp parallel for firstprivate(lm, tempvalues, temp, m, t) shared(result_pols) schedule(static)
+	int nb_threads = vpols.size();
+	#pragma omp parallel for firstprivate(lm, tempvalues, temp, m, t) shared(result_pols) schedule(static) num_threads(nb_threads)
 	for (int itmap = 0; itmap < vpols.size(); itmap ++) {
-		Polynom<T> p = get<1>(vpols[itmap]);
+		Polynom<T> p = vpols[itmap].second;
 		Polynom<T> newpol = Polynom<T>(p.order, p.eps, p.vars, 0);
 		for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::iterator i = p.terms.begin(); i != p.terms.end(); ++i) {
 			m.clear();
@@ -280,7 +300,7 @@ template <class T> Polmap<T> Polmap<T>::parallelmult(Polmap<T> other) {
 				newpol = newpol + coef;
 			 
 		} 
-		result_pols[get<0>(vpols[itmap])] = newpol;
+		result_pols[vpols[itmap].first] = newpol;
 	}
 	return Polmap<T>(result_pols);
 }
