@@ -15,10 +15,10 @@ class MapBeamLine : public Polmap<double> {
 	public:
 		string polmap;
 	public:
-		MapBeamLine(string filename, int order, int nbthreads);
-		MapBeamLine(string filename, string filenamerr, int order, int nbthreads);
-		MapBeamLine(Twiss t, int order, int nbthreads);
-		MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads);
+		MapBeamLine(string filename, int order, int nbthreads, int fmultipole, bool strpl);
+		MapBeamLine(string filename, string filenamerr, int order, int nbthreads, int fmultipole, bool strpl);
+		MapBeamLine(Twiss t, int order, int nbthreads, int fmultipole, bool strpl);
+		MapBeamLine(Twiss t, Twiss terr, int order, int nbthreads, int fmultipole, bool strpl);
 };
 
 

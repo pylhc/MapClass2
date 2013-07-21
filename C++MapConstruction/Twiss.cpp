@@ -15,8 +15,8 @@ Twiss::Twiss(std::string filename) {
 	string line;
   	ifstream file (filename);
   	vector<string> labels;
-    vector<string> types;
-    unordered_map<string, string> e;
+    	vector<string> types;
+    	unordered_map<string, string> e;
   	if (file.is_open())
   	{
     		while (!file.eof())
@@ -42,7 +42,7 @@ Twiss::Twiss(std::string filename) {
       			trim_if(splt[3],is_any_of("\""));
       			string s = splt[3];
       			if (splt.size() > 3) {
-      				for (int i = 4; i < splt.size(); i ++)
+      				for (unsigned int i = 4; i < splt.size(); i ++)
       					s += " " + splt[i];
       				trim_if(s,is_any_of("\""));
       			}
@@ -56,12 +56,12 @@ Twiss::Twiss(std::string filename) {
       		if (line.find("$ ") != string::npos || line.find("$\t") != string::npos) {
       			types = splt;
       			types.erase(types.begin());
-      			for (int i = 0; i < labels.size(); i ++)
+      			for (unsigned int i = 0; i < labels.size(); i ++)
       				types_parameters[labels[i]] = types[i];
       		}
       		if (line.find("@") == string::npos && line.find("%") == string::npos && line.find("*") == string::npos) {
         			
-        			for (int j = 0; j < labels.size(); j ++)  {
+        			for (unsigned int j = 0; j < labels.size(); j ++)  {
           		/*	if (types[j].compare("%d") == 0)
           				e[labels[j]] = atoi(splt[j].c_str());
           			else if (types[j].compare("%le") == 0) {
@@ -80,7 +80,15 @@ Twiss::Twiss(std::string filename) {
           		}
           		if (line.find("$") != string::npos) 
           			markers.push_back(e);
-          		else elems.push_back(e);	
+          		else {
+				
+				//string keyword = e["KEYWORD"];
+                                //strip the line
+				//if (keyword.compare("MARKER") != 0 && keyword.compare("MONITOR") != 0 
+			//		&& keyword.compare("MATRIX") != 0)
+
+					elems.push_back(e);
+			}	
       		}
       		
     		}
@@ -107,6 +115,17 @@ void Twiss:: printtwiss() {
 			cout <<j->first << " "<<j->second << endl;
 		}
 	
+	}
+}
+
+void Twiss:: stripLine() {
+	vector<unordered_map<string, string>>:: iterator i = elems.begin();
+	while (i != elems.end()) {
+		unordered_map<string, string> e = *i;
+		string keyword = e["KEYWORD"];
+		if (keyword.compare("MARKER") == 0 || keyword.compare("MONITOR") == 0 || keyword.compare("MATRIX") == 0)
+                	i = elems.erase(i);
+		else ++i;
 	}
 }
 
