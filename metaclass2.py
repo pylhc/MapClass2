@@ -64,6 +64,8 @@ class twiss2(dct):
             vals.append(splt[j].strip('"'))	  
         e = dct(zip(labels, vals))
         e.update(self)
+        e['ACHROMAT'] = "F"
+        self.types_parameters['ACHROMAT'] = "%s"
         del e['markers']
         del e['elems']
         del e['types_parameters']  
@@ -83,7 +85,14 @@ class twiss2(dct):
 
   def setDelta(self, nE, delta):
     self.elems[nE].DELTAP = delta
-    
+   
+  def setDeltaForAll(self, delta):
+    for i in range(0, len(self.elems)):
+      self.elems[i].DELTAP = delta
+      
+  def setAchromat(self, nE):
+    self.elems[nE].ACHROMAT = "T" 
+
   def getBeta(self, nE, s):
     """
     Calculates beta, alpha, gamma at location s in element nE.
