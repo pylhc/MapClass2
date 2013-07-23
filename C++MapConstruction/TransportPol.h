@@ -267,8 +267,6 @@ template <class T> Polmap<T> MUL(Polynom<T> K1L, Polynom<T> K2L, Polynom<T> K3L,
     		mp[pystring] = mp[pystring] + By(v[1][3], K4L);	
   	}
   	
-  	//m[pxstring] = m[pxstring] + Bx(1,K1L,order) + Bx(2,K2L,order) + Bx(3,K3L,order) + Bx(4,K4L,order)
-  	//m[pystring] = m[pystring] + By(1,K1L,order) + By(2,K2L,order) + By(3,K3L,order) + By(4,K4L,order)
 	return mp;
 }
 
