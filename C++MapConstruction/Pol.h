@@ -165,7 +165,7 @@ template <class T> Polynom<T>& Polynom<T>::truncate(int o) {
 
 template <class T> Polynom<T> Polynom<T>::operator*(Polynom<T> other) {
 	int neworder = min(order, other.order);
-	unordered_map<vector<int>, T, container_hash<vector<int>>> result_terms(terms.size() * other.terms.size());
+	unordered_map<vector<int>, T, container_hash<vector<int>>> result_terms;
 	
 	vector<string> newvars;
 	if (vars == other.vars) {
@@ -218,7 +218,7 @@ template <class T> Polynom<T> Polynom<T>::operator/(Polynom<T> other) {
 }
 
 template <class T> Polynom<T> Polynom<T>::operator+(Polynom<T> other) {
-	unordered_map<vector<int>, T, container_hash<vector<int>>> result_terms (terms.size() + other.terms.size());
+	unordered_map<vector<int>, T, container_hash<vector<int>>> result_terms;
 	int neworder = min(order, other.order);
 	vector<string> newvars;
 	if (vars == other.vars) {
@@ -288,7 +288,7 @@ template <class T> Polynom<T> Polynom<T>::operator+(Polynom<T> other) {
 }
 
 template <class T> Polynom<T> Polynom<T>::operator-(Polynom<T> other) {
-	unordered_map<vector<int>, T, container_hash<vector<int>>> result_terms (terms.size() + other.terms.size());
+	unordered_map<vector<int>, T, container_hash<vector<int>>> result_terms;
 	int neworder = min(order, other.order);
 	vector<string> newvars (vars.size() + other.vars.size());
 	vector<string> :: iterator it = set_union (vars.begin(), vars.end(), other.vars.begin(), other.vars.end(), newvars.begin());
