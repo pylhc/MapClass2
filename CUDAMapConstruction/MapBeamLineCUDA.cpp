@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <time.h>
 #include <cuda_runtime.h>
-#include "MapBeamLineCUDA.h"
+#include "MapBeamLine.h"
 
 #define CHUNK_SIZE	16
 #define SIZE	8192

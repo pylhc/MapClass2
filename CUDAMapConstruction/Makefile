@@ -126,7 +126,7 @@ all: build
 
 build: mapbeamline.so
 
-MultPol.o: MultPol.cu
+MultPolCUDA.o: MultPolCUDA.cu
 	$(NVCC) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
 
 Twiss.o: Twiss.cpp
@@ -138,7 +138,7 @@ MapBeamLineCUDA.o: MapBeamLineCUDA.cpp
 MapBeamLine_wrapper.o: MapBeamLine_wrapper.cpp
 	$(GCC) $(CCFLAGS) $(EXTRA_CCFLAGS) $(INCLUDES) -I/usr/include/python2.7 -I/usr/include/python2.6 -o $@ -c $<
 
-mapbeamline.so: MultPol.o Twiss.o MapBeamLineCUDA.o MapBeamLine_wrapper.o
+mapbeamline.so: MultPolCUDA.o Twiss.o MapBeamLineCUDA.o MapBeamLine_wrapper.o
 	$(GCC) -shared -o $@ $+  ../libs/boost_1_53_0/libboost_python.so.1.53.0 $(LDFLAGS) $(EXTRA_LDFLAGS)  
 	cp $@ ../doc/FFSexample
 

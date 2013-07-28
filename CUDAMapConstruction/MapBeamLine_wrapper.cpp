@@ -1,5 +1,5 @@
 #include <vector>
-#include "MapBeamLineCUDA.h"
+#include "MapBeamLine.h"
 #include <Python.h>
 #include "boost/python.hpp"
 #include "boost/python/module.hpp"
