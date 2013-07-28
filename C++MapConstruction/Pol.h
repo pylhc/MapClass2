@@ -62,6 +62,8 @@ class Polynom {
 		string getPol();
 		template <class U> friend Polynom<U> operator*(U val, Polynom<U> other);
 		template <class U> friend Polynom<U> operator+(U val, Polynom<U> other);
+		void getPolRaw(int* exponents, T* coefficients);
+ 		Polynom(int, double, vector<string>, int*, T*, int);
 };
 
 template <class T> Polynom<T>::Polynom (int o, double e, vector<string> v, unordered_map<vector<int>, T, container_hash<vector<int>>> t) {
@@ -550,6 +552,31 @@ template <class T> Polynom<T> Polynom<T>::phorner (vector<T> lst, Polynom<T> p) 
 
 template <class T> void Polynom<T>::setOrder(int o) {
 	order = o;
+}
+
+template <class T> void Polynom<T>:: getPolRaw(int* exponents, T* coefficients){
+        int nb_terms = terms.size();
+        int nb_vars = vars.size();
+        int j = 0;
+        for (typename unordered_map<vector<int>, T, container_hash<vector<int>>>::iterator i = terms.begin(); i != terms.end(); ++i) {
+                for (int k = 0; k < nb_vars; k ++)
+		  exponents[j + k * nb_terms] = i->first[k];
+                coefficients[j] = i->second;
+                j++;
+        }
+}
+
+template <class T> Polynom<T>::Polynom(int o, double e, vector<string> vs, int* exps, T* coeffs, int nb_terms) {
+        order = o;
+        eps = e;
+        vars = vs;
+        sort(vars.begin(), vars.end());
+        vector<int> exp(vars.size(), 0);
+        for (int i = 0; i < nb_terms; i ++){
+          for (int k = 0; k < vars.size(); k ++)
+            exp[k] = exps[i + k * nb_terms];
+          terms[exp] = coeffs[i];
+        }
 }
 
 #endif
