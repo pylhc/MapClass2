@@ -6,7 +6,7 @@ from transport import *
 import mapclass
 from pytpsa import polmap
 import math, re
-from integration import simpson
+from integration import simpson, F
 
 
 #########################
@@ -372,7 +372,7 @@ class twiss2(dct):
     return dct([('ChromX', -simpson(fX, s0, s, n) / (4 * math.pi)),
                 ('ChromY', -simpson(fY, s0, s, n) / (4 * math.pi))])
 
-  def oide(self, emi=2e-8, gamma=2.9354207436399e-6, betas=None, n=100):
+  def oide(self, emi=2e-8, gamma=2.9354207436399e6, betas=None, n=100):
     """
     Returns delta(sigma^2) due to Oide Effect
 
@@ -400,19 +400,10 @@ class twiss2(dct):
         Kq = abs(e.K1L / e.L)
         break
 
-    c = math.sqrt(Kq) * ls
-    b = math.sqrt(Kq) * Lq
+    a = math.sqrt(Kq) * Lq
+    b = math.sqrt(Kq) * ls
 
-    # Define functions for integration
-    def f(x):
-      return math.sin(x) + c * math.cos(x)
-
-    def g(y):
-      return (abs(math.sin(y) + c * math.cos(y))**3) * simpson(f, 0, y, n)**2
-
-    integral = simpson(g, 0, b, n)
-
-    return coeff * integral * (emi / (betas * gamma))**2.5
+    return coeff * F(a,b) * (emi / (betas * gamma))**2.5
 
   def getH(self, nE, s):
     """
