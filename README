@@ -1,4 +1,10 @@
-- Python 2.6 or higher is required (not tested with Python 3.X)
-- Python 2.6 for running on lxplus
-- numpy library must be installed or add it to the 'libs' folder
-- boost library for running on lxplus can be found in the libs folder or it can be installed when running on local machine
+-------------------------------------------------------------------------------
+SOFTWARE REQUIREMENTS
++ Python 2.6 or higher is required (not tested with Python 3.X)
+   +  numpy library must be installed or add it to the 'libs' folder
++ gcc 4.4.3 or higher
+-------------------------------------------------------------------------------
+PROVIDED LIBRARIES
++ boost library for running on lxplus can be found in the libs folder or it can
+      be installed when running on local machine
+
