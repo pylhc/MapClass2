@@ -43,6 +43,8 @@ class twiss2(dct):
 
       elif "@ " in line and "s" in splt[2]:
         label = splt[1].strip(":")
+        if label == "NAME": # recovering from bug: NAME has two uses
+          label = "TNAME"   # tableNAME and elementNAME!
         self[label] = splt[3].strip('"')
         self.types_parameters[label] = "%s"
 
