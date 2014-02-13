@@ -1,39 +1,69 @@
 -------------------------------------------------------------------------------
 MAPCLASS2----------------------------------------------------------------------
 -------------------------------------------------------------------------------
-This is the MAPCLASS2 with C++ libraries README file. It contains a brief expl-
-nation, content  and use instruction.
+This is the MAPCLASS2 README file.
+It contains a brief explanation, content and use instructions.
 -------------------------------------------------------------------------------
 DESCRIPTION
 A code to aid the optimisation of lattice design.
-See bibliography section.
+MAPCLASS2 uses transfer map either
+ + read from fort.18 PTC module in MAD-X or 
+ + generated from twiss MAD-X
+to do several lattice computations, the most relevant up to now is the
+second order moment (beamsize) from the transfer map and a given input beam.
+See bibliography section, item [1] for a conceptual review.
+See bibliography section, item [2] for use and detailed python code
+                                         explanations.
+See bibliography section, item [3] for C++ and CUDA libraries.
+See bibliography section, item [4] for radiation and Oide effect.
+See bibliography section, item [5] B Appendix for fort.18 file details.
+See bibliography section, item [6] for MAD-X in general
+See bibliography section, item [7] for initial MAPCLASS code.
+
 
 -------------------------------------------------------------------------------
 INSTALL INSTRUCTIONS
-From a terminal, move to desired installation directory, then do:
-$ git clone https://github.com/pylhc/MapClass2.git
-Move to the MapClass2 created folder and do:
-$ git submodule init
-$ git submodule update
+Two options are available:
+    C++ libraries (recommended)
+    CUDA libraries (some build must be done in the working machine)
 
-Python variables need to be modified in order to run it. In Linux systems there
-are three ways:
+1. From a terminal, move to desired installation directory, then do:
+  $ git clone https://github.com/pylhc/MapClass2.git
+2. Move to the MapClass2 created folder and do:
+  $ git submodule init
+  $ git submodule update
+
+3. Python variables need to be modified in order to load libraries and run it.
+In Linux systems there are three ways (in all cases see below WARNING):
 + by adding ~/.bashrc file
-    export LD_LIBRARY_PATH=
-    	   $LD_LIBRARY_PATH:path_to_libs_boost_1_53_0_libboost_python.so.1.53.0
-    export PYTHONPATH=
+        export LD_LIBRARY_PATH=
+    	   $LD_LIBRARY_PATH:path_to_libs_boost_1_53_0_libboost_python.so.1.53.0      
+        export PYTHONPATH=
     	   $PYTHONPATH:path_to_MapClass:path_to_mapbeamline.so
-+ by loading it in the user Python script, for example
-    cdll.LoadLibrary("path/to/libs/boost_1_53_0/libboost_python.so.1.53.0")
++ by loading them in the user Python script, for example
+      cdll.LoadLibrary("path/to/libs/boost_1_53_0/libboost_python.so.1.53.0")
+    and equivalent for the mapbeamline.so
 + by copying the .so files to the working directory
+    libboost_python.so.1.53.0
+    mapbeamline.so
+WARNING: Choose one of these options
+  IF USING C++ LIBRARIES (recommended), use "C++MapConstruction" dir 
+  IF USING CUDA LIBRARIES (it must be build), use "CUDAMapConstruction" dir
 
+NOTE:
 To update, move to MapClass2 folder:
 $ git pull
+To recover in an accidental file remove or modification
+$ git reset --hard
 -------------------------------------------------------------------------------
 SOFTWARE REQUIREMENTS
 + Python 2.6 or higher is required (not tested with Python 3.X)
    +  numpy library must be installed or add it to the 'libs' folder
 + gcc 4.4.3 or higher
+    if working on the afs cern system and gcc is lower than 4.4.3, then do
+      $ source /afs/cern.ch/sw/lcg/external/gcc/4.4/x86_64-slc5/setup.sh
+(OPTIONAL)
++ CUDA libraries
 -------------------------------------------------------------------------------
 PROVIDED LIBRARIES
 + boost library for running on lxplus cern server can be found in the libs
@@ -60,7 +90,16 @@ INPUT FILES
          ANGLE,K1L, K2L, K3L, K4L
   WARNING: All elements should be referenced to its exit side.
 + fort.18 files from MAD-X PTC
-  From the PTC module in MAD-X
+  Check the PTC module docs in MAD-X as it is very powerful. Here is a common
+    MAD-X coding example to generate fort.18 file.
+      !!! MAD-X Code
+      !###PTC  To procude fort.18
+        ptc_create_universe;
+        ptc_create_layout,model=2,method=6,nst=10;
+        ptc_normal,icase=5,no=8,deltap=0.00;
+        ptc_end; 
+      !!! End MAD-X Code
+
 -------------------------------------------------------------------------------
 EXAMPLES
 Some examples of use can be found in ./doc/FFSexample
@@ -69,51 +108,53 @@ Some examples of use can be found in ./doc/FFSexample
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 QUICK Q/A
-+ How to load a twiss file?
-    In a python script or shell:
-  import metaclass2
-  tw = metaclass2.twiss2("twissfilename")
-+ How to check what was loaded?
-  len(tw.elems)
-    it tells you how many elements were loaded
-  tw.elems[0]
-    it is the first loaded element. Writing this in a python shell will print 
-    all its info. In general, it uses the same twiss file column names except
-    for TNAME which is TableNAME=TWISS (TNAME does not exists in MAD-X).
-  tw.elems[0].KEYWORD
-    Keyword used in MAD-X for this element
-  tw.elems[0].BETX
-    it is the betax twiss value at the EXIT of the element
-    WARNING!!!: it is always the EXIT, twiss file should be generated accord-
-    ingly.
-+ How to get betas at any point?
-  tw.getBeta(#,0)
-    where # is the element number and 0 is position in the element. Here s=0
-    refers to ENTRANCE side.
-    To get betas at the output you could use:
-      tw.elems[#].BETX (faster option)
-      tw.getBeta(#,tw.elems[#].L)
-+ How to get phase at any point?
-  tw.getPhase(#,0)
-    exactly the same as in getBeta()
-+ How do I load a map?
-  Create a Map2 from either a fort.18 or a twiss file.
-  import mapclass
-  mf = mapclass.Map2(#,"fort.18")
-  mt = mapclass.Map2(tw,#)
-+ How to calculate the beamsize
-  Using a map m
-  m.sigma('y',[sx,spx,sy,spy,dpp,t])
-  m.offset('y',[sx,spx,sy,spy,dpp,t])
-  beamsize=m.sigma - m.offset**2
-  WARNING: m.sigma returns squared value
-+ How to calculate oide effect?
-  tw.oide(emitn,gamm)
-    where emitn is normalized emittance, gamma is the relativistic factor. 
-    Check the function declaration, it has other parameters, this is a 
-    minimum implementation
+++++ Using twiss files
+  + How to load a twiss file?
+      In a python script or shell:
+    import metaclass2
+    tw = metaclass2.twiss2("twissfilename")
+  + How to check what was loaded?
+    len(tw.elems)
+      it tells you how many elements were loaded
+    tw.elems[0]
+      it is the first loaded element. Writing this in a python shell will print 
+      all its info. In general, it uses the same twiss file column names except
+      for TNAME which is TableNAME=TWISS (TNAME does not exists in MAD-X).
+    tw.elems[0].KEYWORD
+      Keyword used in MAD-X for this element
+    tw.elems[0].BETX
+      it is the betax twiss value at the EXIT of the element
+      WARNING!!!: it is always the EXIT, twiss file should be generated accord-
+      ingly.
+  + How to get betas at any point?
+    tw.getBeta(#,0)
+      where # is the element number and 0 is position in the element. Here s=0
+      refers to ENTRANCE side.
+      To get betas at the output you could use:
+        tw.elems[#].BETX (faster option)
+        tw.getBeta(#,tw.elems[#].L)
+  + How to get phase at any point?
+    tw.getPhase(#,0)
+      exactly the same as in getBeta()
+++++ Using fort.18 files or twiss files
+  + How do I load a map?
+    Create a Map2 from either a fort.18 or a twiss file.
+    import mapclass
+    mf = mapclass.Map2(#,"fort.18")
+    mt = mapclass.Map2(tw,#)
+  + How to calculate the beamsize
+    Using a map m
+    m.sigma('y',[sx,spx,sy,spy,dpp,t])
+    m.offset('y',[sx,spx,sy,spy,dpp,t])
+    beamsize=m.sigma - m.offset**2
+      WARNING: m.sigma returns squared value already!
+  + How to calculate oide effect?
+    tw.oide(emitn,gamm)
+      where emitn is normalized emittance, gamma is the relativistic factor. 
+      Check the function declaration, it has other parameters, this is a 
+      minimum implementation
 -------------------------------------------------------------------------------
-TROUBLESHOOTING
+SIMPLE TROUBLESHOOTING
 
 + ERROR
 Traceback (most recent call last):
@@ -129,11 +170,11 @@ Traceback (most recent call last):
   File ".../MapClass2/mapclass.py", line 219, in sigma
     for ind1, coeff1 in self[xory].iteritems():
 KeyError: 'x'
-ANSWER: Missing argument, correct call is
+ANSWER: Missing argument, correct call example is
   mw=mapclass.Map2(1,"fort.18")
 
 + ERROR
-print math.sqrt(mw.sigma(xory='x',sig=sigmaFFS)
+print math.sqrt(mw.sigma(xory='x',sig=sigmaFFS))
 Traceback (most recent call last):
 TypeError: can't convert complex to float
 ANSWER:  When using twiss objects in mapclass, retuned values are complex.
@@ -148,10 +189,31 @@ ANSWER: all is OK, this is an info message
 BIBLIOGRAPHY-------------------------------------------------------------------
 -------------------------------------------------------------------------------
 [1] R. Tomas. Nonlinear optimization of beams lines. PRST - AB 9,081001 (2006).
-
+[2] Martinez, David et al. MAPCLASS2: a code to aid the optimization of 
+      lattice design. CERN-ATS-Note-2012-087 TECH. Nov 01, 2012.
+[3] Diana Andreea Popescu. Parallel Computing Methods for Particle Accelerator
+      Design. Master Thesis. Ecole Polytechnique Federale de Lausanne, CERN.
+      July, 2013.
+[4] O.R. Blanco et al. CLIC 3TeV Beam Size Optimization with Radiation Effects.
+      Proceedings of IPAC2013, Shanghai, China. TUPW0003.
+[5] E. FOREST et al. Introduction to Polymorphic Tracking Code. Fibre Bundles,
+      Polymorphic Taylor Types and "Exact Tracking". Geneva, Switzerland.
+      July 24, 2002.
+      CERN-SL-2002-044 (AP).
+      KEK-Report 2002-3.
+[6] MAD-X. http://mad.web.cern.ch/mad/
+[7] R. Tomas. MAPCLASS: a code to optimize high order aberrations.
+      CERN-AB-Note-2006-017. Jan 15, 2007.
 
 -------------------------------------------------------------------------------
 LICENCE------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 Code was originally written by R. Tomas (CERN)
+
+
+
+-------------------------------------------------------------------------------
+CONTACT/COMMENTS/QUESTIONS-----------------------------------------------------
+-------------------------------------------------------------------------------
+O. BLANCO oscar.roberto.blanco.garcia@cern.ch
 
