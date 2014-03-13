@@ -191,6 +191,20 @@ class Map2(polmap, dct):
           sx += coeff * factor * exp(Gammasumln) * sigmaprod
     return sx
 
+  def rstmmt(self, xory, sig, gaussianDelta=False):
+    '''
+    Calculate the beam offset
+
+    :param string xory: Which dimension to calculate for (x,y,px, or py)
+    :param list sig: Initial size of beam (sigma) for [x,px,y,py,d,s]
+    :param boolean gaussianDelta: Use gaussian energy delta or not
+
+    :return: the offset in the desired dimension
+
+    Calling offset for backwards compatibility
+    '''
+    return self.offset(xory=xory, sig=sig, gaussianDelta=gaussianDelta)
+
   def sigma(self, xory, sig, gaussianDelta=False):
     '''
     Calculate the beam size in sigma.
@@ -216,6 +230,20 @@ class Map2(polmap, dct):
               factor = countfactor * self.__factor(ind, gaussianDelta)
               sx += coeff1 * coeff2 * factor * exp(Gammasumln) * sigmaprod
     return sx
+
+  def sndmmt(self, xory, sig, gaussianDelta=False):
+    '''
+    Calculate the beam size in sigma.
+
+    :param string xory: Which coordinate to calculate for (x,y,px, or py)
+    :param list sig: Initial size of beam (sigma) for [x,px,y,py,d,s]
+    :param boolean gaussianDelta: Use gaussian energy delta or not
+
+    :return: sigma for xory dimension
+
+    Calling sigma for backwards compatibility
+    '''
+    return self.sigma(xory=xory, sig=sig, gaussianDelta=gaussianDelta)
 
   def comp(self, m, v=None):
     '''
