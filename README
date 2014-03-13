@@ -34,7 +34,7 @@ Two options are available:
   $ git submodule update
 
 3. Python variables need to be modified in order to load libraries and run it.
-In Linux systems there are three ways (in all cases see below WARNING):
+In Linux systems there are three ways (in all cases see below NOTE):
 + by adding ~/.bashrc file
         export LD_LIBRARY_PATH=
     	   $LD_LIBRARY_PATH:path_to_libs_boost_1_53_0_libboost_python.so.1.53.0      
@@ -46,11 +46,11 @@ In Linux systems there are three ways (in all cases see below WARNING):
 + by copying the .so files to the working directory
     libboost_python.so.1.53.0
     mapbeamline.so
-WARNING: Choose one of these options
+NOTE: Choose one of these options
   IF USING C++ LIBRARIES (recommended), use "C++MapConstruction" dir 
   IF USING CUDA LIBRARIES (it must be build), use "CUDAMapConstruction" dir
 
-NOTE:
+COMMENTS:
 To update, move to MapClass2 folder:
 $ git pull
 To recover in an accidental file remove or modification
@@ -136,6 +136,13 @@ QUICK Q/A
   + How to get phase at any point?
     tw.getPhase(#,0)
       exactly the same as in getBeta()
+  + How do I get the horizontal polynomial expression?
+        print mymap.x   ### prints all the polynoms in x
+      It can be used with either x,px,y,py,d,s.
+  + How do I check an specific component on the map?
+        print mymap.x[0,0,0,0,1] # 5 dim map, prints the hor. dependence on d
+        print mymap.y[0,0,0,1,2] # 5 dim map, prints the  ver. dep. on py*d**2 
+      if the map is 6 dimensional, then, it needs 6 indexes
 ++++ Using fort.18 files or twiss files
   + How do I load a map?
     Create a Map2 from either a fort.18 or a twiss file.
