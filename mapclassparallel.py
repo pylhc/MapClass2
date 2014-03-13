@@ -181,7 +181,10 @@ class Map2(polmap, dct):
         xory = XYZD[2]
     for ind, coeff in self[xory].iteritems():
       if all(n % 2 == 0 for n in ind):
-        sigmaprod = self.__sigma(ind, sig, gaussianDelta, dv=2)
+        ### ??? Possible BUG. Why divided by 2
+        #sigmaprod = self.__sigma(ind, sig, gaussianDelta, dv=2)
+        ### Set to dv=1 to test
+        sigmaprod = self.__sigma(ind, sig, gaussianDelta, dv=1)
         if sigmaprod > 0:
           Gammasumln = self.__gamma(ind, gaussianDelta)
           factor = self.__factor(ind, gaussianDelta)
