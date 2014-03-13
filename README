@@ -11,6 +11,9 @@ MAPCLASS2 uses transfer map either
  + generated from twiss MAD-X
 to do several lattice computations, the most relevant up to now is the
 second order moment (beamsize) from the transfer map and a given input beam.
+Beam is assumed gaussian in x,y and s. 
+Beam energy spread distribution could be chosen to be gaussian or uniform.
+
 See bibliography section, item [1] for a conceptual review.
 See bibliography section, item [2] for use and detailed python code
                                          explanations.
@@ -154,6 +157,10 @@ QUICK Q/A
     m.sigma('y',[sx,spx,sy,spy,dpp,t])
     m.offset('y',[sx,spx,sy,spy,dpp,t])
     beamsize=m.sigma - m.offset**2
+      NOTE:
+        sx,spx,sy,spy and t are one sigma of the gaussian distribution
+        dpp: either one sigma of the gaussian distribution
+             or total width of uniform centered energy spread distribution
       WARNING: m.sigma returns squared value already!
   + How to calculate oide effect?
     tw.oide(emitn,gamm)
