@@ -95,6 +95,24 @@ class twiss2(dct):
   def setAchromat(self, nE):
     self.elems[nE].ACHROMAT = "T" 
 
+  def matrixnE(self,nE,s):
+    # Copy element nE and change length to location of interest, s                                                                                    
+    # Calculate transport matrix for this element assuming D=0                                                                                        
+    # If nE is not DRIFT, QUADRUPOLE or DIPOLE, change element to                                                                                     
+    # DRIFT and recalculate transport matrix                                                                                                          
+    if s == 0: return 0
+    e = dct(self.elems[nE])
+    if e.L != 0:
+      e.K1L = (e.K1L / e.L) * s
+      e.ANGLE = (e.ANGLE / e.L) * s
+    e.L = s
+    eTransport = matrixForElement(e, 6)  # NOTE: Takes order 6                                                                                        
+    if eTransport == None:
+      e.KEYWORD ="DRIFT"
+      eTransport = matrixForElement(e, 6)
+    eTransport = eTransport(d=0)
+    return eTransport
+
   def getBeta(self, nE, s):
     """
     Calculates beta, alpha, gamma at location s in element nE.
@@ -175,6 +193,117 @@ class twiss2(dct):
                 ('ALFY', para[1].item(1)),
                 ('GAMY', para[1].item(2))])
 
+
+  def getBeta2(self, nE, s, matrixnE):
+    """
+    Calculates beta, alpha, gamma at location s in element nE.
+
+    :param int nE: number of element of interest - where the first element is 0
+    :param float s: location of interest within element nE
+
+    :return: dct of BETX, BETY, ALFX, ALFY, GAMX and GAMY
+    """
+
+    # Gets initial beta, alpha, gamma from previous element or start
+    # marker (if nE=0)
+    if nE != 0:
+      prevE = self.elems[nE-1]
+    else:
+      prevE = self.markers[0]
+
+    betX0 = prevE.BETX
+    alfX0 = prevE.ALFX
+    gamX0 = (1 + alfX0*alfX0) / betX0
+
+    betY0 = prevE.BETY
+    alfY0 = prevE.ALFY
+    gamY0 = (1 + alfY0*alfY0) / betY0
+
+    if s == 0:
+      return  dct([('BETX', betX0),
+                   ('ALFX', alfX0),
+                   ('GAMX', gamX0),
+                   ('BETY', betY0),
+                   ('ALFY', alfY0),
+                   ('GAMY', gamY0)])
+
+    paraX0 = mtrx([[betX0],
+                   [alfX0],
+                   [gamX0]])
+
+    paraY0 = mtrx([[betY0],
+                   [alfY0],
+                   [gamY0]])
+
+    paraInitial = [paraX0, paraY0]
+
+    eTransport = matrixnE
+
+    # Extract required elements from transport matrix to form transform matrix
+    # i=0 for x-direction; i=1 for y-direction
+    # a=C, b=S, c=C', d=S' according to standard notation
+    para = []
+    for i in [0, 1]:
+      j = 2 * i
+      a = eTransport.item((j, j))
+      b = eTransport.item((j, j+1))
+      c = eTransport.item((j+1, j))
+      d = eTransport.item((j+1, j+1))
+      twissTransform = mtrx([[a**2, -2*a*b, b**2],
+                             [-a*c, b*c + a*d, -b*d],
+                             [c**2, -2*c*d, d**2]])
+      para.append(twissTransform*paraInitial[i])  # Calculate final values
+
+    return dct([('BETX', para[0].item(0)),
+                ('ALFX', para[0].item(1)),
+                ('GAMX', para[0].item(2)),
+                ('BETY', para[1].item(0)),
+                ('ALFY', para[1].item(1)),
+                ('GAMY', para[1].item(2))])    
+              
+  def getDisp2(self, nE, s, matrixnE):
+    """
+    Calculates dispersion at location s in element nE.
+
+    :param int nE: number of element of interest
+    :param float s: location of interest within element nE
+
+    :return: dct of DX, DPX, DY and DPY
+    """
+
+    # Get initial dispersion values DX, DPX, DY, DPY from previous
+    # element or start marker (if nE=0)
+    if nE != 0:
+      prevE = self.elems[nE-1]
+    else:
+      prevE = self.markers[0]
+
+    if s == 0:
+      return  dct([('DX', prevE.DX),
+                   ('DPX', prevE.DPX),
+                   ('DY', prevE.DY),
+                   ('DPY', prevE.DPY)])
+
+    # Set up initial "dispersion vector" such that multiplication by
+    # transport matrix gives final dispersion function
+    disp0 = mtrx([[prevE.DX],
+                  [prevE.DPX],
+                  [prevE.DY],
+                  [prevE.DPY],
+                  [1],
+                  [0]])
+
+    m = matrixnE
+
+    # Calculate final values
+    disp = m * disp0
+
+    return dct([('DX', disp.item(0)),
+                ('DPX', disp.item(1)),
+                ('DY', disp.item(2)),
+                ('DPY', disp.item(3))])
+  
+
   def getDisp(self, nE, s):
     """
     Calculates dispersion at location s in element nE.
@@ -229,6 +358,51 @@ class twiss2(dct):
                 ('DPX', disp.item(1)),
                 ('DY', disp.item(2)),
                 ('DPY', disp.item(3))])
+
+  def getPhase2(self,nE,s,matrixnE):
+    """
+    Calculates phase at location s in element nE.
+
+    :param int nE: number of element of interest - where the first element is 0
+    :param float s: location of interest within element nE
+
+    :return: dct of MUX and MUY
+    """
+
+    # Get initial phase values MUX and MUY from previous element
+    # or start marker (if nE=0)
+    if nE != 0:
+      prevE = self.elems[nE-1]
+    else:
+      prevE = self.markers[0]
+
+    if s == 0:
+      return  dct([('MUX', prevE.MUX),
+                   ('MUY', prevE.MUY)])
+
+    para = self.getBeta(nE,s)
+
+    m = matrixnE
+
+    # Calculate cos(delta Phi) and sin(delta Phi) in x and y planes
+    xy = m.item((0,1)) / math.sqrt(prevE.BETX * para.BETX)
+    xx = (math.sqrt(prevE.BETX) * m.item((0,0)) / math.sqrt(para.BETX)) - (prevE.ALFX * xy)
+
+    yy = m.item((2,3)) / math.sqrt(prevE.BETY * para.BETY)
+    yx = (math.sqrt(prevE.BETY) * m.item((2,2)) / math.sqrt(para.BETY)) - (prevE.ALFY * yy)
+
+    thetaX = math.atan2(xy,xx)
+    thetaY = math.atan2(yy, yx)
+    if thetaX < 0:
+      thetaX =+ 2 * math.pi
+    if thetaY < 0:
+      thetaY =+ 2 * math.pi
+#    print  s, thetaX
+
+    return  dct([('MUX', thetaX / (2 * math.pi) + prevE.MUX),
+                 ('MUY', thetaY / (2 * math.pi) + prevE.MUY)])
+
+
 
   def getPhase(self,nE,s):
     """
@@ -525,6 +699,159 @@ class twiss2(dct):
           total += coeff * simpson(wrap(i), 0, e.L, n)
       if i == nELast: return total
 
+
+  def sigmaBends2a(self, E, s=None, s0=0, n=10):
+    """
+    Returns delta(sigma^2) due to bends (dipoles)
+
+    :param float E: energy
+    :param float s: location of interest along beamline (optional)
+    :param float s0: start location along beamline (optional)
+    :param int n: number of intervals for integrations (optional)
+    """
+
+
+    if s is None:
+      s = self.markers[1].S
+      nELast = len(self.elems)-1
+      endPhase = self.markers[1].MUX
+      ss = self.elems[-1].L
+#      print "aqui"
+    else:
+      nELast = self.findElem(s)
+      last = self.elems[nELast]
+      ss = s - (last.S - last.L)
+      endPhase = self.getPhase(nELast, ss).MUX
+
+    if s0 != 0:
+      nEFirst = self.findElem(s0)
+      first = self.elems[nEFirst]
+      ss0 = s0 - (first.S - first.L)
+      rangeElems = xrange(nEFirst, len(self.elems))
+    else:
+      nEFirst = self.findElem(s0)
+      first = self.elems[nEFirst]
+      ss0 = s0 - (first.S - first.L)
+      nEFirst = 0
+      rangeElems = xrange(len(self.elems))
+
+    # Calculates H*G^3 cos(phi)^2 at location s along the beamline
+    def wrap5(nE,betaxL,dx0,dpx0,dxL,dxpL,E):
+      def f(ss):
+        dE = 14.6e-6 * (e.ANGLE/e.L)**2 * ss*E**4
+        Energie = E# - dE
+        matnE = self.matrixnE(nE,ss)
+#        print matnE
+        para = self.getBeta2(nE,ss,matnE)
+        disp = self.getDisp2(nE,ss, matnE)
+        etax = disp.DX
+#        print ss,disp.DX, disp.DPX, dxL, dxpL, para.BETX, betaxL
+        etapx = disp.DPX
+        dphi = (endPhase - self.getPhase(nE,ss).MUX) * 2 * math.pi
+#        fact1 = math.sqrt(betaxL)/math.sqrt(para.BETX) * (etax * math.cos(dphi) + (para.ALFX * etax + para.BETX * etapx)*math.sin(dphi)) - (math.cos(e.ANGLE)*dx0 + e.L/e.ANGLE*math.sin(e.ANGLE)*dpx0)
+        fact1 = math.sqrt(betaxL)/math.sqrt(para.BETX) * (etax * math.cos(dphi) + (para.ALFX * etax + para.BETX * etapx)*math.sin(dphi)) - (dxL)
+        fact2 = fact1 * fact1
+        P = abs(e.L / e.ANGLE)
+        return Energie**5*fact2/(P*P*P)
+      return f
+    
+    c2 = 4.13e-11  # m^2(GeV)^-5
+    coeff = c2 
+    total = 0
+
+    for i in rangeElems:
+      e = self.elems[i]
+      if e.KEYWORD == 'SBEND' and e.ANGLE!=0:
+        if i == nEFirst:
+#         print self.markers[0].DX,self.markers[0].DPX
+          total += coeff * simpson(wrap5(i,self.markers[1].BETX,self.markers[0].DX, self.markers[0].DPX, self.markers[1].DX, self.markers[1].DPX, E),ss0, e.L, n)
+#          print "este"
+        elif i == nELast:
+          total += coeff * simpson(wrap5(i,self.markers[1].BETX,self.markers[0].DX, self.markers[0].DPX, self.markers[1].DX, self.markers[1].DPX, E), self.mar0, ss, n)
+#          print "oeste"
+        else:
+          total += coeff * simpson(wrap5(i,self.markers[1].BETX,self.markers[0].DX, self.markers[0].DPX, self.markers[1].DX, self.markers[1].DPX, E), 0, e.L, n)
+#          print "norte"
+      if i == nELast: return total
+
+
+  def sigmaBends2b(self, E, s=None, s0=0, n=10):
+    """
+    Returns delta(sigma^2) due to bends (dipoles)
+
+    :param float E: energy
+    :param float s: location of interest along beamline (optional)
+    :param float s0: start location along beamline (optional)
+    :param int n: number of intervals for integrations (optional)
+    """
+
+
+    if s is None:
+      s = self.markers[1].S
+      nELast = len(self.elems)-1
+      endPhase = self.markers[1].MUX
+      ss = self.elems[-1].L
+    else:
+      nELast = self.findElem(s)
+      last = self.elems[nELast]
+      ss = s - (last.S - last.L)
+      endPhase = self.getPhase(nELast, ss).MUX
+
+    if s0 != 0:
+      nEFirst = self.findElem(s0)
+      first = self.elems[nEFirst]
+      ss0 = s0 - (first.S - first.L)
+      rangeElems = xrange(nEFirst, len(self.elems))
+    else:
+      nEFirst = self.findElem(s0)
+      first = self.elems[nEFirst]
+      ss0 = s0 - (first.S - first.L)
+      nEFirst = 0
+      rangeElems = xrange(len(self.elems))
+
+    # Calculates H*G^3 cos(phi)^2 at location s along the beamline
+    def wrap5(nE,betaxL,dx0,dpx0,dxL,dxpL,E):
+      def f(ss):
+        dE = 14.6e-6 * (e.ANGLE/e.L)**2 * ss*E**4
+        Energie = E - dE
+        matnE = self.matrixnE(nE,ss)
+        para = self.getBeta2(nE,ss,matnE)
+        disp = self.getDisp2(nE,ss, matnE)
+        etax = disp.DX
+        etapx = disp.DPX
+        dphi = (endPhase - self.getPhase(nE,ss).MUX) * 2 * math.pi
+        dphiT = abs(self.getPhase(nE,e.L).MUX - self.getPhase(nE,0).MUX) * 2 * math.pi
+#        print dphiT
+#        fact1 = math.sqrt(betaxL)/math.sqrt(para.BETX) * (etax * math.cos(dphi) + (para.ALFX * etax + para.BETX * etapx)*math.sin(dphi)) - (math.cos(e.ANGLE)*dx0 + e.L/e.ANGLE*math.sin(e.ANGLE)*dpx0)
+        fact1 = (math.sqrt(betaxL)/math.sqrt(para.BETX) * (etax * math.cos(dphi) + (para.ALFX * etax + para.BETX * etapx)*math.sin(dphi)) - (dxL)) * (1-1/dphiT)
+        fact2 = fact1 * fact1
+        P = abs(e.L / e.ANGLE)
+        return Energie**5*fact2/(P*P*P)
+      return f
+
+    coeff = 4.13e-11  # m^2(GeV)^-5
+    coeff2 = 2.0/3*2.8179403267e-15/((0.510998928e-3)**3)
+#    coeff3 = 5*math.sqrt(3)*2.8179403267e-15/(6*197.326963e-18*299792458)
+    total = 0
+    total2 =0
+    total3=0
+
+    for i in rangeElems:
+      e = self.elems[i]
+      if e.KEYWORD == 'SBEND':
+        if i == nEFirst:
+          total += coeff * simpson(wrap5(i,self.markers[1].BETX,self.markers[0].DX, self.markers[0].DPX, self.markers[1].DX, self.markers[1].DPX, E),ss0, e.L, n)
+        elif i == nELast:
+          total += coeff * simpson(wrap5(i,self.markers[1].BETX,self.markers[0].DX, self.markers[0].DPX, self.markers[1].DX, self.markers[1].DPX, E), self.mar0, ss, n)
+        else:
+          total += coeff * simpson(wrap5(i,self.markers[1].BETX,self.markers[0].DX, self.markers[0].DPX, self.markers[1].DX, self.markers[1].DPX, E), 0, e.L, n) 
+      if i == nELast:
+        return total
+
+
+
+
+
   # Temporal definition
   def sigmaBendsI5(self, E):
     '''
@@ -701,6 +1028,7 @@ def matrixForElement(e, order):
       r = DI(order=order, **e)
     return r
   except Exception as e:
+    print "Here?",e
     print "The Twiss object doesn't have the desired structure"
     print e
     exit()
