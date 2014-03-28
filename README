@@ -170,6 +170,10 @@ QUICK Q/A
       where emitn is normalized emittance, gamma is the relativistic factor. 
       Check the function declaration, it has other parameters, this is a 
       minimum implementation
+  + How to calculate beam size contribution due to radiation in bending
+      magnets?
+        tw.sigmaBends2a(E=theenergy)
+      NOTE: it returns the squared value.
 -------------------------------------------------------------------------------
 SIMPLE TROUBLESHOOTING
 
