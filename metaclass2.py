@@ -739,7 +739,7 @@ class twiss2(dct):
     def wrap5(nE,betaxL,dx0,dpx0,dxL,dxpL,E):
       def f(ss):
         dE = 14.6e-6 * (e.ANGLE/e.L)**2 * ss*E**4
-        Energie = E# - dE
+        Energie = E - dE
         matnE = self.matrixnE(nE,ss)
 #        print matnE
         para = self.getBeta2(nE,ss,matnE)
