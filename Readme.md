@@ -139,14 +139,8 @@ QUICK Q/A
       tw = metaclass2.twiss2("twissfilename")
 ```
   + How to check what was loaded?
-```
-      len(tw.elems)
-```
-    tells you how many elements were loaded, while
-```
-      tw.elems[0]
-```
-    it is the first loaded element. Writing this in a python shell will print 
+    `len(tw.elems)` tells you how many elements were loaded, while
+    `tw.elems[0]` is the first loaded element. Writing this in a python shell will print 
     all its info. In general, it uses the same twiss file column names except
     for TNAME which is TableNAME=TWISS (TNAME does not exists in MAD-X).
 ```
