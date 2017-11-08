@@ -63,11 +63,11 @@ and equivalent for the mapbeamline.so
     libboost_python.so.1.53.0
     mapbeamline.so
 ```
-### NOTE: 
+#### NOTE: 
 *  If you choose C++ LIBRARIES (recommended), use the "C++MapConstruction" dir 
 *  If you choose CUDA LIBRARIES (it must be build), use the "CUDAMapConstruction" dir
 
-### COMMENTS:
+#### COMMENTS: for the new users of git
 To update, move to MapClass2 folder:
 ```bash
 $ git pull
@@ -130,8 +130,9 @@ Some examples of use can be found in ./doc/FFSexample
 
 QUICK Q/A
 ---------
-++++ Using twiss files
+### Using twiss files
   + How to load a twiss file?
+
     In a python script or shell:
       import metaclass2
       tw = metaclass2.twiss2("twissfilename")
@@ -165,7 +166,7 @@ QUICK Q/A
       print mymap.x[0,0,0,0,1] # 5 dim map, prints the hor. dependence on d
       print mymap.y[0,0,0,1,2] # 5 dim map, prints the  ver. dep. on py*d**2 
     if the map is 6 dimensional, then, it needs 6 indexes
-++++ Using fort.18 files or twiss files
+### Using fort.18 files or twiss files
   + How do I load a map?
     Create a Map2 from either a fort.18 or a twiss file.
       import mapclass
