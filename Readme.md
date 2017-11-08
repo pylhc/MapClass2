@@ -109,7 +109,7 @@ calculations.
 ```
 NAME, KEYWORD, S, L, BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DPX, DY, DPY, ANGLE, K1L, K2L, K3L, K4L
 ```
-#### WARNING: All elements should be referenced to its exit side.
+***WARNING: Some functions assume elements referenced to its exit side.***
 + fort.18 files from MAD-X PTC
 
   Check the PTC module docs in MAD-X as it is very powerful. Here is a common MAD-X coding example to generate fort.18 file.
@@ -178,42 +178,53 @@ QUICK Q/A
     if the map is 6 dimensional, then, it needs 6 indexes
 ### Using fort.18 files or twiss files
   + How do I load a map?
+
     Create a Map2 from either a fort.18 or a twiss file.
+    ``` python
       import mapclass
       mf = mapclass.Map2(#,"fort.18")
       mt = mapclass.Map2(tw,#)
-    where tw is a twiss object created with metaclass2 module
+    ```
+    where `tw` is a twiss object created with metaclass2 module
   + How to calculate the beamsize
+
     Using a map m, either mf or mt (from a fort.18 is more precise)
+    ```
     m.sndmmt('y',[sx,spx,sy,spy,dpp,t])
     m.rstmmt('y',[sx,spx,sy,spy,dpp,t])
     beamsize = m.sndmmt - m.rstmmt**2
-      NOTE:
+    ```
+    #### NOTE:
         sx,spx,sy,spy and t are one sigma of the gaussian distribution
         dpp: either one sigma of the gaussian distribution
              or total width of uniform centered energy spread distribution
-      WARNING:
-        m.sigma returns squared value already!
-        m.sigma and m.offset are still valid for backwards compatibility
+    ####  WARNING:
+        `m.sigma` returns squared value already!
+        `m.sigma` and `m.offset` are still valid for backwards compatibility
   + How to calculate oide effect?
-    tw.oide(emitn,gamm)
+
+    `tw.oide(emitn,gamm)`
       where emitn is normalized emittance, gamma is the relativistic factor. 
       Check the function declaration, it has other parameters, this is a 
       minimum implementation
   + How to calculate beam size contribution due to radiation in bending
       magnets?
-        tw.sigmaBends2a(E=theenergy)
-      NOTE: it returns the squared value.
--------------------------------------------------------------------------------
-SIMPLE TROUBLESHOOTING
 
-+ ERROR
-Traceback (most recent call last):
-  File ".../MapClass2/mapclass.py", line 227, in sigma
-    sigmaprod = self.__sigma(ind, sig, gaussianDelta)
-  File ".../MapClass2/mapclass.py", line 392, in __sigma
-    qq = pow(i[5] / dv, ind[5])
-ANSWER: Only 5 elements in the passed sigmas list [sx,...], there must be six
+      `tw.sigmaBends2a(E=theenergy)`
+      #### NOTE: it returns the squared value.
+
+
+SIMPLE TROUBLESHOOTING
+----------------------
+### ERROR
+  + Traceback (most recent call last):
+    ```
+       File ".../MapClass2/mapclass.py", line 227, in sigma
+       sigmaprod = self.__sigma(ind, sig, gaussianDelta)
+       File ".../MapClass2/mapclass.py", line 392, in __sigma
+       qq = pow(i[5] / dv, ind[5])
+    ```
+    ***ANSWER:*** Only 5 elements in the passed sigmas list [sx,...], there must be six
 
 + ERROR
 mw=mapclass.Map2("fort.18")
