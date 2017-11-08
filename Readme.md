@@ -176,17 +176,17 @@ QUICK Q/A
     where `tw` is a twiss object created with metaclass2 module
   + How to calculate the beamsize
 
-    Using a map `m`, either `mf` or `mt` (from a fort.18 is more precise)
+    Using a map `m`, either `mf` or `mt` (the calculation from a fort.18 is generally more precise)
     ```python
       m.sndmmt('y',[sx,spx,sy,spy,dpp,t])
       m.rstmmt('y',[sx,spx,sy,spy,dpp,t])
       beamsize = m.sndmmt - m.rstmmt**2
     ```
-    #### NOTE:
+    ***NOTE:***
         sx,spx,sy,spy and t are one sigma of the gaussian distribution
         dpp: either one sigma of the gaussian distribution
              or total width of uniform centered energy spread distribution
-    ####  WARNING:
+    ***WARNING:***
         `m.sigma` returns squared value already!
         `m.sigma` and `m.offset` are still valid for backwards compatibility
   + How to calculate oide effect?
