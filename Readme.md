@@ -41,9 +41,10 @@ Two options are available:
   $ git clone https://github.com/pylhc/MapClass2.git
 ```
 2. Move to the MapClass2 created folder and do:
+```bash
   $ git submodule init
   $ git submodule update
-
+```
 3. Python variables need to be modified in order to load libraries and run it.
 In Linux systems there are three ways (in all cases see below NOTE):
 + by adding ~/.bashrc file
