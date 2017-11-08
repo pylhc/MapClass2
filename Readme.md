@@ -115,7 +115,7 @@ NAME, KEYWORD, S, L, BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DPX, DY, DPY, ANGLE, 
   Check the PTC module docs in MAD-X as it is very powerful. Here is a common MAD-X coding example to generate fort.18 file.
 ```
       !!! MAD-X Code
-      !###PTC  To procude fort.18
+      !PTC  To procude fort.18
         ptc_create_universe;
         ptc_create_layout,model=2,method=6,nst=10;
         ptc_normal,icase=5,no=8,deltap=0.00;
@@ -134,20 +134,30 @@ QUICK Q/A
   + How to load a twiss file?
 
     In a python script or shell:
+```
       import metaclass2
       tw = metaclass2.twiss2("twissfilename")
+```
   + How to check what was loaded?
+```
       len(tw.elems)
-    it tells you how many elements were loaded
+```
+    tells you how many elements were loaded, while
+```
       tw.elems[0]
+```
     it is the first loaded element. Writing this in a python shell will print 
     all its info. In general, it uses the same twiss file column names except
     for TNAME which is TableNAME=TWISS (TNAME does not exists in MAD-X).
+```
       tw.elems[0].KEYWORD
+```
     Keyword used in MAD-X for this element
+```
       tw.elems[0].BETX
+```
     it is the betax twiss value at the EXIT of the element
-    WARNING!!!: it is always the EXIT, twiss file should be generated accord-
+#### WARNING!!!: it is always the EXIT, twiss file should be generated accord-
     ingly.
   + How to get betas at any point?
       tw.getBeta(#,0)
