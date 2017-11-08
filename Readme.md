@@ -28,7 +28,7 @@ MAPCLASS2 uses a transfer map either
 
 to calculate the first and second order moments of a beam to any given map order. In addition, several map manipulations can be done.
 
-The beam is assumed gaussian in the x, px, y, py and t. The beam energy spread distribution could be chosen to be gaussian or uniform.
+The beam is assumed gaussian in x, px, y, py and t. The beam energy spread distribution could be chosen to be gaussian or uniform.
 
 
 INSTALL INSTRUCTIONS
@@ -57,8 +57,8 @@ In Linux systems there are three ways (in all cases see below NOTE):
 ```python
       cdll.LoadLibrary("path/to/libs/boost_1_53_0/libboost_python.so.1.53.0")
 ```
-and equivalent for the mapbeamline.so
-* by copying the .so files to the working directory
+and equivalent for the mapbeamline.so, and mapclass.py
+* by copying the .so files to the working directory and working inside the MAPCLASS2 dir
 ```
     libboost_python.so.1.53.0
     mapbeamline.so
@@ -104,18 +104,16 @@ now, a twiss or fort.18 file (from MAD-X 5.X.X) is required to perform beamsize
 calculations.
 
 ### INPUT FILES
-+ twiss files from MAD-X
-  Twiss file should be generated with at least the following columns:
++ twiss files from MAD-X Twiss should be generated with at least the following columns:
 ```
 NAME, KEYWORD, S, L, BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DPX, DY, DPY, ANGLE, K1L, K2L, K3L, K4L
 ```
-  ***WARNING: Some functions assume elements referenced to its exit side.***
+  ***WARNING: Some MAPCLASS2 functions assume elements referenced to its exit side.***
 + fort.18 files from MAD-X PTC
 
   Check the PTC module docs in MAD-X as it is very powerful. Here is a common MAD-X coding example to generate fort.18 file.
 ```
-      !!! MAD-X Code
-      !PTC  To procude fort.18
+      !!! MAD-X PTC Code to procude fort.18
         ptc_create_universe;
         ptc_create_layout,model=2,method=6,nst=10;
         ptc_normal,icase=5,no=8,deltap=0.00;
@@ -162,7 +160,7 @@ QUICK Q/A
 ```
   + How to get the phase advance at any point?
 
-    e.g. `tw.getPhase(#,0)`
+    e.g. `tw.getPhase(1,0)`
     exactly the same as in `getBeta()`
 ### Using fort.18 files or twiss files
   + How do I load a map?
@@ -170,13 +168,15 @@ QUICK Q/A
     Create a Map2 from either a fort.18 or a twiss file.
     ``` python
       import mapclass
-      mf = mapclass.Map2(#,"fort.18")
-      mt = mapclass.Map2(tw,#)
+      mf = mapclass.Map2(4,"fort.18")
+      mt = mapclass.Map2(tw,4)
     ```
-    where `tw` is a twiss object created with metaclass2 module
+    where `tw` is a twiss object created with metaclass2 module and `4` is the map order. MAPCLASS2 
+    do not check the map order inside the fort.18 file, therefore, the map requested with `MaP2` should be of the
+    same order or smaller.
   + How to calculate the beamsize
 
-    Using a map `m`, either `mf` or `mt` (the calculation from a fort.18 is generally more precise)
+    Using a map `m`, from either a twiss or a fort.18 file (the calculation from a fort.18 is generally more precise)
     ```python
       import math
       rms=m.sndmmt('y',[sx,spx,sy,spy,dpp,t])
@@ -236,7 +236,7 @@ SIMPLE TROUBLESHOOTING
     for ind1, coeff1 in self[xory].iteritems():
     KeyError: 'x'
     ```
-    ***ANSWER:*** Missing argument, correct call example is
+    ***ANSWER:*** Missing argument. A correct call example is
     ` mw=mapclass.Map2(1,"fort.18")`
 
 + 
@@ -246,6 +246,7 @@ SIMPLE TROUBLESHOOTING
     TypeError: can't convert complex to float
     ```
     ***ANSWER:***  When using twiss objects in mapclass, retuned values are complex.
+
     Use real: `print math.sqrt(mw.sigma(xory='x',sig=sigmaFFS.real)`
 +    
     ```python
