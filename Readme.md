@@ -26,9 +26,9 @@ MAPCLASS2 uses a transfer map either
  * loaded from a fort.18 file generated in MAD-X PTC,
  * or generates a map from a MAD-X twiss table output,
 
-to calculate the first and second order moments of a beam to any given order. In addition, several map manipulations can be done.
+to calculate the first and second order moments of a beam to any given map order. In addition, several map manipulations can be done.
 
-The beam is assumed gaussian in the x, px ,y ,py and t. The beam energy spread distribution could be chosen to be gaussian or uniform.
+The beam is assumed gaussian in the x, px, y, py and t. The beam energy spread distribution could be chosen to be gaussian or uniform.
 
 
 INSTALL INSTRUCTIONS
@@ -109,7 +109,7 @@ calculations.
 ```
 NAME, KEYWORD, S, L, BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DPX, DY, DPY, ANGLE, K1L, K2L, K3L, K4L
 ```
-***WARNING: Some functions assume elements referenced to its exit side.***
+  ***WARNING: Some functions assume elements referenced to its exit side.***
 + fort.18 files from MAD-X PTC
 
   Check the PTC module docs in MAD-X as it is very powerful. Here is a common MAD-X coding example to generate fort.18 file.
@@ -145,37 +145,25 @@ QUICK Q/A
 
     `tw.elems[0].KEYWORD` is the keyword used in MAD-X for the element zero. In general MAPCLASS2 uses the same 
     twiss file column names except
-    for `TNAME` which is `TableNAME` (TNAME does not exists in MAD-X).
+    for `TNAME` which is `TableNAME` (TNAME does not exist in MAD-X).
 
     `tw.elems[0].BETX` is the betax twiss value at the EXIT of the element.
 
     ***WARNING!!!: it is always the EXIT, twiss file should be generated accordingly.***
   + How to get betas at any point?
 
-    `tw.getBeta(#,0)` where `#` is the element number and `0` is position in the element. Here s=0
+    e.g. `tw.getBeta(3,0.5)` where `3` is the element number and `0.5` is position in the element. Position equal to 0
     refers to ENTRY side.
+
     To get betas at the output you could use:
 ```
-      tw.elems[#].BETX (faster option)
-      tw.getBeta(#,tw.elems[#].L)
+      tw.elems[3].BETX #(faster option)
+      tw.getBeta(3,tw.elems[3].L)
 ```
-  + How to get phase at any point?
+  + How to get the phase advance at any point?
 
-    `tw.getPhase(#,0)`
+    e.g. `tw.getPhase(#,0)`
     exactly the same as in `getBeta()`
-  + How do I get the horizontal polynomial expression?
-
-    ```python
-    print mymap.x   ### prints all the polynoms in x
-    ```
-
-    It can be used with either x,px,y,py,d,s.
-  + How do I check an specific component on the map?
-    ```python
-      print mymap.x[0,0,0,0,1] # 5 dim map, prints the hor. dependence on d
-      print mymap.y[0,0,0,1,2] # 5 dim map, prints the  ver. dep. on py*d**2 
-    ```
-    if the map is 6 dimensional, then, it needs 6 indexes
 ### Using fort.18 files or twiss files
   + How do I load a map?
 
@@ -212,6 +200,18 @@ QUICK Q/A
 
       `tw.sigmaBends2a(E=theenergy)`
       #### NOTE: it returns the squared value.
+  + How do I get the horizontal polynomial expression?
+
+    ```python
+    print mymap.x   ### prints all the polynoms in x
+    ```
+    It can be used with x, px, y, py, d, s.
+  + How do I check an specific component on the map?
+    ```python
+      print mymap.x[0,0,0,0,1] # 5 dim map, prints the hor. dependence on d
+      print mymap.y[0,0,0,1,2] # 5 dim map, prints the  ver. dep. on py*d**2 
+    ```
+    if the map is 6 dimensional, then, it needs 6 indexes
 
 
 SIMPLE TROUBLESHOOTING
