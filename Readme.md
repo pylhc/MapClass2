@@ -1,8 +1,22 @@
-MAPCLASS2
-=========
-A code to aid the optimisation of lattice design.
-
+MAPCLASS2 (A code to aid the optimisation of lattice design)
+============================================================
 This Readme.md contains a brief explanation, installation and use instructions.
+
+See, bibliography section :
+
+[1] a conceptual review.
+
+[2] use and detailed python code explanations.
+
+[3] C++ and CUDA libraries.
+
+[4] radiation and Oide effect.
+
+[5] Appendix B, the fort.18 file details.
+
+[6] MAD-X in general
+
+[7] initial MAPCLASS code.
 
 DESCRIPTION
 -----------
@@ -14,24 +28,8 @@ to calculate the first and second order moments of a beam to any given order. In
 The beam is assumed gaussian in the x, px ,y ,py and t. The beam energy spread distribution could be chosen to be gaussian or uniform.
 
 
-See bibliography section, item [1] for a conceptual review.
-
-See bibliography section, item [2] for use and detailed python code
-                                         explanations.
-See bibliography section, item [3] for C++ and CUDA libraries.
-
-See bibliography section, item [4] for radiation and Oide effect.
-
-See bibliography section, item [5] B Appendix for fort.18 file details.
-
-See bibliography section, item [6] for MAD-X in general
-
-See bibliography section, item [7] for initial MAPCLASS code.
-
-
-
--------------------------------------------------------------------------------
 INSTALL INSTRUCTIONS
+--------------------
 Two options are available:
     C++ libraries (recommended)
     CUDA libraries (some build must be done in the working machine)
