@@ -1,22 +1,17 @@
 MAPCLASS2
 =========
-This is the MAPCLASS2 README file.
+A code to aid the optimisation of lattice design.
 
-It contains a brief explanation, content and use instructions.
+This Readme.md contains a brief explanation, installation and use instructions.
 
 DESCRIPTION
 -----------
-A code to aid the optimisation of lattice design.
+MAPCLASS2 uses a transfer map either
+ * loaded from a fort.18 file generated in MAD-X PTC,
+ * or generates a map from a MAD-X twiss table output,
+to calculate the first and second order moments of a beam to any given order. In addition, several map manipulations can be done.
 
-MAPCLASS2 uses transfer map either
- * read from fort.18 PTC module in MAD-X or 
- * generated from MAD-X twiss function
-to do several lattice computations, the most relevant up to now is the
-second order moment (beamsize) from the transfer map and a given input beam.
-
-Beam is assumed gaussian in x,y and s. 
-
-Beam energy spread distribution could be chosen to be gaussian or uniform.
+The beam is assumed gaussian in the x, px ,y ,py and t. The beam energy spread distribution could be chosen to be gaussian or uniform.
 
 
 See bibliography section, item [1] for a conceptual review.
