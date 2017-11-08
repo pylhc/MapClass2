@@ -1,7 +1,7 @@
 MAPCLASS2
 =========
-A code to aid the optimisation of lattice design
---------------------------------------------------
+### A code to aid the optimisation of lattice design
+
 This Readme.md contains a brief explanation, installation and use instructions.
 
 See, bibliography section :
@@ -79,32 +79,31 @@ $ git reset --hard
 SOFTWARE REQUIREMENTS
 ---------------------
 + Python 2.6 or higher is required (not tested with Python 3.X)
-   +  numpy library must be installed or add it to the 'libs' folder
+   +  numpy library must be installed or added to the 'libs' folder
 + gcc 4.4.3 or higher
     if working on the afs cern system and gcc is lower than 4.4.3, then do
+```bash
       $ source /afs/cern.ch/sw/lcg/external/gcc/4.4/x86_64-slc5/setup.sh
-(OPTIONAL)
-+ CUDA libraries
--------------------------------------------------------------------------------
+```
++ (OPTIONAL) CUDA libraries
+
 PROVIDED LIBRARIES
+------------------
 + boost library for running on lxplus cern server can be found in the libs
     folder or it can be installed when running on local machine
--------------------------------------------------------------------------------
 
 
--------------------------------------------------------------------------------
-HOW TO USE---------------------------------------------------------------------
--------------------------------------------------------------------------------
-From any Python terminal environment or script, it is possible to load the mo-
-dules: mapclass, metaclass2.
-
+HOW TO USE
+----------
+From any Python terminal environment or script, it is possible to load the modules mapclass and metaclass2.
+```python
 >>> import mapclass
 >>> import metaclass2
-
-now, a twiss or fort.18 file (MAD-X 5.X.X) is required to perform beamsize
+```
+now, a twiss or fort.18 file (from MAD-X 5.X.X) is required to perform beamsize
 calculations.
 
-INPUT FILES
+### INPUT FILES
 + twiss files from MAD-X
   Twiss file should be generated with at least the following columns:
       NAME, KEYWORD, S, L, BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DPX, DY, DPY,
@@ -121,14 +120,14 @@ INPUT FILES
         ptc_end; 
       !!! End MAD-X Code
 
--------------------------------------------------------------------------------
-EXAMPLES
-Some examples of use can be found in ./doc/FFSexample
--------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
+EXAMPLES
+--------
+Some examples of use can be found in ./doc/FFSexample
+
+
 QUICK Q/A
+---------
 ++++ Using twiss files
   + How to load a twiss file?
     In a python script or shell:
