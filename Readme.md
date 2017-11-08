@@ -47,17 +47,21 @@ Two options are available:
 ```
 3. Python variables need to be modified in order to load libraries and run it.
 In Linux systems there are three ways (in all cases see below NOTE):
-+ by adding ~/.bashrc file
-        export LD_LIBRARY_PATH=
-    	   $LD_LIBRARY_PATH:path_to_libs_boost_1_53_0_libboost_python.so.1.53.0      
-        export PYTHONPATH=
-    	   $PYTHONPATH:path_to_MapClass:path_to_mapbeamline.so
-+ by loading them in the user Python script, for example
+* by adding ~/.bashrc file
+```bash
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:path_to_libs_boost_1_53_0_libboost_python.so.1.53.0      
+        export PYTHONPATH=$PYTHONPATH:path_to_MapClass:path_to_mapbeamline.so
+```
+* by loading them in the user Python script, for example
+```python
       cdll.LoadLibrary("path/to/libs/boost_1_53_0/libboost_python.so.1.53.0")
+```
     and equivalent for the mapbeamline.so
-+ by copying the .so files to the working directory
+* by copying the .so files to the working directory
+```
     libboost_python.so.1.53.0
     mapbeamline.so
+```
 NOTE: Choose one of these options
   IF USING C++ LIBRARIES (recommended), use "C++MapConstruction" dir 
   IF USING CUDA LIBRARIES (it must be build), use "CUDAMapConstruction" dir
@@ -67,8 +71,9 @@ To update, move to MapClass2 folder:
 $ git pull
 To recover in an accidental file remove or modification
 $ git reset --hard
--------------------------------------------------------------------------------
+
 SOFTWARE REQUIREMENTS
+---------------------
 + Python 2.6 or higher is required (not tested with Python 3.X)
    +  numpy library must be installed or add it to the 'libs' folder
 + gcc 4.4.3 or higher
