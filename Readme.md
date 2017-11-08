@@ -178,14 +178,16 @@ QUICK Q/A
 
     Using a map `m`, either `mf` or `mt` (the calculation from a fort.18 is generally more precise)
     ```python
-      m.sndmmt('y',[sx,spx,sy,spy,dpp,t])
-      m.rstmmt('y',[sx,spx,sy,spy,dpp,t])
-      beamsize = m.sndmmt - m.rstmmt**2
+      import math
+      rms=m.sndmmt('y',[sx,spx,sy,spy,dpp,t])
+      mu =m.rstmmt('y',[sx,spx,sy,spy,dpp,t])
+      beamsize = math.sqrt(rms - mu**2)
     ```
     ***NOTE:***
         sx,spx,sy,spy and t are one sigma of the gaussian distribution
         dpp: either one sigma of the gaussian distribution
              or total width of uniform centered energy spread distribution
+
     ***WARNING:***
         `m.sigma` returns squared value already!
         `m.sigma` and `m.offset` are still valid for backwards compatibility
