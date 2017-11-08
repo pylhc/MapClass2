@@ -176,11 +176,11 @@ QUICK Q/A
     where `tw` is a twiss object created with metaclass2 module
   + How to calculate the beamsize
 
-    Using a map m, either mf or mt (from a fort.18 is more precise)
-    ```
-    m.sndmmt('y',[sx,spx,sy,spy,dpp,t])
-    m.rstmmt('y',[sx,spx,sy,spy,dpp,t])
-    beamsize = m.sndmmt - m.rstmmt**2
+    Using a map `m`, either `mf` or `mt` (from a fort.18 is more precise)
+    ```python
+      m.sndmmt('y',[sx,spx,sy,spy,dpp,t])
+      m.rstmmt('y',[sx,spx,sy,spy,dpp,t])
+      beamsize = m.sndmmt - m.rstmmt**2
     ```
     #### NOTE:
         sx,spx,sy,spy and t are one sigma of the gaussian distribution
