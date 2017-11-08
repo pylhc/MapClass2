@@ -1,6 +1,6 @@
 MAPCLASS2
 =========
-(A code to aid the optimisation of lattice design)
+A code to aid the optimisation of lattice design
 --------------------------------------------------
 This Readme.md contains a brief explanation, installation and use instructions.
 
@@ -33,11 +33,13 @@ The beam is assumed gaussian in the x, px ,y ,py and t. The beam energy spread d
 INSTALL INSTRUCTIONS
 --------------------
 Two options are available:
-    C++ libraries (recommended)
+    C++ libraries (recommended) and
     CUDA libraries (some build must be done in the working machine)
 
 1. From a terminal, move to desired installation directory, then do:
+```bash
   $ git clone https://github.com/pylhc/MapClass2.git
+```
 2. Move to the MapClass2 created folder and do:
   $ git submodule init
   $ git submodule update
