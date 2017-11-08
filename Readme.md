@@ -25,6 +25,7 @@ DESCRIPTION
 MAPCLASS2 uses a transfer map either
  * loaded from a fort.18 file generated in MAD-X PTC,
  * or generates a map from a MAD-X twiss table output,
+
 to calculate the first and second order moments of a beam to any given order. In addition, several map manipulations can be done.
 
 The beam is assumed gaussian in the x, px ,y ,py and t. The beam energy spread distribution could be chosen to be gaussian or uniform.
@@ -56,22 +57,25 @@ In Linux systems there are three ways (in all cases see below NOTE):
 ```python
       cdll.LoadLibrary("path/to/libs/boost_1_53_0/libboost_python.so.1.53.0")
 ```
-    and equivalent for the mapbeamline.so
+and equivalent for the mapbeamline.so
 * by copying the .so files to the working directory
 ```
     libboost_python.so.1.53.0
     mapbeamline.so
 ```
-NOTE: Choose one of these options
-  IF USING C++ LIBRARIES (recommended), use "C++MapConstruction" dir 
-  IF USING CUDA LIBRARIES (it must be build), use "CUDAMapConstruction" dir
+### NOTE: 
+*  If you choose C++ LIBRARIES (recommended), use the "C++MapConstruction" dir 
+*  IF you choose CUDA LIBRARIES (it must be build), use the "CUDAMapConstruction" dir
 
-COMMENTS:
+### COMMENTS:
 To update, move to MapClass2 folder:
+```bash
 $ git pull
+```
 To recover in an accidental file remove or modification
+```bash
 $ git reset --hard
-
+```
 SOFTWARE REQUIREMENTS
 ---------------------
 + Python 2.6 or higher is required (not tested with Python 3.X)
