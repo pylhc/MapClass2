@@ -193,10 +193,10 @@ QUICK Q/A
         `m.sigma` and `m.offset` are still valid for backwards compatibility
   + How to calculate oide effect?
 
-    `tw.oide(emitn,gamm)`
+    `tw.oide(emitn,gamma)`
       where emitn is normalized emittance, gamma is the relativistic factor. 
-      Check the function declaration, it has other parameters, this is a 
-      minimum implementation
+      Check the function declaration, it has other parameters, this is an example with 
+      minimum parameters
   + How to calculate beam size contribution due to radiation in bending
       magnets?
 
@@ -218,7 +218,6 @@ QUICK Q/A
 
 SIMPLE TROUBLESHOOTING
 ----------------------
-### ERRORS
   + 
     ```python
        Traceback (most recent call last):
@@ -247,11 +246,7 @@ SIMPLE TROUBLESHOOTING
     TypeError: can't convert complex to float
     ```
     ***ANSWER:***  When using twiss objects in mapclass, retuned values are complex.
-    Use real:
-    ```
-    print math.sqrt(mw.sigma(xory='x',sig=sigmaFFS.real)
-    ```
-
+    Use real: `print math.sqrt(mw.sigma(xory='x',sig=sigmaFFS.real)`
 +    
     ```python
     No implementation for element:  TWISS MARKER
@@ -289,6 +284,6 @@ LICENCE
 -------
 Code was originally written by R. Tomas (CERN)
 
-CONTACT/COMMENTS/QUESTIONS
+CONTACT
 --------------------------
-email: orblancog@gmail.com
+email: orblancog@gmail.com, rogelio.tomas@cern.ch
