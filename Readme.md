@@ -216,9 +216,10 @@ QUICK Q/A
 
 SIMPLE TROUBLESHOOTING
 ----------------------
-### ERROR
-  + Traceback (most recent call last):
-    ```
+### ERRORS
+  + 
+    ```python
+       Traceback (most recent call last):
        File ".../MapClass2/mapclass.py", line 227, in sigma
        sigmaprod = self.__sigma(ind, sig, gaussianDelta)
        File ".../MapClass2/mapclass.py", line 392, in __sigma
@@ -226,56 +227,66 @@ SIMPLE TROUBLESHOOTING
     ```
     ***ANSWER:*** Only 5 elements in the passed sigmas list [sx,...], there must be six
 
-+ ERROR
-mw=mapclass.Map2("fort.18")
-Traceback (most recent call last):
-  File ".../MapClass2/mapclass.py", line 219, in sigma
++ 
+    ```python
+    mw=mapclass.Map2("fort.18")
+    Traceback (most recent call last):
+    File ".../MapClass2/mapclass.py", line 219, in sigma
     for ind1, coeff1 in self[xory].iteritems():
-KeyError: 'x'
-ANSWER: Missing argument, correct call example is
-  mw=mapclass.Map2(1,"fort.18")
+    KeyError: 'x'
+    ```
+    ***ANSWER:*** Missing argument, correct call example is
+    ` mw=mapclass.Map2(1,"fort.18")`
 
-+ ERROR
-print math.sqrt(mw.sigma(xory='x',sig=sigmaFFS))
-Traceback (most recent call last):
-TypeError: can't convert complex to float
-ANSWER:  When using twiss objects in mapclass, retuned values are complex.
-  Use real:
++ 
+    ```python
+    print math.sqrt(mw.sigma(xory='x',sig=sigmaFFS))
+    Traceback (most recent call last):
+    TypeError: can't convert complex to float
+    ```
+    ***ANSWER:***  When using twiss objects in mapclass, retuned values are complex.
+    Use real:
+    ```
     print math.sqrt(mw.sigma(xory='x',sig=sigmaFFS.real)
+    ```
 
-+ ERROR
-No implementation for element:  TWISS MARKER
-ANSWER: all is OK, this is an info message
++    
+    ```python
+    No implementation for element:  TWISS MARKER
+    ```
+    ***ANSWER:*** all is OK, this is an info message
 
--------------------------------------------------------------------------------
-BIBLIOGRAPHY-------------------------------------------------------------------
--------------------------------------------------------------------------------
+
+BIBLIOGRAPHY
+------------
 [1] R. Tomas. Nonlinear optimization of beams lines. PRST - AB 9,081001 (2006).
+
 [2] Martinez, David et al. MAPCLASS2: a code to aid the optimization of 
       lattice design. CERN-ATS-Note-2012-087 TECH. Nov 01, 2012.
+
 [3] Diana Andreea Popescu. Parallel Computing Methods for Particle Accelerator
       Design. Master Thesis. Ecole Polytechnique Federale de Lausanne, CERN.
       July, 2013.
+
 [4] O.R. Blanco et al. CLIC 3TeV Beam Size Optimization with Radiation Effects.
       Proceedings of IPAC2013, Shanghai, China. TUPW0003.
+
 [5] E. FOREST et al. Introduction to Polymorphic Tracking Code. Fibre Bundles,
       Polymorphic Taylor Types and "Exact Tracking". Geneva, Switzerland.
       July 24, 2002.
       CERN-SL-2002-044 (AP).
       KEK-Report 2002-3.
+
 [6] MAD-X. http://mad.web.cern.ch/mad/
+
 [7] R. Tomas. MAPCLASS: a code to optimize high order aberrations.
       CERN-AB-Note-2006-017. Jan 15, 2007.
 
--------------------------------------------------------------------------------
-LICENCE------------------------------------------------------------------------
--------------------------------------------------------------------------------
+
+LICENCE
+-------
 Code was originally written by R. Tomas (CERN)
 
-
-
--------------------------------------------------------------------------------
-CONTACT/COMMENTS/QUESTIONS-----------------------------------------------------
--------------------------------------------------------------------------------
-O. BLANCO oscar.roberto.blanco.garcia@cern.ch
-
+CONTACT/COMMENTS/QUESTIONS
+--------------------------
+email: orblancog@gmail.com
