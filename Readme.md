@@ -1,5 +1,7 @@
-MAPCLASS2 (A code to aid the optimisation of lattice design)
-============================================================
+MAPCLASS2
+=========
+(A code to aid the optimisation of lattice design)
+--------------------------------------------------
 This Readme.md contains a brief explanation, installation and use instructions.
 
 See, bibliography section :
