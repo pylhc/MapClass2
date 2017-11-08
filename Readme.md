@@ -65,7 +65,7 @@ and equivalent for the mapbeamline.so
 ```
 ### NOTE: 
 *  If you choose C++ LIBRARIES (recommended), use the "C++MapConstruction" dir 
-*  IF you choose CUDA LIBRARIES (it must be build), use the "CUDAMapConstruction" dir
+*  If you choose CUDA LIBRARIES (it must be build), use the "CUDAMapConstruction" dir
 
 ### COMMENTS:
 To update, move to MapClass2 folder:
@@ -80,8 +80,8 @@ SOFTWARE REQUIREMENTS
 ---------------------
 + Python 2.6 or higher is required (not tested with Python 3.X)
    +  numpy library must be installed or added to the 'libs' folder
-+ gcc 4.4.3 or higher
-    if working on the afs cern system and gcc is lower than 4.4.3, then do
++ gcc 4.4.3 or higher.
+   +  If working on the cern afs and your gcc is lower than 4.4.3, then do
 ```bash
       $ source /afs/cern.ch/sw/lcg/external/gcc/4.4/x86_64-slc5/setup.sh
 ```
@@ -106,12 +106,14 @@ calculations.
 ### INPUT FILES
 + twiss files from MAD-X
   Twiss file should be generated with at least the following columns:
-      NAME, KEYWORD, S, L, BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DPX, DY, DPY,
-         ANGLE,K1L, K2L, K3L, K4L
-  WARNING: All elements should be referenced to its exit side.
+```
+NAME, KEYWORD, S, L, BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DPX, DY, DPY, ANGLE, K1L, K2L, K3L, K4L
+```
+#### WARNING: All elements should be referenced to its exit side.
 + fort.18 files from MAD-X PTC
-  Check the PTC module docs in MAD-X as it is very powerful. Here is a common
-    MAD-X coding example to generate fort.18 file.
+
+  Check the PTC module docs in MAD-X as it is very powerful. Here is a common MAD-X coding example to generate fort.18 file.
+```
       !!! MAD-X Code
       !###PTC  To procude fort.18
         ptc_create_universe;
@@ -119,7 +121,7 @@ calculations.
         ptc_normal,icase=5,no=8,deltap=0.00;
         ptc_end; 
       !!! End MAD-X Code
-
+```
 
 EXAMPLES
 --------
