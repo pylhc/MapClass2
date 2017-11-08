@@ -146,25 +146,35 @@ QUICK Q/A
     `tw.elems[0].KEYWORD` is the keyword used in MAD-X for the element zero. In general MAPCLASS2 uses the same 
     twiss file column names except
     for `TNAME` which is `TableNAME` (TNAME does not exists in MAD-X).
-    `tw.elems[0].BETX` is the betax twiss value at the EXIT of the element
-#### WARNING!!!: it is always the EXIT, twiss file should be generated accord-
-    ingly.
+
+    `tw.elems[0].BETX` is the betax twiss value at the EXIT of the element.
+
+    ***WARNING!!!: it is always the EXIT, twiss file should be generated accordingly.***
   + How to get betas at any point?
-      tw.getBeta(#,0)
-    where # is the element number and 0 is position in the element. Here s=0
-    refers to ENTRANCE side.
+
+    `tw.getBeta(#,0)` where `#` is the element number and `0` is position in the element. Here s=0
+    refers to ENTRY side.
     To get betas at the output you could use:
+```
       tw.elems[#].BETX (faster option)
       tw.getBeta(#,tw.elems[#].L)
+```
   + How to get phase at any point?
-      tw.getPhase(#,0)
-    exactly the same as in getBeta()
+
+    `tw.getPhase(#,0)`
+    exactly the same as in `getBeta()`
   + How do I get the horizontal polynomial expression?
-      print mymap.x   ### prints all the polynoms in x
+
+    ```python
+    print mymap.x   ### prints all the polynoms in x
+    ```
+
     It can be used with either x,px,y,py,d,s.
   + How do I check an specific component on the map?
+    ```python
       print mymap.x[0,0,0,0,1] # 5 dim map, prints the hor. dependence on d
       print mymap.y[0,0,0,1,2] # 5 dim map, prints the  ver. dep. on py*d**2 
+    ```
     if the map is 6 dimensional, then, it needs 6 indexes
 ### Using fort.18 files or twiss files
   + How do I load a map?
