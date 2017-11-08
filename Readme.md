@@ -184,8 +184,8 @@ QUICK Q/A
       beamsize = math.sqrt(rms - mu**2)
     ```
     ***NOTE:***
-        sx,spx,sy,spy and t are one sigma of the gaussian distribution
-        dpp: either one sigma of the gaussian distribution
+        `sx`, `spx`, `sy`, `spy` and `t` are one sigma of the gaussian distribution, while
+        `dpp`: either one sigma of the gaussian distribution
              or total width of uniform centered energy spread distribution
 
     ***WARNING:***
