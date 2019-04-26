@@ -26,7 +26,7 @@ template <class T> Polynom<T> expp(Polynom<T> c) {
 	vector<T> lst;
 	lst.push_back(exp(a0));
 	for (int i = 1; i < c.order + 1; ++i) 
-		lst.push_back(-lst[i - 1]/i);
+		lst.push_back(lst[i - 1]/i);
 	return Polynom<T>::phorner(lst, p);
 }
 
@@ -76,7 +76,7 @@ template <class T> Polynom<T> sinhp(Polynom<T> c) {
 	lst.push_back(sinh(a0));
 	lst.push_back(cosh(a0));
 	for (int i = 2; i < c.order + 1; ++i) 
-		lst.push_back(-lst[i - 2]/i/(i - 1));
+		lst.push_back(lst[i - 2]/i/(i - 1));
 	return Polynom<T>::phorner(lst, p);
 }
 
@@ -87,6 +87,6 @@ template <class T> Polynom<T> coshp(Polynom<T> c) {
 	lst.push_back(cosh(a0));
 	lst.push_back(sinh(a0));
 	for (int i = 2; i < c.order + 1; ++i) 
-		lst.push_back(-lst[i - 2]/i/(i - 1));
+		lst.push_back(lst[i - 2]/i/(i - 1));
 	return Polynom<T>::phorner(lst, p);
 }
