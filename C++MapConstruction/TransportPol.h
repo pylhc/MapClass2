@@ -211,7 +211,7 @@ static vector<Polynom<complex<double>>> EQ(int n, int order) {
 	
 	lst.push_back(init);
 	for (int i = 2; i <= n; i ++) {
-		lst.push_back((lst[i - 2] * init) * (1./factorial(i)));
+		lst.push_back((lst[i - 2] * init) * (1./(i)));
 	}
 	return lst;
 }
