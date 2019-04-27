@@ -126,16 +126,16 @@ QUICK Q/A
   + How to load a twiss file?
 
     In a python script or shell:
-```
-      import metaclass2
-      tw = metaclass2.twiss2("twissfilename")
+``` python
+    import metaclass2
+    tw = metaclass2.twiss2("twissfilename")
 ```
   + How to check what was loaded?
 
     `len(tw.elems)` tells you how many elements were loaded, while
     `tw.elems[0]` is the first loaded element.
 
-    `tw.elems[0].KEYWORD` is the keyword used in MAD-X for the element zero. In general MAPCLASS2 uses the same 
+    `tw.elems[0].KEYWORD` is the keyword used in MAD-X for the element zero. MapClass2 uses the same 
     twiss file column names except
     for `TNAME` which is `TableNAME` (TNAME does not exist in MAD-X).
 
@@ -144,8 +144,7 @@ QUICK Q/A
     ***WARNING!!!: it is always the EXIT, twiss file should be generated accordingly.***
   + How to get betas at any point?
 
-    e.g. `tw.getBeta(3,0.5)` where `3` is the element number and `0.5` is position in the element. Position equal to 0
-    refers to ENTRY side.
+    e.g. `tw.getBeta(3,0.5)` where `3` is the element number and `0.5` is position in the element in meters. `tw.getBeta(3,0)` refers the twiss beta at the ENTRY side.
 
     To get betas at the output you could use:
 ```
@@ -161,21 +160,22 @@ QUICK Q/A
 
     Create a Map2 from either a fort.18 or a twiss file.
     ``` python
-      import mapclass
-      mf = mapclass.Map2(4,"fort.18")
-      mt = mapclass.Map2(tw,4)
+    import mapclass
+    mf = mapclass.Map2(4,"fort.18")
+    mt = mapclass.Map2(tw,4)
     ```
-    where `tw` is a twiss object created with metaclass2 module and `4` is the map order. MAPCLASS2 
-    do not check the map order inside the fort.18 file, therefore, the map requested with `MaP2` should be of the
-    same order or smaller.
+    where `tw` is a twiss object created with `metaclass2` module and `4` is the map order.
+
+    In the case of a fort.18 file, please, checka that The map order in `Map2` is smaller or equal to the fort.18 map.
+
   + How to calculate the beamsize
 
     Using a map `m`, from either a twiss or a fort.18 file (the calculation from a fort.18 is generally more precise)
     ```python
       import math
-      rms=m.sndmmt('y',[sx,spx,sy,spy,dpp,t])
+      var=m.sndmmt('y',[sx,spx,sy,spy,dpp,t])
       mu =m.rstmmt('y',[sx,spx,sy,spy,dpp,t])
-      beamsize = math.sqrt(rms - mu**2)
+      beamsize = math.sqrt(var - mu**2)
     ```
     ***NOTE:***
         `sx`, `spx`, `sy`, `spy` and `t` are one sigma of the gaussian distribution, while
@@ -185,6 +185,7 @@ QUICK Q/A
     ***WARNING:***
         `m.sigma` returns squared value already!
         `m.sigma` and `m.offset` are still valid for backwards compatibility
+	
   + How to calculate oide effect?
 
     `tw.oide(emitn,gamma)`
@@ -199,13 +200,13 @@ QUICK Q/A
   + How do I get the horizontal polynomial expression?
 
     ```python
-    print mymap.x   ### prints all the polynoms in x
+    print mymap.x   ### prints all the monoms in x
     ```
     It can be used with x, px, y, py, d, s.
   + How do I check an specific component on the map?
     ```python
       print mymap.x[0,0,0,0,1] # 5 dim map, prints the hor. dependence on d
-      print mymap.y[0,0,0,1,2] # 5 dim map, prints the  ver. dep. on py*d**2 
+      print mymap.y[0,0,0,1,2] # 5 dim map, prints the  ver. dep. on py * d**2 
     ```
     if the map is 6 dimensional, then, it needs 6 indexes
 
