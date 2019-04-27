@@ -1,104 +1,98 @@
 MAPCLASS2
 =========
-### A code to aid the optimisation of lattice design
+### A code to aid particle accelerator lattice design and optimization
 
-This Readme.md contains a brief explanation, installation and use instructions.
+This Readme.md contains a brief description of the code purpose, installation instructions and usage.
 
-See, bibliography section :
+For a more comprehensive description, refer to the bibliography section, where you can find :
 
-[1] a conceptual review.
+[1] a conceptual review,
 
-[2] use and detailed python code explanations.
+[2] use and detailed python code explanations,
 
-[3] C++ and CUDA libraries.
+[3] the implemention with C++ and CUDA libraries,
 
-[4] radiation and Oide effect.
+[4] effects of radiation in dipoles and quadrupoles (Oide effect),
 
-[5] Appendix B, the fort.18 file details.
+[5] the fort.18 file details, in Appendix B,
 
-[6] MAD-X in general
+[6] the MAD-X project,
 
-[7] initial MAPCLASS code.
+[7] and the initial MAPCLASS code.
 
 DESCRIPTION
 -----------
-MAPCLASS2 uses a transfer map either
- * loaded from a fort.18 file generated in MAD-X PTC,
- * or generates a map from a MAD-X twiss table output,
+The transport of a particle beam through out an accelerator requires the calculation of the beam properties, e.g. beamsize in the transverse planes, correlation, etc. Typically, it is done by tracking several hundreds to thousands of particles, with an statistical post-analysis. Such process could be computationlly intensive and too slow for very long or complicated transfer lines. On top of that, during the lattice design and iterative optimization one would like to explore several possibilities, and it would be advatageous to reduce the time of calculation.
 
-to calculate the first and second order moments of a beam to any given map order. In addition, several map manipulations can be done.
+MAPCLASS was written to perform a fast calculation of the beam size at the output, given a lattice and a beamsize at the input. Therefore, it avoids the time consuming single particle tracking. It has extended in MAPCLASS2 to calculate twiss functions inside elements, correlations in the phase space and many others.
 
-The beam is assumed gaussian in x, px, y, py and t. The beam energy spread distribution could be chosen to be gaussian or uniform.
+The main input to MAPCLASS2 is the lattice, either from
+ * a fort.18 file generated in MAD-X PTC, or, alternatively
+ * a twiss file from MAD-X
+ 
+Naturally, in order to give fast results we must make a simplification. MAPCLASS assumes the beam at the entry point is gaussian in the horizontal phase space (x, px), vertical phase space (y, py) and longitudinal position (t). The beam energy spread distribution could be chosen to be gaussian or uniform. Also, the lattice twiss parameters alfx and alfy must be zero.
 
 
 INSTALL INSTRUCTIONS
 --------------------
-Two options are available:
-    C++ libraries (recommended) and
-    CUDA libraries (some build must be done in the working machine)
+Two options are available: C++ libraries (recommended),and CUDA libraries (paralelization)
 
-1. From a terminal, move to desired installation directory, then do:
+1. From a bash terminal, move to desired location, and then execute the following lines:
 ```bash
-  $ git clone https://github.com/pylhc/MapClass2.git
+git clone https://github.com/pylhc/MapClass2.git
+cd MapClass2
+git submodule init
+git submodule update
 ```
-2. Move to the MapClass2 created folder and do:
-```bash
-  $ git submodule init
-  $ git submodule update
-```
-3. Python variables need to be modified in order to load libraries and run it.
-In Linux systems there are three ways (in all cases see below NOTE):
-* by adding ~/.bashrc file
-```bash
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:path_to_libs_boost_1_53_0_libboost_python.so.1.53.0      
-        export PYTHONPATH=$PYTHONPATH:path_to_MapClass:path_to_mapbeamline.so
-```
-* by loading them in the user Python script, for example
+
+2. The Python variables need to be modified in order to load libraries and run it. Here are two ways to do it :
+
+* Include the path inside the python script where you call MAPCLASS2, e.g.
 ```python
-      cdll.LoadLibrary("path/to/libs/boost_1_53_0/libboost_python.so.1.53.0")
+import sys, ctypes
+sys.path.append('/home/o/MapClass2_C++_2019/MapClass2/')
+sys.path.append('/home/o/MapClass2_C++_2019/MapClass2/C++MapConstruction/')
+ctypes.cdll.LoadLibrary("/home/o/MapClass2/libs/boost_1_53_0/libboost_python.so.1.53.0")
 ```
-and equivalent for the mapbeamline.so, and mapclass.py
-* by copying the .so files to the working directory and working inside the MAPCLASS2 dir
-```
-    libboost_python.so.1.53.0
-    mapbeamline.so
-```
-#### NOTE: 
-*  If you choose C++ LIBRARIES (recommended), use the "C++MapConstruction" dir 
-*  If you choose CUDA LIBRARIES (it must be build), use the "CUDAMapConstruction" dir
 
-#### COMMENTS: for the new users of git
+* by adding ~/.bashrc file the paths, e.g.
+```bash
+### Mapclass2_C++
+export PYTHONPATH="/home/ob1/MapClass2:$PYTHONPATH"
+export PYTHONPATH="$PYTHONPATH:/home/o/MapClass2/C++MapConstruction"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/o/MapClass2/libs/boost_1_53_0"
+
+```
+#### NOTE: In the previous example we show the usage of C++ LIBRARIES (recommended) in the "C++MapConstruction" dir. If you choose CUDA LIBRARIES (it must be build), use the "CUDAMapConstruction" dir
+
+#### COMMENTS: If you are new to git commands  
 To update, move to MapClass2 folder:
 ```bash
-$ git pull
+git pull
 ```
 To recover in an accidental file remove or modification
 ```bash
-$ git reset --hard
+git reset --hard
 ```
+
 SOFTWARE REQUIREMENTS
 ---------------------
-+ Python 2.6 or higher is required (not tested with Python 3.X)
-   +  numpy library must be installed or added to the 'libs' folder
++ Python 2.6 or higher is required (not tested with Python 3)
+   +  numpy library must be installed or added to the 'libs' folder (tested 1.13.3)
 + gcc 4.4.3 or higher.
    +  If working on the cern afs and your gcc is lower than 4.4.3, then do
 ```bash
-      $ source /afs/cern.ch/sw/lcg/external/gcc/4.4/x86_64-slc5/setup.sh
+source /afs/cern.ch/sw/lcg/external/gcc/4.4/x86_64-slc5/setup.sh
 ```
 + (OPTIONAL) CUDA libraries
-
-PROVIDED LIBRARIES
-------------------
-+ boost library for running on lxplus cern server can be found in the libs
-    folder or it can be installed when running on local machine
 
 
 HOW TO USE
 ----------
 From any Python terminal environment or script, it is possible to load the modules mapclass and metaclass2.
 ```python
->>> import mapclass
->>> import metaclass2
+import mapclass
+import metaclass2
 ```
 now, a twiss or fort.18 file (from MAD-X 5.X.X) is required to perform beamsize
 calculations.
