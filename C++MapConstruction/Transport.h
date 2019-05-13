@@ -155,6 +155,23 @@ template <class T> Polynom<T>  D34(double L, Polynom<T> d) {
 	return (d + 1).pinv() * L;
 }
 
+template <class T> Polmap<T> RotMap(double e, double L, double ANGLE, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
+  unordered_map<string, Polynom<T>> mp;
+  double phi = 0;// correction term. Handbook of accelerators sec2.2 Pole face rotation matrix
+  
+  double d21  = ANGLE/L * tan(e) ;
+  double d43  = -1*ANGLE/L * tan ( e - phi ) ;
+
+  mp[xstring]  =  x ;
+  mp[pxstring] = d21 * x  +  px ;
+  mp[ystring]  =  y ;
+  mp[pystring] = d43 * y  +  py ;
+  mp[dstring]  = d;
+  mp[sstring]  = s;
+
+  return Polmap<T>(mp);
+}
+
 template <class T> Polmap<T> DIMap(double L,double ANGLE, Polynom<T> x, Polynom<T> px, Polynom<T> y, Polynom<T> py, Polynom<T> d, Polynom<T> s) {
 	unordered_map<string, Polynom<T>> mp;
   	Polynom<T> d11 = D11(L, ANGLE, d);
@@ -169,6 +186,9 @@ template <class T> Polmap<T> DIMap(double L,double ANGLE, Polynom<T> x, Polynom<
   	mp[pystring] = py;
   	mp[dstring] = d;
   	mp[sstring] = s;
+
+	
+
   	return Polmap<T>(mp);
 }
 
@@ -306,6 +326,8 @@ template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, vect
 	double k3l = atof(e["K3L"].c_str());
 	double k4l = atof(e["K4L"].c_str());
 	double angle = atof(e["ANGLE"].c_str());
+	double e1 = atof(e["E1"].c_str());
+	double e2 = atof(e["E2"].c_str());
 
 	string drift       = "DRIFT";
 	string rcollimator = "RCOLLIMATOR";
@@ -340,10 +362,18 @@ template <class T> Polmap<T> mapForElement(unordered_map<string, string> e, vect
           			return QDMap(l, k1l, x, px, y, py, d, s);
           } 
 	if (keyword.compare(sbend) == 0) {
-	        if (angle == 0 )
-	                return DRIFTMap(l, x, px, y, py, d, s);
-         	else
-     		        return DIMap(l, angle, x, px, y, py, d, s);        
+	  Polmap<T> tmpmap;
+	  if (angle == 0 ) tmpmap = DRIFTMap(l, x, px, y, py, d, s);
+	  else tmpmap = DIMap(l, angle, x, px, y, py, d, s);
+	  if ( e1 == 0 && e2 == 0 )
+	    return tmpmap;
+	  else
+	    if ( e1 != 0 && e2 == 0)
+	      return tmpmap * RotMap(e1, l, angle, x, px, y, py, d, s);
+	  if ( e1 == 0 && e2 != 0)
+	    return RotMap(e2, l, angle, x, px, y, py, d, s) * tmpmap ;
+	  else
+	    return RotMap(e2, l, angle, x, px, y, py, d, s) * tmpmap * RotMap(e1, l, angle, x, px, y, py, d, s);
 	}  
     	if (keyword.compare(quadrupole) == 0)
      		if (l == 0)
